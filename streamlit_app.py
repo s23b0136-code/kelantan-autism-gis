@@ -1207,105 +1207,106 @@ if page == "Dashboard":
 elif page == "Student Registry":
     with st.container(border=True):
         st.subheader("Student Registry — Edit & Insert Records")
-    with st.expander("➕ Insert New Student Record", expanded=False):
-        with st.form("insert_student_form", clear_on_submit=True):
-            c1, c2, c3, c4 = st.columns(4)
-            new_id = c1.text_input("Record ID", value=f"KOD-{1000 + len(df_students)}")
-            new_ident = c2.text_input("Identifier", value=f"Child Record #{len(df_students) + 1} (Anonymized)")
-            new_age = c3.number_input("Age", min_value=1, max_value=21, value=6)
-            new_dist = c4.selectbox("District", list(DISTRICT_INFO.keys()))
 
-            c5, c6, c7, c8 = st.columns(4)
-            new_diag = c5.selectbox("Diagnosis", ["Mild Autism", "High-Function Autism", "Severe Autism"])
-            new_serv = c6.selectbox("Required Service", ["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"])
-            new_date = c7.text_input("Date (YYYY-MM-DD)", value="2026-11-23")
-            new_status = c8.selectbox("Status", ["Verified Active", "Pending Verification"])
+        with st.expander("➕ Insert New Student Record", expanded=False):
+            with st.form("insert_student_form", clear_on_submit=True):
+                c1, c2, c3, c4 = st.columns(4)
+                new_id = c1.text_input("Record ID", value=f"KOD-{1000 + len(df_students)}")
+                new_ident = c2.text_input("Identifier", value=f"Child Record #{len(df_students) + 1} (Anonymized)")
+                new_age = c3.number_input("Age", min_value=1, max_value=21, value=6)
+                new_dist = c4.selectbox("District", list(DISTRICT_INFO.keys()))
 
-            if st.form_submit_button("Add Record"):
-                new_row = pd.DataFrame([{
-                    "Record ID": new_id.strip(),
-                    "Identifier": new_ident.strip(),
-                    "Age": int(new_age),
-                    "District": new_dist,
-                    "Diagnosis": new_diag,
-                    "Required Service": new_serv,
-                    "Date": new_date.strip(),
-                    "Status": new_status,
-                }])
-                st.session_state["student_df"] = pd.concat([st.session_state["student_df"], new_row], ignore_index=True)
-                st.success(f"Added {new_id}!")
-                st.rerun()
+                c5, c6, c7, c8 = st.columns(4)
+                new_diag = c5.selectbox("Diagnosis", ["Mild Autism", "High-Function Autism", "Severe Autism"])
+                new_serv = c6.selectbox("Required Service", ["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"])
+                new_date = c7.text_input("Date (YYYY-MM-DD)", value="2026-11-23")
+                new_status = c8.selectbox("Status", ["Verified Active", "Pending Verification"])
 
-    edited_df = st.data_editor(
-        st.session_state["student_df"],
-        num_rows="dynamic",
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "District": st.column_config.SelectboxColumn("District", options=list(DISTRICT_INFO.keys()), required=True),
-            "Diagnosis": st.column_config.SelectboxColumn("Diagnosis", options=["Mild Autism", "High-Function Autism", "Severe Autism"], required=True),
-            "Required Service": st.column_config.SelectboxColumn("Required Service", options=["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"], required=True),
-            "Status": st.column_config.SelectboxColumn("Status", options=["Verified Active", "Pending Verification"], required=True),
-        },
-    )
+                if st.form_submit_button("Add Record"):
+                    new_row = pd.DataFrame([{
+                        "Record ID": new_id.strip(),
+                        "Identifier": new_ident.strip(),
+                        "Age": int(new_age),
+                        "District": new_dist,
+                        "Diagnosis": new_diag,
+                        "Required Service": new_serv,
+                        "Date": new_date.strip(),
+                        "Status": new_status,
+                    }])
+                    st.session_state["student_df"] = pd.concat([st.session_state["student_df"], new_row], ignore_index=True)
+                    st.success(f"Added {new_id}!")
+                    st.rerun()
 
-    b1, b2 = st.columns([2, 3])
-    if b1.button("Save Table Edits", type="primary"):
-        st.session_state["student_df"] = edited_df.copy()
-        st.success("Saved changes to registry!")
+        edited_df = st.data_editor(
+            st.session_state["student_df"],
+            num_rows="dynamic",
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "District": st.column_config.SelectboxColumn("District", options=list(DISTRICT_INFO.keys()), required=True),
+                "Diagnosis": st.column_config.SelectboxColumn("Diagnosis", options=["Mild Autism", "High-Function Autism", "Severe Autism"], required=True),
+                "Required Service": st.column_config.SelectboxColumn("Required Service", options=["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"], required=True),
+                "Status": st.column_config.SelectboxColumn("Status", options=["Verified Active", "Pending Verification"], required=True),
+            },
+        )
 
-    b2.download_button(
-        label="Download Updated CSV",
-        data=st.session_state["student_df"].to_csv(index=False).encode("utf-8"),
-        file_name="kelantan_student_registry_updated.csv",
-        mime="text/csv",
-    )
-    
+        b1, b2 = st.columns([2, 3])
+        if b1.button("Save Table Edits", type="primary"):
+            st.session_state["student_df"] = edited_df.copy()
+            st.success("Saved changes to registry!")
+
+        b2.download_button(
+            label="Download Updated CSV",
+            data=st.session_state["student_df"].to_csv(index=False).encode("utf-8"),
+            file_name="kelantan_student_registry_updated.csv",
+            mime="text/csv",
+        )
+
 
 # ==============================================================================
 # PAGE 3: PARENTS — CHILD & CENTRE MATCHER
 # ==============================================================================
 elif page == "Child & Centre Matcher":
     with st.container(border=True):
-    st.subheader("Child Profile, Suitable Centre & Therapists")
+        st.subheader("Child Profile, Suitable Centre & Therapists")
 
-    f1, f2 = st.columns([2, 4])
-    dist_filter = f1.selectbox("Filter District", ["ALL"] + list(DISTRICT_INFO.keys()))
-    pool_df = df_students if dist_filter == "ALL" else df_students[df_students["District"] == dist_filter]
+        f1, f2 = st.columns([2, 4])
+        dist_filter = f1.selectbox("Filter District", ["ALL"] + list(DISTRICT_INFO.keys()))
+        pool_df = df_students if dist_filter == "ALL" else df_students[df_students["District"] == dist_filter]
 
-    selected_rec_id = f2.selectbox(
-        "Choose Child Record",
-        options=pool_df["Record ID"].tolist(),
-        format_func=lambda rid: f"{rid} — {pool_df.loc[pool_df['Record ID'] == rid, 'Identifier'].values[0]} ({pool_df.loc[pool_df['Record ID'] == rid, 'District'].values[0]})",
-    )
-
-    child_row = df_students[df_students["Record ID"] == selected_rec_id].iloc[0]
-    c_dist = str(child_row["District"]).upper()
-    c_diag = str(child_row["Diagnosis"])
-    c_info = DISTRICT_INFO.get(c_dist, DISTRICT_INFO["KOTA BHARU"])
-
-    left, right = st.columns([5, 7], gap="large")
-    with left:
-        st.markdown("#### Child Information")
-        st.markdown(f"**Record ID:** `{child_row['Record ID']}`")
-        st.markdown(f"**Identifier:** {child_row['Identifier']}")
-        st.markdown(f"**Age:** `{child_row['Age']}` years old")
-        st.markdown(f"**District:** `{c_dist}` (`{c_info['zone']}`)")
-        st.markdown(f"**Type of Autism:** `{c_diag}`")
-        st.markdown(f"**Required Service:** `{child_row['Required Service']}`")
-        st.markdown(f"**Date:** `{child_row['Date']}` | **Status:** `{child_row['Status']}`")
-
-    with right:
-        st.markdown("#### Suitable Centre & Therapists")
-        st.markdown(
-            f'<span class="module-badge" style="background:{c_info["badge_bg"]};">{c_info["zone"]}</span>',
-            unsafe_allow_html=True,
+        selected_rec_id = f2.selectbox(
+            "Choose Child Record",
+            options=pool_df["Record ID"].tolist(),
+            format_func=lambda rid: f"{rid} — {pool_df.loc[pool_df['Record ID'] == rid, 'Identifier'].values[0]} ({pool_df.loc[pool_df['Record ID'] == rid, 'District'].values[0]})",
         )
-        st.markdown(f"##### {c_info['recommended_centre']}")
-        st.markdown(f"**Why Suitable:** {c_info['why_suitable']}")
-        st.markdown(f"**Therapists Provided:** {c_info['therapists']}")
-        st.markdown(f"**Matched Required Service:** `{child_row['Required Service']}`")
-    
+
+        child_row = df_students[df_students["Record ID"] == selected_rec_id].iloc[0]
+        c_dist = str(child_row["District"]).upper()
+        c_diag = str(child_row["Diagnosis"])
+        c_info = DISTRICT_INFO.get(c_dist, DISTRICT_INFO["KOTA BHARU"])
+
+        left, right = st.columns([5, 7], gap="large")
+        with left:
+            st.markdown("#### Child Information")
+            st.markdown(f"**Record ID:** `{child_row['Record ID']}`")
+            st.markdown(f"**Identifier:** {child_row['Identifier']}")
+            st.markdown(f"**Age:** `{child_row['Age']}` years old")
+            st.markdown(f"**District:** `{c_dist}` (`{c_info['zone']}`)")
+            st.markdown(f"**Type of Autism:** `{c_diag}`")
+            st.markdown(f"**Required Service:** `{child_row['Required Service']}`")
+            st.markdown(f"**Date:** `{child_row['Date']}` | **Status:** `{child_row['Status']}`")
+
+        with right:
+            st.markdown("#### Suitable Centre & Therapists")
+            st.markdown(
+                f'<span class="zone-pill" style="background:{c_info["badge_bg"]};">{c_info["zone"]}</span>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(f"##### {c_info['recommended_centre']}")
+            st.markdown(f"**Why Suitable:** {c_info['why_suitable']}")
+            st.markdown(f"**Therapists Provided:** {c_info['therapists']}")
+            st.markdown(f"**Matched Required Service:** `{child_row['Required Service']}`")
+
 
 # ==============================================================================
 # PAGE 4: PARENTS — 4 INTERACTIVE FLIPBOOK MODULES
@@ -1321,45 +1322,44 @@ else:
 
         with cols[idx % 2]:
             with st.container(border=True):
-            st.markdown(
-                f'<span class="module-badge" style="background:{mod["color"]};">{mod["code"]} • {mod["domain"]}</span>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(f"#### {mod['title']}")
-            components.html(module_animated_html(mod["key"], mod["color"], mod["soft_bg"], cur_page), height=205)
+                st.markdown(
+                    f'<span class="zone-pill" style="background:{mod["color"]};">{mod["code"]} • {mod["domain"]}</span>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(f"#### {mod['title']}")
+                components.html(module_animated_html(mod["key"], mod["color"], mod["soft_bg"], cur_page), height=205)
 
-            st.markdown(
-                f"""
-                <div class="flip-card" style="margin-top:12px;">
-                    <div style="font-weight:700;font-size:15px;margin-bottom:6px;">{p_heading}</div>
-                    <div style="font-size:13px;margin-bottom:10px;">{p_summary}</div>
-                    <div style="background:#FFFFFF;padding:10px 12px;border-radius:8px;font-size:12.5px;line-height:1.55;">
-                        {p_steps.replace(chr(10), "<br>")}
+                st.markdown(
+                    f"""
+                    <div class="flip-panel" style="margin-top:12px;">
+                        <div style="font-weight:700;font-size:15px;margin-bottom:6px;">{p_heading}</div>
+                        <div style="font-size:13px;margin-bottom:10px;">{p_summary}</div>
+                        <div style="background:#FFFFFF;padding:10px 12px;border-radius:8px;font-size:12.5px;line-height:1.55;">
+                            {p_steps.replace(chr(10), "<br>")}
+                        </div>
                     </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+                    """,
+                    unsafe_allow_html=True,
+                )
 
-            nav1, nav2, nav3 = st.columns([1, 1.4, 1])
-            if nav1.button("◀ Prev", key=f"prev_{mod['key']}", disabled=(cur_page == 0), use_container_width=True):
-                st.session_state[p_key] = cur_page - 1
-                st.rerun()
-            nav2.markdown(
-                f"<div style='text-align:center;padding-top:8px;font-weight:700;'>Page {cur_page + 1} / {total_pages}</div>",
-                unsafe_allow_html=True,
-            )
-            if nav3.button("Next ▶", key=f"next_{mod['key']}", disabled=(cur_page == total_pages - 1), use_container_width=True):
-                st.session_state[p_key] = cur_page + 1
-                st.rerun()
+                nav1, nav2, nav3 = st.columns([1, 1.4, 1])
+                if nav1.button("◀ Prev", key=f"prev_{mod['key']}", disabled=(cur_page == 0), use_container_width=True):
+                    st.session_state[p_key] = cur_page - 1
+                    st.rerun()
+                nav2.markdown(
+                    f"<div style='text-align:center;padding-top:8px;font-weight:700;'>Page {cur_page + 1} / {total_pages}</div>",
+                    unsafe_allow_html=True,
+                )
+                if nav3.button("Next ▶", key=f"next_{mod['key']}", disabled=(cur_page == total_pages - 1), use_container_width=True):
+                    st.session_state[p_key] = cur_page + 1
+                    st.rerun()
 
-            flip_html = build_flipbook_html(mod)
-            st.download_button(
-                label=f"Download {mod['code']} Flipbook (.html)",
-                data=flip_html.encode("utf-8"),
-                file_name=f"{mod['code'].replace(' ', '_')}_Flipbook.html",
-                mime="text/html",
-                key=f"dl_flip_{mod['key']}",
-                use_container_width=True,
-            )
-            
+                flip_html = build_flipbook_html(mod)
+                st.download_button(
+                    label=f"Download {mod['code']} Flipbook (.html)",
+                    data=flip_html.encode("utf-8"),
+                    file_name=f"{mod['code'].replace(' ', '_')}_Flipbook.html",
+                    mime="text/html",
+                    key=f"dl_flip_{mod['key']}",
+                    use_container_width=True,
+                )
