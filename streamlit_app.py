@@ -27,22 +27,32 @@ st.markdown(
         color: #0F172A !important;
     }
 
+    
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0F172A 0%, #1E3A8A 55%, #4C1D95 100%) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.14);
+        background: linear-gradient(180deg, #F1F5F9 0%, #EDE9FE 55%, #DBEAFE 100%) !important;
+        border-right: 1px solid #CBD5E1 !important;
     }
 
     [data-testid="stSidebar"] * {
-        color: #F8FAFC !important;
+        color: #0F172A !important;
+    }
+
+    [data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] {
+        background: #FFFFFF;
+        border-radius: 18px;
+        padding: 8px;
+        border: 1px solid #CBD5E1;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
     }
 
     [data-testid="stSidebar"] .stRadio > label {
-        font-weight: 700 !important;
-        font-size: 13px !important;
-        letter-spacing: 0.4px;
+        font-weight: 800 !important;
+        font-size: 11px !important;
+        letter-spacing: 0.8px;
         text-transform: uppercase;
-        color: #99F6E4 !important;
+        color: #0F766E !important;
     }
+
 
     [data-testid="stVerticalBlockBorderWrapper"] {
         background-color: #FFFFFF !important;
@@ -200,6 +210,35 @@ DISTRICT_INFO = {
         "recommended_centre": "NASOM Malaysia - Kota Bharu",
         "therapists": "Speech-Language Pathologists (SLP), Occupational Therapists (OT), ABA Therapists, Special Educators",
         "why_suitable": "Strongest concentration of therapy specialists and structured programs in the registry.",
+        "options": [
+            {
+                "rank": "1st Option • Best Match",
+                "centre": "NASOM Malaysia - Kota Bharu",
+                "district": "KOTA BHARU",
+                "zone": "Green Zone",
+                "badge_bg": "#0D9488",
+                "therapists": "Speech-Language Pathologists (SLP), Occupational Therapists (OT), ABA Therapists, Special Educators",
+                "reason": "Highest specialist availability and structured therapy programs in Kelantan.",
+            },
+            {
+                "rank": "2nd Option • Nearby Hub",
+                "centre": "Wakaf Bharu Care & Intervention Hub",
+                "district": "WAKAF BHARU",
+                "zone": "Red Zone",
+                "badge_bg": "#BE123C",
+                "therapists": "Occupational Therapy Practitioners, Daily Living Skills Coaches, Sensory Facilitators",
+                "reason": "Convenient nearby option for daily living routines and sensory regulation.",
+            },
+            {
+                "rank": "3rd Option • Outreach Support",
+                "centre": "Bachok Autism Outreach Clinic",
+                "district": "BACHOK",
+                "zone": "Yellow Zone",
+                "badge_bg": "#D97706",
+                "therapists": "Early Intervention Specialists, Speech Therapy Support, Behavioral Coaches",
+                "reason": "Accessible secondary outreach centre for ongoing speech and behavioral support.",
+            },
+        ],
     },
     "BACHOK": {
         "lat": 6.0610,
@@ -212,6 +251,35 @@ DISTRICT_INFO = {
         "recommended_centre": "Bachok Autism Outreach Clinic",
         "therapists": "Early Intervention Specialists, Speech Therapy Support, Behavioral Coaches",
         "why_suitable": "Keeps travel short within Bachok to reduce travel fatigue and support daily routine consistency.",
+        "options": [
+            {
+                "rank": "1st Option • Local Priority",
+                "centre": "Bachok Autism Outreach Clinic",
+                "district": "BACHOK",
+                "zone": "Yellow Zone",
+                "badge_bg": "#D97706",
+                "therapists": "Early Intervention Specialists, Speech Therapy Support, Behavioral Coaches",
+                "reason": "Closest local option in Bachok to reduce travel fatigue and keep daily routines steady.",
+            },
+            {
+                "rank": "2nd Option • Specialist Hub",
+                "centre": "NASOM Malaysia - Kota Bharu",
+                "district": "KOTA BHARU",
+                "zone": "Green Zone",
+                "badge_bg": "#0D9488",
+                "therapists": "Speech-Language Pathologists (SLP), Occupational Therapists (OT), ABA Therapists, Special Educators",
+                "reason": "Full multidisciplinary therapy team when specialized SLP/OT/ABA sessions are needed.",
+            },
+            {
+                "rank": "3rd Option • Southern Alternative",
+                "centre": "Pasir Puteh Special Needs Center",
+                "district": "PASIR PUTEH",
+                "zone": "Red Zone",
+                "badge_bg": "#BE123C",
+                "therapists": "Developmental Therapists, Motor & Play Specialists, Caregiver Counselors",
+                "reason": "Additional developmental and play-based support option along the southern route.",
+            },
+        ],
     },
     "PASIR MAS": {
         "lat": 6.1042,
@@ -224,6 +292,35 @@ DISTRICT_INFO = {
         "recommended_centre": "Pasir Mas Early Intervention Centre",
         "therapists": "Early Childhood Special Educators, Speech & Language Therapists, Sensory-Motor Therapists",
         "why_suitable": "Offers local early intervention and structured skill development close to home.",
+        "options": [
+            {
+                "rank": "1st Option • Local Priority",
+                "centre": "Pasir Mas Early Intervention Centre",
+                "district": "PASIR MAS",
+                "zone": "Yellow Zone",
+                "badge_bg": "#D97706",
+                "therapists": "Early Childhood Special Educators, Speech & Language Therapists, Sensory-Motor Therapists",
+                "reason": "Provides local early intervention and sensory-motor guidance right in Pasir Mas.",
+            },
+            {
+                "rank": "2nd Option • Border Hub",
+                "centre": "Rantau Panjang Autism Support Hub",
+                "district": "RANTAU PANJANG",
+                "zone": "Yellow Zone",
+                "badge_bg": "#D97706",
+                "therapists": "Outreach Special Educators, Speech & Communication Coaches, Parent Training Advisors",
+                "reason": "Nearby western support hub for outreach educators and caregiver coaching.",
+            },
+            {
+                "rank": "3rd Option • Specialist Hub",
+                "centre": "NASOM Malaysia - Kota Bharu",
+                "district": "KOTA BHARU",
+                "zone": "Green Zone",
+                "badge_bg": "#0D9488",
+                "therapists": "Speech-Language Pathologists (SLP), Occupational Therapists (OT), ABA Therapists, Special Educators",
+                "reason": "Comprehensive specialist hub for intensive therapy escalation.",
+            },
+        ],
     },
     "PASIR PUTEH": {
         "lat": 5.8361,
@@ -236,6 +333,35 @@ DISTRICT_INFO = {
         "recommended_centre": "Pasir Puteh Special Needs Center",
         "therapists": "Developmental Therapists, Motor & Play Specialists, Caregiver Counselors",
         "why_suitable": "Closest local option in Pasir Puteh for foundational therapy and parent guidance.",
+        "options": [
+            {
+                "rank": "1st Option • Closest Local",
+                "centre": "Pasir Puteh Special Needs Center",
+                "district": "PASIR PUTEH",
+                "zone": "Red Zone",
+                "badge_bg": "#BE123C",
+                "therapists": "Developmental Therapists, Motor & Play Specialists, Caregiver Counselors",
+                "reason": "Closest local centre in Pasir Puteh for foundational therapy and family counseling.",
+            },
+            {
+                "rank": "2nd Option • Coastal Option",
+                "centre": "Bachok Autism Outreach Clinic",
+                "district": "BACHOK",
+                "zone": "Yellow Zone",
+                "badge_bg": "#D97706",
+                "therapists": "Early Intervention Specialists, Speech Therapy Support, Behavioral Coaches",
+                "reason": "Secondary option for early intervention and speech support.",
+            },
+            {
+                "rank": "3rd Option • Specialist Hub",
+                "centre": "NASOM Malaysia - Kota Bharu",
+                "district": "KOTA BHARU",
+                "zone": "Green Zone",
+                "badge_bg": "#0D9488",
+                "therapists": "Speech-Language Pathologists (SLP), Occupational Therapists (OT), ABA Therapists, Special Educators",
+                "reason": "Full specialist referral centre when broader therapy bandwidth is needed.",
+            },
+        ],
     },
     "WAKAF BHARU": {
         "lat": 6.1400,
@@ -248,6 +374,35 @@ DISTRICT_INFO = {
         "recommended_centre": "Wakaf Bharu Care & Intervention Hub",
         "therapists": "Occupational Therapy Practitioners, Daily Living Skills Coaches, Sensory Facilitators",
         "why_suitable": "Supports daily living routines, sensory regulation, and practical skill carryover.",
+        "options": [
+            {
+                "rank": "1st Option • Closest Local",
+                "centre": "Wakaf Bharu Care & Intervention Hub",
+                "district": "WAKAF BHARU",
+                "zone": "Red Zone",
+                "badge_bg": "#BE123C",
+                "therapists": "Occupational Therapy Practitioners, Daily Living Skills Coaches, Sensory Facilitators",
+                "reason": "Local hub focused on daily living skills, sensory routines, and practical carryover.",
+            },
+            {
+                "rank": "2nd Option • Specialist Hub",
+                "centre": "NASOM Malaysia - Kota Bharu",
+                "district": "KOTA BHARU",
+                "zone": "Green Zone",
+                "badge_bg": "#0D9488",
+                "therapists": "Speech-Language Pathologists (SLP), Occupational Therapists (OT), ABA Therapists, Special Educators",
+                "reason": "Nearby specialist hub with SLP, OT, and ABA therapy teams.",
+            },
+            {
+                "rank": "3rd Option • Northern Option",
+                "centre": "Tumpat Pediatric Therapy Unit",
+                "district": "TUMPAT",
+                "zone": "Red Zone",
+                "badge_bg": "#BE123C",
+                "therapists": "Pediatric Speech Therapists, Play-Based Interventionists, Social Communication Coaches",
+                "reason": "Additional pediatric speech and social communication support option.",
+            },
+        ],
     },
     "TUMPAT": {
         "lat": 6.1990,
@@ -260,6 +415,35 @@ DISTRICT_INFO = {
         "recommended_centre": "Tumpat Pediatric Therapy Unit",
         "therapists": "Pediatric Speech Therapists, Play-Based Interventionists, Social Communication Coaches",
         "why_suitable": "Provides child-friendly speech and play-based communication support in Tumpat.",
+        "options": [
+            {
+                "rank": "1st Option • Closest Local",
+                "centre": "Tumpat Pediatric Therapy Unit",
+                "district": "TUMPAT",
+                "zone": "Red Zone",
+                "badge_bg": "#BE123C",
+                "therapists": "Pediatric Speech Therapists, Play-Based Interventionists, Social Communication Coaches",
+                "reason": "Closest local unit in Tumpat for pediatric speech and play-based communication.",
+            },
+            {
+                "rank": "2nd Option • Nearby Hub",
+                "centre": "Wakaf Bharu Care & Intervention Hub",
+                "district": "WAKAF BHARU",
+                "zone": "Red Zone",
+                "badge_bg": "#BE123C",
+                "therapists": "Occupational Therapy Practitioners, Daily Living Skills Coaches, Sensory Facilitators",
+                "reason": "Nearby option for sensory regulation and daily living coaching.",
+            },
+            {
+                "rank": "3rd Option • Specialist Hub",
+                "centre": "NASOM Malaysia - Kota Bharu",
+                "district": "KOTA BHARU",
+                "zone": "Green Zone",
+                "badge_bg": "#0D9488",
+                "therapists": "Speech-Language Pathologists (SLP), Occupational Therapists (OT), ABA Therapists, Special Educators",
+                "reason": "Main specialist hub for intensive therapy and broader clinical support.",
+            },
+        ],
     },
     "RANTAU PANJANG": {
         "lat": 6.0200,
@@ -272,6 +456,35 @@ DISTRICT_INFO = {
         "recommended_centre": "Rantau Panjang Autism Support Hub",
         "therapists": "Outreach Special Educators, Speech & Communication Coaches, Parent Training Advisors",
         "why_suitable": "Reduces long travel distances for border families and supports home-based routines.",
+        "options": [
+            {
+                "rank": "1st Option • Local Priority",
+                "centre": "Rantau Panjang Autism Support Hub",
+                "district": "RANTAU PANJANG",
+                "zone": "Yellow Zone",
+                "badge_bg": "#D97706",
+                "therapists": "Outreach Special Educators, Speech & Communication Coaches, Parent Training Advisors",
+                "reason": "Reduces travel distance for border families and supports home routines.",
+            },
+            {
+                "rank": "2nd Option • Western Corridor",
+                "centre": "Pasir Mas Early Intervention Centre",
+                "district": "PASIR MAS",
+                "zone": "Yellow Zone",
+                "badge_bg": "#D97706",
+                "therapists": "Early Childhood Special Educators, Speech & Language Therapists, Sensory-Motor Therapists",
+                "reason": "Nearby early intervention and sensory-motor centre in Pasir Mas.",
+            },
+            {
+                "rank": "3rd Option • Specialist Hub",
+                "centre": "NASOM Malaysia - Kota Bharu",
+                "district": "KOTA BHARU",
+                "zone": "Green Zone",
+                "badge_bg": "#0D9488",
+                "therapists": "Speech-Language Pathologists (SLP), Occupational Therapists (OT), ABA Therapists, Special Educators",
+                "reason": "Specialist referral hub for comprehensive SLP, OT, and ABA care.",
+            },
+        ],
     },
 }
 
@@ -433,13 +646,12 @@ def get_parent_kid_phrase(mod_key: str, page_idx: int) -> tuple[str, str]:
 
 
 def module_animated_scene_svg(mod_key: str, accent: str, page_idx: int = 0) -> str:
-    parent_act, kid_phrase = get_parent_phrase_tuple = get_parent_kid_phrase(mod_key, page_idx)
+    parent_act, kid_phrase = get_parent_kid_phrase(mod_key, page_idx)
     p_esc = html.escape(parent_act)
     k_esc = html.escape(kid_phrase)
 
     if mod_key == "AG":
         action_art = """
-        <!-- Visual card held between parent and kid -->
         <g class="card-pulse">
           <rect x="126" y="40" width="68" height="50" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="2.5"/>
           <path d="M153 49 Q160 41 167 49 Q167 59 160 64 Q153 59 153 49 Z" fill="#1E3A8A"/>
@@ -450,7 +662,6 @@ def module_animated_scene_svg(mod_key: str, accent: str, page_idx: int = 0) -> s
         bg_fill, floor_fill, parent_shirt, kid_shirt = "#CCFBF1", "#99F6E4", "#1E3A8A", "#0D9488"
     elif mod_key == "AH":
         action_art = """
-        <!-- FIRST -> THEN transition card shown by parent -->
         <g class="card-pulse">
           <rect x="118" y="38" width="84" height="52" rx="9" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2.5"/>
           <text x="160" y="54" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="8" font-weight="800" fill="#1E3A8A">FIRST: BAG</text>
@@ -462,7 +673,6 @@ def module_animated_scene_svg(mod_key: str, accent: str, page_idx: int = 0) -> s
         bg_fill, floor_fill, parent_shirt, kid_shirt = "#DBEAFE", "#BFDBFE", "#1E3A8A", "#0D9488"
     elif mod_key == "AI":
         action_art = """
-        <!-- Walk & calm sensory cue shown by parent -->
         <g class="card-pulse">
           <rect x="122" y="38" width="76" height="52" rx="9" fill="#FFFFFF" stroke="#0D9488" stroke-width="2.5"/>
           <circle cx="145" cy="60" r="10" fill="#CCFBF1" stroke="#0F766E" stroke-width="2"/>
@@ -476,7 +686,6 @@ def module_animated_scene_svg(mod_key: str, accent: str, page_idx: int = 0) -> s
         bg_fill, floor_fill, parent_shirt, kid_shirt = "#CCFBF1", "#5EEAD4", "#0F766E", "#1E3A8A"
     else:
         action_art = """
-        <!-- PECS phrase card shown by parent to kid -->
         <g class="card-pulse">
           <rect x="120" y="38" width="80" height="52" rx="9" fill="#FFFFFF" stroke="#6D28D9" stroke-width="2.5"/>
           <text x="160" y="55" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="7.5" font-weight="800" fill="#6D28D9">PECS PHRASE</text>
@@ -488,32 +697,19 @@ def module_animated_scene_svg(mod_key: str, accent: str, page_idx: int = 0) -> s
 
     return f"""
     <style>
-      @keyframes parentShow {{
-        0%, 100% {{ transform: translateY(0px); }}
-        50% {{ transform: translateY(-4px); }}
-      }}
-      @keyframes kidNotice {{
-        0%, 100% {{ transform: scale(1); }}
-        50% {{ transform: scale(1.05); }}
-      }}
-      @keyframes phrasePop {{
-        0%, 100% {{ transform: translateY(0px); }}
-        50% {{ transform: translateY(-3px); }}
-      }}
+      @keyframes parentShow {{ 0%, 100% {{ transform: translateY(0px); }} 50% {{ transform: translateY(-4px); }} }}
+      @keyframes kidNotice {{ 0%, 100% {{ transform: scale(1); }} 50% {{ transform: scale(1.05); }} }}
+      @keyframes phrasePop {{ 0%, 100% {{ transform: translateY(0px); }} 50% {{ transform: translateY(-3px); }} }}
       .parent-anim {{ animation: parentShow 2.2s ease-in-out infinite; }}
       .kid-anim {{ animation: kidNotice 2.2s ease-in-out infinite; transform-origin: 256px 76px; }}
       .card-pulse {{ animation: phrasePop 2s ease-in-out infinite; }}
     </style>
     <rect x="0" y="0" width="320" height="164" rx="14" fill="{bg_fill}"/>
     <rect x="0" y="122" width="320" height="42" fill="{floor_fill}"/>
-
-    <!-- Top phrase banner showing what parent says/shows and kid sees -->
     <rect x="14" y="8" width="292" height="22" rx="11" fill="#0F172A"/>
     <text x="160" y="22" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="9.5" font-weight="700" fill="#FFFFFF">
       {p_esc}  •  {k_esc}
     </text>
-
-    <!-- Parent character on left showing the card/phrase -->
     <g class="parent-anim">
       <circle cx="62" cy="62" r="17" fill="#FDBA74" stroke="#0F172A" stroke-width="2.2"/>
       <path d="M46 57 Q62 40 78 57 Q70 49 62 50 Q54 49 46 57 Z" fill="#0F172A"/>
@@ -521,18 +717,12 @@ def module_animated_scene_svg(mod_key: str, accent: str, page_idx: int = 0) -> s
       <circle cx="67" cy="61" r="2.2" fill="#0F172A"/>
       <path d="M58 68 Q62 72 66 68" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
       <rect x="46" y="81" width="32" height="36" rx="10" fill="{parent_shirt}"/>
-      <!-- Arm pointing/showing toward center -->
       <path d="M78 90 L116 70" stroke="#FDBA74" stroke-width="6.5" stroke-linecap="round"/>
       <circle cx="116" cy="70" r="4.5" fill="#FDBA74" stroke="#0F172A" stroke-width="1.5"/>
     </g>
-
     {action_art}
-
-    <!-- Arrow from visual cue to kid seeing it -->
     <path d="M204 66 L224 66" stroke="#0F172A" stroke-width="2.8" stroke-linecap="round"/>
     <polygon points="222,61 232,66 222,71" fill="#0F172A"/>
-
-    <!-- Kid character on right seeing the cue -->
     <g class="kid-anim">
       <circle cx="258" cy="70" r="15" fill="#FDBA74" stroke="#0F172A" stroke-width="2.2"/>
       <path d="M244 65 Q258 50 272 65 Q265 58 258 59 Q251 58 244 65 Z" fill="#1E293B"/>
@@ -541,8 +731,6 @@ def module_animated_scene_svg(mod_key: str, accent: str, page_idx: int = 0) -> s
       <circle cx="258" cy="76" r="3" fill="#0F172A"/>
       <rect x="245" y="87" width="26" height="30" rx="9" fill="{kid_shirt}"/>
     </g>
-
-    <!-- Bottom phrase strip -->
     <rect x="24" y="131" width="272" height="24" rx="8" fill="#FFFFFF" stroke="{accent}" stroke-width="1.5"/>
     <text x="160" y="147" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="10" font-weight="800" fill="#0F172A">
       Kid Sees: {k_esc}
@@ -558,25 +746,9 @@ def module_animated_html(mod_key: str, accent: str, soft_bg: str, page_idx: int)
 <head>
 <meta charset="UTF-8" />
 <style>
-  html, body {{
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
-  }}
-  .wrap {{
-    background: {soft_bg};
-    border: 1.5px solid {accent}44;
-    border-radius: 14px;
-    padding: 10px;
-  }}
-  .caption {{
-    margin-top: 6px;
-    font-size: 11.5px;
-    font-weight: 700;
-    color: #0F172A;
-    text-align: center;
-  }}
+  html, body {{ margin: 0; padding: 0; background: transparent; font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif; }}
+  .wrap {{ background: {soft_bg}; border: 1.5px solid {accent}44; border-radius: 14px; padding: 10px; }}
+  .caption {{ margin-top: 6px; font-size: 11.5px; font-weight: 700; color: #0F172A; text-align: center; }}
 </style>
 </head>
 <body>
@@ -622,78 +794,23 @@ def build_flipbook_html(mod: dict) -> str:
   body {{
     font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
     background: linear-gradient(135deg, #CCFBF1 0%, #EDE9FE 52%, #DBEAFE 100%);
-    margin: 0;
-    padding: 28px;
-    color: #0F172A;
-    display: flex;
-    justify-content: center;
+    margin: 0; padding: 28px; color: #0F172A; display: flex; justify-content: center;
   }}
   .book-shell {{
-    max-width: 720px;
-    width: 100%;
-    background: #FFFFFF;
-    border-radius: 18px;
-    padding: 26px;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-    border-top: 8px solid {accent};
+    max-width: 720px; width: 100%; background: #FFFFFF; border-radius: 18px; padding: 26px;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08); border-top: 8px solid {accent};
   }}
-  .top-tag {{
-    display: inline-block;
-    background: {accent};
-    color: #FFFFFF;
-    font-weight: 700;
-    font-size: 12px;
-    padding: 5px 12px;
-    border-radius: 999px;
-  }}
+  .top-tag {{ display: inline-block; background: {accent}; color: #FFFFFF; font-weight: 700; font-size: 12px; padding: 5px 12px; border-radius: 999px; }}
   h1 {{ margin: 10px 0 4px 0; font-size: 24px; }}
   .domain {{ color: #475569; font-size: 14px; margin-bottom: 16px; }}
-  .anim-card {{
-    background: {soft_bg};
-    border: 1.5px solid {accent}44;
-    border-radius: 14px;
-    padding: 12px;
-  }}
-  .anim-caption {{
-    margin-top: 8px;
-    font-size: 12.5px;
-    font-weight: 700;
-    color: #0F172A;
-    text-align: center;
-  }}
-  .page-box {{
-    background: {soft_bg};
-    border-radius: 14px;
-    padding: 20px;
-    margin-top: 16px;
-    min-height: 170px;
-  }}
+  .anim-card {{ background: {soft_bg}; border: 1.5px solid {accent}44; border-radius: 14px; padding: 12px; }}
+  .anim-caption {{ margin-top: 8px; font-size: 12.5px; font-weight: 700; color: #0F172A; text-align: center; }}
+  .page-box {{ background: {soft_bg}; border-radius: 14px; padding: 20px; margin-top: 16px; min-height: 170px; }}
   .page-heading {{ font-size: 18px; font-weight: 700; margin-bottom: 8px; }}
   .page-summary {{ font-size: 15px; margin-bottom: 12px; line-height: 1.5; }}
-  .page-steps {{
-    background: #FFFFFF;
-    padding: 14px 16px;
-    border-radius: 10px;
-    line-height: 1.65;
-    font-size: 14px;
-  }}
-  .controls {{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-    gap: 12px;
-  }}
-  button {{
-    background: {accent};
-    color: #FFFFFF;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }}
+  .page-steps {{ background: #FFFFFF; padding: 14px 16px; border-radius: 10px; line-height: 1.65; font-size: 14px; }}
+  .controls {{ display: flex; justify-content: space-between; align-items: center; margin-top: 20px; gap: 12px; }}
+  button {{ background: {accent}; color: #FFFFFF; border: none; padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }}
   button:disabled {{ background: #CBD5E1; cursor: not-allowed; }}
   .indicator {{ font-weight: 700; color: #334155; }}
 </style>
@@ -745,6 +862,266 @@ def build_flipbook_html(mod: dict) -> str:
 </html>
 """
 
+
+def animated_admin_charts_html(dist_records: list[dict], diag_records: list[dict], serv_records: list[dict]) -> str:
+    d_json = json.dumps(dist_records)
+    g_json = json.dumps(diag_records)
+    s_json = json.dumps(serv_records)
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  html, body {{
+    margin: 0; padding: 0; background: transparent;
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+    color: #0F172A;
+  }}
+  .grid-top {{
+    display: grid; grid-template-columns: 1.45fr 1fr; gap: 14px; margin-bottom: 14px;
+  }}
+  .card {{
+    background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 16px;
+    padding: 16px 18px; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+  }}
+  .title {{ font-size: 16px; font-weight: 800; color: #0F172A; margin: 0 0 2px 0; }}
+  .sub {{ font-size: 12.5px; color: #475569; margin: 0 0 12px 0; }}
+  @keyframes growBar {{
+    from {{ transform: scaleY(0); }}
+    to {{ transform: scaleY(1); }}
+  }}
+  @keyframes fadeUp {{
+    from {{ opacity: 0; transform: translateY(8px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+  }}
+  .bar-anim {{
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: growBar 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }}
+  .label-anim {{
+    opacity: 0;
+    animation: fadeUp 0.65s ease forwards;
+    animation-delay: 0.35s;
+  }}
+  .donut-wrap {{
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }}
+  .legend-list {{
+    display: flex; flex-direction: column; gap: 8px; font-size: 13px; font-weight: 700;
+  }}
+  .legend-item {{
+    display: flex; align-items: center; gap: 8px;
+  }}
+  .dot {{
+    width: 12px; height: 12px; border-radius: 999px; flex-shrink: 0;
+  }}
+  .tooltip-box {{
+    margin-top: 8px; font-size: 12px; font-weight: 700; color: #0F766E; min-height: 18px;
+  }}
+</style>
+</head>
+<body>
+  <div class="grid-top">
+    <div class="card">
+      <div class="title">Students Across Kelantan Districts</div>
+      <div class="sub">Exact animated student count per district (hover any bar for details)</div>
+      <svg id="distChart" viewBox="0 0 560 235" width="100%" height="235"></svg>
+      <div class="tooltip-box" id="distTip">Hover a district bar to inspect exact student & centre count</div>
+    </div>
+
+    <div class="card">
+      <div class="title">Diagnosis Breakdown</div>
+      <div class="sub">Exact count and share of registered autism profiles</div>
+      <div class="donut-wrap">
+        <svg id="diagChart" viewBox="0 0 190 190" width="175" height="175"></svg>
+        <div class="legend-list" id="diagLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Required Therapy Services Demand</div>
+    <div class="sub">Clear animated count of students requiring each intervention service</div>
+    <svg id="servChart" viewBox="0 0 880 185" width="100%" height="185"></svg>
+  </div>
+
+<script>
+  const distData = {d_json};
+  const diagData = {g_json};
+  const servData = {s_json};
+
+  // 1. District Bar Chart with exact integers & gridlines
+  (function renderDist() {{
+    const svg = document.getElementById("distChart");
+    const tip = document.getElementById("distTip");
+    const maxVal = Math.max(16, ...distData.map(d => d.students));
+    const padL = 38, padR = 16, padT = 26, padB = 38;
+    const plotW = 560 - padL - padR;
+    const plotH = 235 - padT - padB;
+    let htmlStr = "";
+
+    for (let g = 0; g <= 4; g++) {{
+      const val = Math.round((maxVal / 4) * g);
+      const y = padT + plotH - (val / maxVal) * plotH;
+      htmlStr += `<line x1="${{padL}}" y1="${{y}}" x2="${{560 - padR}}" y2="${{y}}" stroke="#E2E8F0" stroke-width="1"/>`;
+      htmlStr += `<text x="${{padL - 8}}" y="${{y + 4}}" text-anchor="end" font-size="11" font-weight="700" fill="#475569">${{val}}</text>`;
+    }}
+
+    const step = plotW / distData.length;
+    const barW = Math.min(46, step * 0.56);
+    distData.forEach((d, i) => {{
+      const h = (d.students / maxVal) * plotH;
+      const x = padL + i * step + (step - barW) / 2;
+      const y = padT + plotH - h;
+      const fill = d.zone === "Green Zone" ? "#0D9488" : (d.zone === "Yellow Zone" ? "#1E3A8A" : "#6D28D9");
+      htmlStr += `<rect class="bar-anim" x="${{x}}" y="${{y}}" width="${{barW}}" height="${{h}}" rx="7" fill="${{fill}}" style="animation-delay:${{(i * 0.07).toFixed(2)}}s;cursor:pointer;" onmouseenter="document.getElementById('distTip').innerText='${{d.district}}: ${{d.students}} students • ${{d.centres}} centres (${{d.zone}})'"/>`;
+      htmlStr += `<text class="label-anim" x="${{x + barW / 2}}" y="${{y - 6}}" text-anchor="middle" font-size="12" font-weight="800" fill="#0F172A">${{d.students}}</text>`;
+      htmlStr += `<text x="${{x + barW / 2}}" y="${{padT + plotH + 17}}" text-anchor="middle" font-size="9.5" font-weight="800" fill="#0F172A">${{d.short}}</text>`;
+    }});
+    svg.innerHTML = htmlStr;
+  }})();
+
+  // 2. Diagnosis Donut Chart with exact values
+  (function renderDiag() {{
+    const svg = document.getElementById("diagChart");
+    const leg = document.getElementById("diagLegend");
+    const total = diagData.reduce((acc, item) => acc + item.count, 0) || 1;
+    const colors = ["#0D9488", "#1E3A8A", "#6D28D9"];
+    const cx = 95, cy = 95, r = 64, strokeW = 24;
+    const circ = 2 * Math.PI * r;
+    let offset = 0;
+    let arcs = `<circle cx="${{cx}}" cy="${{cy}}" r="${{r}}" fill="none" stroke="#F1F5F9" stroke-width="${{strokeW}}"/>`;
+    let legendHtml = "";
+
+    diagData.forEach((item, idx) => {{
+      const frac = item.count / total;
+      const dash = frac * circ;
+      const col = colors[idx % colors.length];
+      arcs += `<circle cx="${{cx}}" cy="${{cy}}" r="${{r}}" fill="none" stroke="${{col}}" stroke-width="${{strokeW}}" stroke-dasharray="${{dash}} ${{circ}}" stroke-dashoffset="${{-offset}}" transform="rotate(-90 ${{cx}} ${{cy}})"/>`;
+      offset += dash;
+      const pct = Math.round(frac * 100);
+      legendHtml += `<div class="legend-item"><span class="dot" style="background:${{col}};"></span><span>${{item.label}}: <strong>${{item.count}}</strong> (${{pct}}%)</span></div>`;
+    }});
+
+    arcs += `<text x="${{cx}}" y="${{cy - 2}}" text-anchor="middle" font-size="18" font-weight="800" fill="#0F172A">${{total}}</text>`;
+    arcs += `<text x="${{cx}}" y="${{cy + 15}}" text-anchor="middle" font-size="10" font-weight="700" fill="#475569">TOTAL</text>`;
+    svg.innerHTML = arcs;
+    leg.innerHTML = legendHtml;
+  }})();
+
+  // 3. Service Demand Chart with exact counts
+  (function renderServ() {{
+    const svg = document.getElementById("servChart");
+    const maxVal = Math.max(30, ...servData.map(s => s.students));
+    const padL = 42, padR = 20, padT = 24, padB = 34;
+    const plotW = 880 - padL - padR;
+    const plotH = 185 - padT - padB;
+    const palette = ["#0F766E", "#1E3A8A", "#6D28D9", "#0D9488"];
+    let htmlStr = "";
+
+    for (let g = 0; g <= 3; g++) {{
+      const val = Math.round((maxVal / 3) * g);
+      const y = padT + plotH - (val / maxVal) * plotH;
+      htmlStr += `<line x1="${{padL}}" y1="${{y}}" x2="${{880 - padR}}" y2="${{y}}" stroke="#E2E8F0" stroke-width="1"/>`;
+      htmlStr += `<text x="${{padL - 8}}" y="${{y + 4}}" text-anchor="end" font-size="11" font-weight="700" fill="#475569">${{val}}</text>`;
+    }}
+
+    const step = plotW / servData.length;
+    const barW = Math.min(90, step * 0.45);
+    servData.forEach((s, i) => {{
+      const h = (s.students / maxVal) * plotH;
+      const x = padL + i * step + (step - barW) / 2;
+      const y = padT + plotH - h;
+      const col = palette[i % palette.length];
+      htmlStr += `<rect class="bar-anim" x="${{x}}" y="${{y}}" width="${{barW}}" height="${{h}}" rx="8" fill="${{col}}" style="animation-delay:${{(i * 0.1).toFixed(2)}}s;"/>`;
+      htmlStr += `<text class="label-anim" x="${{x + barW / 2}}" y="${{y - 6}}" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0F172A">${{s.students}}</text>`;
+      htmlStr += `<text x="${{x + barW / 2}}" y="${{padT + plotH + 18}}" text-anchor="middle" font-size="11" font-weight="800" fill="#0F172A">${{s.service}}</text>`;
+    }});
+    svg.innerHTML = htmlStr;
+  }})();
+</script>
+</body>
+</html>
+"""
+
+
+def animated_centre_options_html(child_name: str, age: int, district: str, diagnosis: str, service: str, options: list[dict]) -> str:
+    c_esc = html.escape(child_name.strip() or "Child")
+    d_esc = html.escape(district)
+    g_esc = html.escape(diagnosis)
+    s_esc = html.escape(service)
+
+    cards_html = ""
+    for idx, opt in enumerate(options):
+        delay = idx * 0.18
+        cards_html += f"""
+        <div class="pop-card" style="animation-delay:{delay:.2f}s;border-top:6px solid {opt['badge_bg']};">
+          <div class="rank-pill" style="background:{opt['badge_bg']};">{html.escape(opt['rank'])}</div>
+          <div class="centre-name">{html.escape(opt['centre'])}</div>
+          <div class="meta-line"><strong>District:</strong> {html.escape(opt['district'])} • <span style="color:{opt['badge_bg']};">{html.escape(opt['zone'])}</span></div>
+          <div class="meta-line"><strong>Therapists:</strong> {html.escape(opt['therapists'])}</div>
+          <div class="reason-box">{html.escape(opt['reason'])}</div>
+        </div>
+        """
+
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  html, body {{
+    margin: 0; padding: 0; background: transparent;
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+    color: #0F172A;
+  }}
+  @keyframes popInOption {{
+    0% {{ opacity: 0; transform: translateY(22px) scale(0.95); }}
+    70% {{ opacity: 1; transform: translateY(-4px) scale(1.01); }}
+    100% {{ opacity: 1; transform: translateY(0) scale(1); }}
+  }}
+  .banner {{
+    background: linear-gradient(135deg, #0F766E 0%, #1E3A8A 60%, #6D28D9 100%);
+    color: #FFFFFF; border-radius: 14px; padding: 12px 16px; margin-bottom: 14px;
+    font-size: 13px; font-weight: 700;
+  }}
+  .options-grid {{
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }}
+  .pop-card {{
+    opacity: 0;
+    animation: popInOption 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 14px;
+    padding: 14px; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    display: flex; flex-direction: column; gap: 8px;
+  }}
+  .rank-pill {{
+    display: inline-block; align-self: flex-start; color: #FFFFFF;
+    font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px;
+  }}
+  .centre-name {{ font-size: 15.5px; font-weight: 800; color: #0F172A; line-height: 1.25; }}
+  .meta-line {{ font-size: 12px; color: #334155; line-height: 1.4; }}
+  .reason-box {{
+    margin-top: auto; background: #F8FAFC; border: 1px solid #E2E8F0;
+    border-radius: 10px; padding: 9px 10px; font-size: 12px; color: #0F172A; line-height: 1.45;
+  }}
+  @media (max-width: 780px) {{
+    .options-grid {{ grid-template-columns: 1fr; }}
+  }}
+</style>
+</head>
+<body>
+  <div class="banner">
+    Recommended Centres for <strong>{c_esc}</strong> (Age {age}) • {d_esc} • {g_esc} • {s_esc}
+  </div>
+  <div class="options-grid">
+    {cards_html}
+  </div>
+</body>
+</html>
+"""
+
+
 @st.cache_data
 def load_initial_csv(path: str = "Kelantan_Student_Registry_104.csv") -> pd.DataFrame:
     try:
@@ -761,6 +1138,15 @@ if "student_df" not in st.session_state:
 if "selected_zone_district" not in st.session_state:
     st.session_state["selected_zone_district"] = "PASIR PUTEH"
 
+if "parent_submitted_profile" not in st.session_state:
+    st.session_state["parent_submitted_profile"] = {
+        "kid_name": "Aisyah Humaira",
+        "age": 6,
+        "district": "KOTA BHARU",
+        "diagnosis": "Mild Autism",
+        "service": "Speech Therapy",
+    }
+
 for mod in MODULES_4:
     p_key = f"flip_page_{mod['key']}"
     if p_key not in st.session_state:
@@ -768,23 +1154,47 @@ for mod in MODULES_4:
 
 df_students = st.session_state["student_df"].copy()
 
-st.sidebar.markdown("### ⚡ Kelantan GIS")
+# Sidebar styled cleanly in light pill/rail aesthetic with teal/navy/lavender accents
+st.sidebar.markdown(
+    """
+    <div style="text-align:center;padding:6px 0 12px 0;">
+        <div style="width:54px;height:54px;margin:0 auto 6px auto;border-radius:999px;background:linear-gradient(135deg,#0D9488 0%,#1E3A8A 65%,#6D28D9 100%);color:#FFFFFF;font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(15,23,42,0.16);">
+            KA
+        </div>
+        <div style="font-size:13px;font-weight:800;color:#0F172A;">Kelantan GIS</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#0F766E;">ADMIN & PARENTS</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 page = st.sidebar.radio(
-    "Navigation",
+    "PORTAL & MODULES",
     [
-        "Dashboard",
+        "Admin Dashboard",
+        "Parents Portal",
         "Student Registry",
-        "Child & Centre Matcher",
         "4 Flipbook Modules",
     ],
 )
 
-counts_by_dist = df_students["District"].value_counts().to_dict()
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    """
+    <div style="font-size:11px;font-weight:700;color:#475569;line-height:1.5;">
+        • <strong>Admin Dashboard:</strong> Accurate counts & animated charts<br>
+        • <strong>Parents Portal:</strong> Child form + 1st/2nd/3rd centre pop-up<br>
+        • <strong>Student Registry:</strong> Add & edit student records<br>
+        • <strong>4 Flipbook Modules:</strong> Parent shows → Kid sees
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # ==============================================================================
-# PAGE 1: EXECUTIVE DASHBOARD (SOFT TEAL + NAVY BLUE + LAVENDER)
+# PAGE 1: ADMIN DASHBOARD (ACCURATE COUNTS + ANIMATED GRAPHS)
 # ==============================================================================
-if page == "Dashboard":
+if page == "Admin Dashboard":
     total_students = len(df_students)
     verified_cnt = int((df_students["Status"] == "Verified Active").sum())
     red_zones = sum(1 for v in DISTRICT_INFO.values() if v["zone"] == "Red Zone")
@@ -798,7 +1208,7 @@ if page == "Dashboard":
                     <div class="brand-mark">KA</div>
                     <div>
                         <div style="font-size:18px;font-weight:800;color:#0F172A;">Kelantan Autism GIS</div>
-                        <div style="font-size:11px;font-weight:700;letter-spacing:0.6px;color:#0F766E;">SPATIAL & CAREGIVER ANALYTICS</div>
+                        <div style="font-size:11px;font-weight:700;letter-spacing:0.6px;color:#0F766E;">ADMIN ANALYTICS PORTAL</div>
                         <div style="font-size:12.5px;color:#475569;margin-top:3px;">{total_students} Registry Records • 7 Districts</div>
                     </div>
                 </div>
@@ -810,8 +1220,8 @@ if page == "Dashboard":
         with st.container(border=True):
             h_l, h_r = st.columns([8, 4], vertical_alignment="center")
             with h_l:
-                st.markdown('<div class="section-title">Kelantan Zone & Registry Summary</div>', unsafe_allow_html=True)
-                st.markdown('<div class="section-sub">District student distribution, diagnosis mix, and intervention demand</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-title">Registry & Zone Overview</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-sub">Exact counts across Kelantan districts, diagnoses, and therapy needs</div>', unsafe_allow_html=True)
             with h_r:
                 st.download_button(
                     label="⬇ Download CSV",
@@ -838,138 +1248,126 @@ if page == "Dashboard":
                     unsafe_allow_html=True,
                 )
 
-    mid_l, mid_r = st.columns([7, 5], gap="medium")
+    short_names = {
+        "KOTA BHARU": "K.BHARU",
+        "BACHOK": "BACHOK",
+        "PASIR MAS": "P.MAS",
+        "PASIR PUTEH": "P.PUTEH",
+        "WAKAF BHARU": "W.BHARU",
+        "TUMPAT": "TUMPAT",
+        "RANTAU PANJANG": "R.PANJANG",
+    }
 
-    dist_df = df_students.groupby("District").size().reset_index(name="Students")
-    for d_name in DISTRICT_INFO:
-        if d_name not in dist_df["District"].values:
-            dist_df = pd.concat([dist_df, pd.DataFrame([{"District": d_name, "Students": 0}])], ignore_index=True)
-    dist_df["Order"] = dist_df["District"].map({k: i for i, k in enumerate(DISTRICT_INFO.keys())})
-    dist_df = dist_df.sort_values("Order")
+    dist_records = []
+    for d_name, info in DISTRICT_INFO.items():
+        cnt = int((df_students["District"] == d_name).sum())
+        dist_records.append({
+            "district": d_name,
+            "short": short_names.get(d_name, d_name[:8]),
+            "students": cnt,
+            "centres": info["centres"],
+            "zone": info["zone"],
+        })
 
-    with mid_l:
-        with st.container(border=True):
-            st.markdown('<div class="section-title">Students Across Kelantan Districts</div>', unsafe_allow_html=True)
-            st.markdown('<div class="section-sub">Registered student count per administrative district</div>', unsafe_allow_html=True)
-            area_base = alt.Chart(dist_df).encode(
-                x=alt.X(
-                    "District:N",
-                    sort=list(DISTRICT_INFO.keys()),
-                    axis=alt.Axis(labelAngle=0, labelColor="#0F172A", labelFontSize=11, title=None),
-                ),
-                y=alt.Y(
-                    "Students:Q",
-                    axis=alt.Axis(labelColor="#0F172A", title=None, gridColor="#E2E8F0"),
-                ),
-                tooltip=["District", "Students"],
-            )
-            area_layer = area_base.mark_area(
-                line={"color": "#1E3A8A", "strokeWidth": 2.5},
-                color=alt.Gradient(
-                    gradient="linear",
-                    stops=[
-                        alt.GradientStop(color="rgba(13, 148, 136, 0.36)", offset=0),
-                        alt.GradientStop(color="rgba(124, 58, 237, 0.06)", offset=1),
-                    ],
-                    x1=1, x2=1, y1=1, y2=0,
-                ),
-            )
-            pts_layer = area_base.mark_point(size=80, filled=True, color="#FFFFFF", stroke="#6D28D9", strokeWidth=2.5)
-            txt_layer = area_base.mark_text(dy=-13, fontSize=12, fontWeight="bold", color="#0F172A").encode(text="Students:Q")
-            st.altair_chart(
-                (area_layer + pts_layer + txt_layer)
-                .properties(height=245)
-                .configure(background="#FFFFFF")
-                .configure_view(fill="#FFFFFF", strokeWidth=0),
-                use_container_width=True,
-            )
+    diag_order = ["Mild Autism", "High-Function Autism", "Severe Autism"]
+    diag_records = [
+        {"label": g, "count": int((df_students["Diagnosis"] == g).sum())}
+        for g in diag_order
+    ]
 
-    with mid_r:
-        with st.container(border=True):
-            st.markdown('<div class="section-title">Diagnosis Breakdown</div>', unsafe_allow_html=True)
-            st.markdown('<div class="section-sub">Proportion of registered autism profiles</div>', unsafe_allow_html=True)
-            diag_df = df_students.groupby("Diagnosis").size().reset_index(name="Count")
-            donut = (
-                alt.Chart(diag_df)
-                .mark_arc(innerRadius=54, outerRadius=84)
-                .encode(
-                    theta=alt.Theta("Count:Q"),
-                    color=alt.Color(
-                        "Diagnosis:N",
-                        scale=alt.Scale(
-                            domain=["Mild Autism", "High-Function Autism", "Severe Autism"],
-                            range=["#0D9488", "#1E3A8A", "#7C3AED"],
-                        ),
-                        legend=alt.Legend(orient="bottom", title=None, labelColor="#0F172A"),
-                    ),
-                    tooltip=["Diagnosis", "Count"],
-                )
-                .properties(height=245)
-                .configure(background="#FFFFFF")
-                .configure_view(fill="#FFFFFF", strokeWidth=0)
-            )
-            st.altair_chart(donut, use_container_width=True)
+    serv_order = ["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"]
+    serv_records = [
+        {"service": s, "students": int((df_students["Required Service"] == s).sum())}
+        for s in serv_order
+    ]
 
-    bot_l, bot_r = st.columns([7, 5], gap="medium")
+    components.html(
+        animated_admin_charts_html(dist_records, diag_records, serv_records),
+        height=495,
+    )
 
-    with bot_l:
-        with st.container(border=True):
-            st.markdown('<div class="section-title">Service & Verification Rates</div>', unsafe_allow_html=True)
-            st.markdown('<div class="section-sub">Verification status and required therapy distribution</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown('<div class="section-title">District Zone & Centre Inspector</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-sub">Select any district to inspect exact student count, zone status, and therapy options</div>', unsafe_allow_html=True)
+        selected_dist = st.selectbox(
+            "Select District",
+            options=list(DISTRICT_INFO.keys()),
+            index=list(DISTRICT_INFO.keys()).index(st.session_state["selected_zone_district"]),
+            label_visibility="collapsed",
+        )
+        st.session_state["selected_zone_district"] = selected_dist
+        d_info = DISTRICT_INFO[selected_dist]
+        d_count = int((df_students["District"] == selected_dist).sum())
 
-            verified_pct = round((verified_cnt / total_students) * 100) if total_students else 0
-            speech_cnt = int((df_students["Required Service"] == "Speech Therapy").sum())
-            speech_pct = round((speech_cnt / total_students) * 100) if total_students else 0
+        st.markdown(
+            f'<span class="zone-pill" style="background:{d_info["badge_bg"]};">{d_info["zone"]}</span> '
+            f'<strong style="color:#0F172A;">{selected_dist}</strong> — <strong>{d_count}</strong> students • <strong>{d_info["centres"]}</strong> centres',
+            unsafe_allow_html=True,
+        )
+        st.write(d_info["place_summary"])
+        st.markdown(f"**1st Choice Centre:** {d_info['recommended_centre']}  |  **Therapists:** {d_info['therapists']}")
 
-            r1, r2, r3 = st.columns(3)
-            r1.metric("Verified Rate", f"{verified_pct}%", f"{verified_cnt} students")
-            r2.metric("Speech Therapy Share", f"{speech_pct}%", f"{speech_cnt} students")
-            r3.metric("Total Therapy Centres", sum(v["centres"] for v in DISTRICT_INFO.values()), "7 districts")
-
-            serv_df = df_students.groupby("Required Service").size().reset_index(name="Students")
-            s_bars = (
-                alt.Chart(serv_df)
-                .mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6, color="#0F766E")
-                .encode(
-                    x=alt.X("Required Service:N", axis=alt.Axis(labelAngle=0, labelColor="#0F172A", title=None)),
-                    y=alt.Y("Students:Q", axis=alt.Axis(labelColor="#0F172A", title=None, gridColor="#E2E8F0")),
-                    tooltip=["Required Service", "Students"],
-                )
-            )
-            s_txt = s_bars.mark_text(dy=-8, fontSize=12, fontWeight="bold", color="#0F172A").encode(text="Students:Q")
-            st.altair_chart(
-                (s_bars + s_txt)
-                .properties(height=180)
-                .configure(background="#FFFFFF")
-                .configure_view(fill="#FFFFFF", strokeWidth=0),
-                use_container_width=True,
-            )
-
-    with bot_r:
-        with st.container(border=True):
-            st.markdown('<div class="section-title">District Zone & Centre Inspector</div>', unsafe_allow_html=True)
-            st.markdown('<div class="section-sub">Inspect zone classification, recommended centre, and therapy team</div>', unsafe_allow_html=True)
-            selected_dist = st.selectbox(
-                "Select District",
-                options=list(DISTRICT_INFO.keys()),
-                index=list(DISTRICT_INFO.keys()).index(st.session_state["selected_zone_district"]),
-                label_visibility="collapsed",
-            )
-            st.session_state["selected_zone_district"] = selected_dist
-            d_info = DISTRICT_INFO[selected_dist]
-            d_rows = df_students[df_students["District"] == selected_dist]
-
-            st.markdown(
-                f'<span class="zone-pill" style="background:{d_info["badge_bg"]};">{d_info["zone"]}</span> '
-                f'<strong style="color:#0F172A;">{selected_dist}</strong> — {len(d_rows)} students • {d_info["centres"]} centres',
-                unsafe_allow_html=True,
-            )
-            st.write(d_info["place_summary"])
-            st.markdown(f"**Suitable Centre:** {d_info['recommended_centre']}")
-            st.markdown(f"**Therapists:** {d_info['therapists']}")
 
 # ==============================================================================
-# PAGE 2: STUDENT REGISTRY (EDIT & INSERT)
+# PAGE 2: PARENTS PORTAL (CHILD INFO FORM + 1ST, 2ND, 3RD CENTRE POP-UP)
+# ==============================================================================
+elif page == "Parents Portal":
+    with st.container(border=True):
+        st.subheader("Parents Portal — Child Details & Suitable Centre Options")
+        st.caption("Enter your child's name and details below. When you submit, the 1st, 2nd, and 3rd suitable centres pop up with animation.")
+
+        cur_prof = st.session_state["parent_submitted_profile"]
+
+        with st.form("parents_child_matcher_form"):
+            p1, p2, p3 = st.columns(3)
+            kid_name_in = p1.text_input("Child's Name", value=cur_prof["kid_name"], placeholder="e.g., Aisyah Humaira")
+            kid_age_in = p2.number_input("Child's Age", min_value=1, max_value=21, value=int(cur_prof["age"]))
+            kid_dist_in = p3.selectbox(
+                "District in Kelantan",
+                options=list(DISTRICT_INFO.keys()),
+                index=list(DISTRICT_INFO.keys()).index(cur_prof["district"]),
+            )
+
+            p4, p5 = st.columns(2)
+            kid_diag_in = p4.selectbox(
+                "Autism Type / Diagnosis",
+                options=["Mild Autism", "High-Function Autism", "Severe Autism"],
+                index=["Mild Autism", "High-Function Autism", "Severe Autism"].index(cur_prof["diagnosis"]),
+            )
+            kid_serv_in = p5.selectbox(
+                "Required Therapy Service",
+                options=["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"],
+                index=["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"].index(cur_prof["service"]),
+            )
+
+            submitted = st.form_submit_button("Find Suitable Centres (Pop-Up 1st, 2nd & 3rd Options)", type="primary")
+            if submitted:
+                st.session_state["parent_submitted_profile"] = {
+                    "kid_name": kid_name_in.strip() or "Child",
+                    "age": int(kid_age_in),
+                    "district": kid_dist_in,
+                    "diagnosis": kid_diag_in,
+                    "service": kid_serv_in,
+                }
+                st.rerun()
+
+        active_prof = st.session_state["parent_submitted_profile"]
+        d_entry = DISTRICT_INFO[active_prof["district"]]
+        components.html(
+            animated_centre_options_html(
+                child_name=active_prof["kid_name"],
+                age=active_prof["age"],
+                district=active_prof["district"],
+                diagnosis=active_prof["diagnosis"],
+                service=active_prof["service"],
+                options=d_entry["options"],
+            ),
+            height=345,
+        )
+
+
+# ==============================================================================
+# PAGE 3: STUDENT REGISTRY (EDIT & INSERT)
 # ==============================================================================
 elif page == "Student Registry":
     with st.container(border=True):
@@ -1031,52 +1429,7 @@ elif page == "Student Registry":
 
 
 # ==============================================================================
-# PAGE 3: PARENTS — CHILD & CENTRE MATCHER
-# ==============================================================================
-elif page == "Child & Centre Matcher":
-    with st.container(border=True):
-        st.subheader("Child Profile, Suitable Centre & Therapists")
-
-        f1, f2 = st.columns([2, 4])
-        dist_filter = f1.selectbox("Filter District", ["ALL"] + list(DISTRICT_INFO.keys()))
-        pool_df = df_students if dist_filter == "ALL" else df_students[df_students["District"] == dist_filter]
-
-        selected_rec_id = f2.selectbox(
-            "Choose Child Record",
-            options=pool_df["Record ID"].tolist(),
-            format_func=lambda rid: f"{rid} — {pool_df.loc[pool_df['Record ID'] == rid, 'Identifier'].values[0]} ({pool_df.loc[pool_df['Record ID'] == rid, 'District'].values[0]})",
-        )
-
-        child_row = df_students[df_students["Record ID"] == selected_rec_id].iloc[0]
-        c_dist = str(child_row["District"]).upper()
-        c_diag = str(child_row["Diagnosis"])
-        c_info = DISTRICT_INFO.get(c_dist, DISTRICT_INFO["KOTA BHARU"])
-
-        left, right = st.columns([5, 7], gap="large")
-        with left:
-            st.markdown("#### Child Information")
-            st.markdown(f"**Record ID:** `{child_row['Record ID']}`")
-            st.markdown(f"**Identifier:** {child_row['Identifier']}")
-            st.markdown(f"**Age:** `{child_row['Age']}` years old")
-            st.markdown(f"**District:** `{c_dist}` (`{c_info['zone']}`)")
-            st.markdown(f"**Type of Autism:** `{c_diag}`")
-            st.markdown(f"**Required Service:** `{child_row['Required Service']}`")
-            st.markdown(f"**Date:** `{child_row['Date']}` | **Status:** `{child_row['Status']}`")
-
-        with right:
-            st.markdown("#### Suitable Centre & Therapists")
-            st.markdown(
-                f'<span class="zone-pill" style="background:{c_info["badge_bg"]};">{c_info["zone"]}</span>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(f"##### {c_info['recommended_centre']}")
-            st.markdown(f"**Why Suitable:** {c_info['why_suitable']}")
-            st.markdown(f"**Therapists Provided:** {c_info['therapists']}")
-            st.markdown(f"**Matched Required Service:** `{child_row['Required Service']}`")
-
-
-# ==============================================================================
-# PAGE 4: PARENTS — 4 INTERACTIVE FLIPBOOK MODULES
+# PAGE 4: 4 INTERACTIVE FLIPBOOK MODULES
 # ==============================================================================
 else:
     st.subheader("4 Interactive Flipbook Modules")
