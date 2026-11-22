@@ -146,6 +146,36 @@ st.markdown(
         margin-top: 10px;
     }
 
+    
+    [data-testid="stMain"] .stButton > button {
+        background: linear-gradient(135deg, #0F766E 0%, #1E3A8A 100%) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(15, 23, 42, 0.14) !important;
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+        box-shadow: 0 3px 10px rgba(30, 58, 138, 0.16) !important;
+    }
+
+    [data-testid="stMain"] .stButton > button * {
+        color: #FFFFFF !important;
+    }
+
+    [data-testid="stMain"] .stButton > button:hover {
+        filter: brightness(1.08);
+    }
+
+    [data-testid="stMain"] .stButton > button:disabled {
+        background: #E2E8F0 !important;
+        color: #64748B !important;
+        border: 1px solid #CBD5E1 !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="stMain"] .stButton > button:disabled * {
+        color: #64748B !important;
+    }
+
     [data-testid="stDownloadButton"] button {
         background: linear-gradient(135deg, #1E3A8A 0%, #0F766E 100%) !important;
         color: #FFFFFF !important;
