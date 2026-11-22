@@ -1206,8 +1206,7 @@ if page == "Dashboard":
 # ==============================================================================
 elif page == "Student Registry":
     with st.container(border=True):
-    st.subheader("Student Registry — Edit & Insert Records")
-
+        st.subheader("Student Registry — Edit & Insert Records")
     with st.expander("➕ Insert New Student Record", expanded=False):
         with st.form("insert_student_form", clear_on_submit=True):
             c1, c2, c3, c4 = st.columns(4)
