@@ -3,35 +3,78 @@ import json
 import altair as alt
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="Kelantan Autism GIS — Interactive Dashboard",
-    page_icon="🌈",
+    page_title="Kelantan Autism GIS — Dashboard",
+    page_icon="📊",
     layout="wide",
 )
 
-# Red / Yellow / Blue background theme with high-contrast readable cards
 st.markdown(
     """
     <style>
     .stApp {
         background: linear-gradient(135deg, #FEE2E2 0%, #FEF9C3 50%, #DBEAFE 100%) !important;
-        color: #0F172A !important;
+        color: #1E293B !important;
     }
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #991B1B 0%, #1E3A8A 100%) !important;
+        background: linear-gradient(180deg, #DC2626 0%, #D97706 50%, #2563EB 100%) !important;
     }
     [data-testid="stSidebar"] * {
         color: #FFFFFF !important;
     }
-    .hero-banner {
-        background: linear-gradient(120deg, #DC2626 0%, #F59E0B 50%, #2563EB 100%);
-        padding: 18px 22px;
-        border-radius: 14px;
+    .ui-card {
+        background: #FFFFFF;
+        border-radius: 16px;
+        padding: 18px 20px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+        border: 2px solid #BFDBFE;
+        margin-bottom: 12px;
+    }
+    .kpi-amber {
+        background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
         color: #FFFFFF;
-        margin-bottom: 14px;
-        border: 2px solid #FFFFFF;
-        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16);
+        border-radius: 14px;
+        padding: 16px 18px;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    }
+    .kpi-indigo {
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+        color: #FFFFFF;
+        border-radius: 14px;
+        padding: 16px 18px;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    }
+    .kpi-blue {
+        background: linear-gradient(135deg, #38BDF8 0%, #2563EB 100%);
+        color: #FFFFFF;
+        border-radius: 14px;
+        padding: 16px 18px;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+    .kpi-title {
+        font-size: 13px;
+        font-weight: 600;
+        opacity: 0.98;
+        margin-bottom: 6px;
+    }
+    .kpi-num {
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+    .avatar-circle {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #DC2626 0%, #2563EB 100%);
+        color: #FFFFFF;
+        font-weight: 800;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .module-badge {
         display: inline-block;
@@ -44,21 +87,10 @@ st.markdown(
     }
     .flip-card {
         border-radius: 14px;
-        padding: 20px;
-        border: 2px solid #CBD5E1;
-        background: #FFFFFF;
+        padding: 18px;
+        border: 1px solid #E2E8F0;
+        background: #F8FAFC;
         color: #0F172A;
-        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-    }
-    div[data-testid="stMetric"] {
-        background: rgba(255, 255, 255, 0.92);
-        border: 2px solid #2563EB;
-        border-radius: 12px;
-        padding: 12px 14px;
-    }
-    div[data-testid="stMetric"] label,
-    div[data-testid="stMetric"] [data-testid="stMetricValue"] {
-        color: #0F172A !important;
     }
     </style>
     """,
@@ -188,8 +220,8 @@ MODULES_4 = [
         "code": "Module AH",
         "title": "Arrival Routine & Classroom Transition",
         "domain": "Home & Learning Transitions",
-        "color": "#7C3AED",
-        "soft_bg": "#EDE9FE",
+        "color": "#4F46E5",
+        "soft_bg": "#EEF2FF",
         "pages": [
             (
                 "Page 1 • Welcome & Goal",
@@ -218,8 +250,8 @@ MODULES_4 = [
         "code": "Module AI",
         "title": "Morning Walk & Sensory Regulation",
         "domain": "Physical, Motor & Sensory",
-        "color": "#059669",
-        "soft_bg": "#D1FAE5",
+        "color": "#0D9488",
+        "soft_bg": "#CCFBF1",
         "pages": [
             (
                 "Page 1 • Welcome & Goal",
@@ -248,7 +280,7 @@ MODULES_4 = [
         "code": "Module SK",
         "title": "Speech & Picture Exchange (PECS)",
         "domain": "Communication Support",
-        "color": "#D97706",
+        "color": "#F59E0B",
         "soft_bg": "#FEF3C7",
         "pages": [
             (
@@ -278,81 +310,199 @@ MODULES_4 = [
 EMBEDDED_RECORDS = json.loads("""[{"Record ID": "KOD-1000", "Identifier": "Child Record #1 (Anonymized)", "Age": 4, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1001", "Identifier": "Child Record #2 (Anonymized)", "Age": 5, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1002", "Identifier": "Child Record #3 (Anonymized)", "Age": 6, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1003", "Identifier": "Child Record #4 (Anonymized)", "Age": 7, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1004", "Identifier": "Child Record #5 (Anonymized)", "Age": 8, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1005", "Identifier": "Child Record #6 (Anonymized)", "Age": 9, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1006", "Identifier": "Child Record #7 (Anonymized)", "Age": 10, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1007", "Identifier": "Child Record #8 (Anonymized)", "Age": 11, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1008", "Identifier": "Child Record #9 (Anonymized)", "Age": 12, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1009", "Identifier": "Child Record #10 (Anonymized)", "Age": 13, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1010", "Identifier": "Child Record #11 (Anonymized)", "Age": 14, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1011", "Identifier": "Child Record #12 (Anonymized)", "Age": 15, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1012", "Identifier": "Child Record #13 (Anonymized)", "Age": 4, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1013", "Identifier": "Child Record #14 (Anonymized)", "Age": 5, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1014", "Identifier": "Child Record #15 (Anonymized)", "Age": 6, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1015", "Identifier": "Child Record #16 (Anonymized)", "Age": 7, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1016", "Identifier": "Child Record #17 (Anonymized)", "Age": 8, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1017", "Identifier": "Child Record #18 (Anonymized)", "Age": 9, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1018", "Identifier": "Child Record #19 (Anonymized)", "Age": 10, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1019", "Identifier": "Child Record #20 (Anonymized)", "Age": 11, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1020", "Identifier": "Child Record #21 (Anonymized)", "Age": 12, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1021", "Identifier": "Child Record #22 (Anonymized)", "Age": 13, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1022", "Identifier": "Child Record #23 (Anonymized)", "Age": 14, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1023", "Identifier": "Child Record #24 (Anonymized)", "Age": 15, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1024", "Identifier": "Child Record #25 (Anonymized)", "Age": 4, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1025", "Identifier": "Child Record #26 (Anonymized)", "Age": 5, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1026", "Identifier": "Child Record #27 (Anonymized)", "Age": 6, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1027", "Identifier": "Child Record #28 (Anonymized)", "Age": 7, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1028", "Identifier": "Child Record #29 (Anonymized)", "Age": 8, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1029", "Identifier": "Child Record #30 (Anonymized)", "Age": 9, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1030", "Identifier": "Child Record #31 (Anonymized)", "Age": 10, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1031", "Identifier": "Child Record #32 (Anonymized)", "Age": 11, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1032", "Identifier": "Child Record #33 (Anonymized)", "Age": 12, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1033", "Identifier": "Child Record #34 (Anonymized)", "Age": 13, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1034", "Identifier": "Child Record #35 (Anonymized)", "Age": 14, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1035", "Identifier": "Child Record #36 (Anonymized)", "Age": 15, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1036", "Identifier": "Child Record #37 (Anonymized)", "Age": 4, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1037", "Identifier": "Child Record #38 (Anonymized)", "Age": 5, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1038", "Identifier": "Child Record #39 (Anonymized)", "Age": 6, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1039", "Identifier": "Child Record #40 (Anonymized)", "Age": 7, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1040", "Identifier": "Child Record #41 (Anonymized)", "Age": 8, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1041", "Identifier": "Child Record #42 (Anonymized)", "Age": 9, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1042", "Identifier": "Child Record #43 (Anonymized)", "Age": 10, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1043", "Identifier": "Child Record #44 (Anonymized)", "Age": 11, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1044", "Identifier": "Child Record #45 (Anonymized)", "Age": 12, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1045", "Identifier": "Child Record #46 (Anonymized)", "Age": 13, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1046", "Identifier": "Child Record #47 (Anonymized)", "Age": 14, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1047", "Identifier": "Child Record #48 (Anonymized)", "Age": 15, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1048", "Identifier": "Child Record #49 (Anonymized)", "Age": 4, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1049", "Identifier": "Child Record #50 (Anonymized)", "Age": 5, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1050", "Identifier": "Child Record #51 (Anonymized)", "Age": 6, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1051", "Identifier": "Child Record #52 (Anonymized)", "Age": 7, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1052", "Identifier": "Child Record #53 (Anonymized)", "Age": 8, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1053", "Identifier": "Child Record #54 (Anonymized)", "Age": 9, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1054", "Identifier": "Child Record #55 (Anonymized)", "Age": 10, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1055", "Identifier": "Child Record #56 (Anonymized)", "Age": 11, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1056", "Identifier": "Child Record #57 (Anonymized)", "Age": 12, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1057", "Identifier": "Child Record #58 (Anonymized)", "Age": 13, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1058", "Identifier": "Child Record #59 (Anonymized)", "Age": 14, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1059", "Identifier": "Child Record #60 (Anonymized)", "Age": 15, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1060", "Identifier": "Child Record #61 (Anonymized)", "Age": 4, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1061", "Identifier": "Child Record #62 (Anonymized)", "Age": 5, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1062", "Identifier": "Child Record #63 (Anonymized)", "Age": 6, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1063", "Identifier": "Child Record #64 (Anonymized)", "Age": 7, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1064", "Identifier": "Child Record #65 (Anonymized)", "Age": 8, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1065", "Identifier": "Child Record #66 (Anonymized)", "Age": 9, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1066", "Identifier": "Child Record #67 (Anonymized)", "Age": 10, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1067", "Identifier": "Child Record #68 (Anonymized)", "Age": 11, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1068", "Identifier": "Child Record #69 (Anonymized)", "Age": 12, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1069", "Identifier": "Child Record #70 (Anonymized)", "Age": 13, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1070", "Identifier": "Child Record #71 (Anonymized)", "Age": 14, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1071", "Identifier": "Child Record #72 (Anonymized)", "Age": 15, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1072", "Identifier": "Child Record #73 (Anonymized)", "Age": 4, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1073", "Identifier": "Child Record #74 (Anonymized)", "Age": 5, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1074", "Identifier": "Child Record #75 (Anonymized)", "Age": 6, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1075", "Identifier": "Child Record #76 (Anonymized)", "Age": 7, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1076", "Identifier": "Child Record #77 (Anonymized)", "Age": 8, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1077", "Identifier": "Child Record #78 (Anonymized)", "Age": 9, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1078", "Identifier": "Child Record #79 (Anonymized)", "Age": 10, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1079", "Identifier": "Child Record #80 (Anonymized)", "Age": 11, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1080", "Identifier": "Child Record #81 (Anonymized)", "Age": 12, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1081", "Identifier": "Child Record #82 (Anonymized)", "Age": 13, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1082", "Identifier": "Child Record #83 (Anonymized)", "Age": 14, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1083", "Identifier": "Child Record #84 (Anonymized)", "Age": 15, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1084", "Identifier": "Child Record #85 (Anonymized)", "Age": 4, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1085", "Identifier": "Child Record #86 (Anonymized)", "Age": 5, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1086", "Identifier": "Child Record #87 (Anonymized)", "Age": 6, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1087", "Identifier": "Child Record #88 (Anonymized)", "Age": 7, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1088", "Identifier": "Child Record #89 (Anonymized)", "Age": 8, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1089", "Identifier": "Child Record #90 (Anonymized)", "Age": 9, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1090", "Identifier": "Child Record #91 (Anonymized)", "Age": 10, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1091", "Identifier": "Child Record #92 (Anonymized)", "Age": 11, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1092", "Identifier": "Child Record #93 (Anonymized)", "Age": 12, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1093", "Identifier": "Child Record #94 (Anonymized)", "Age": 13, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1094", "Identifier": "Child Record #95 (Anonymized)", "Age": 14, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1095", "Identifier": "Child Record #96 (Anonymized)", "Age": 15, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1096", "Identifier": "Child Record #97 (Anonymized)", "Age": 4, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1097", "Identifier": "Child Record #98 (Anonymized)", "Age": 5, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1098", "Identifier": "Child Record #99 (Anonymized)", "Age": 6, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1099", "Identifier": "Child Record #100 (Anonymized)", "Age": 7, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1100", "Identifier": "Child Record #101 (Anonymized)", "Age": 8, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1101", "Identifier": "Child Record #102 (Anonymized)", "Age": 9, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1102", "Identifier": "Child Record #103 (Anonymized)", "Age": 10, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1103", "Identifier": "Child Record #104 (Anonymized)", "Age": 11, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}]""")
 
 
-def labeled_bar_chart(df_counts: pd.DataFrame, x_col: str, y_col: str, bar_color: str, title: str) -> alt.Chart:
-    """Creates a clean, high-contrast Altair bar chart with direct numeric labels on every bar."""
-    base = alt.Chart(df_counts).encode(
-        x=alt.X(f"{x_col}:N", sort="-y", title=x_col, axis=alt.Axis(labelAngle=-25, labelColor="#0F172A", titleColor="#0F172A")),
-        y=alt.Y(f"{y_col}:Q", title=y_col, axis=alt.Axis(labelColor="#0F172A", titleColor="#0F172A")),
-    )
-    bars = base.mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6, color=bar_color)
-    labels = base.mark_text(dy=-8, fontSize=13, fontWeight="bold", color="#0F172A").encode(
-        text=alt.Text(f"{y_col}:Q", format="d")
-    )
-    return (
-        (bars + labels)
-        .properties(title=alt.TitleParams(text=title, color="#0F172A", fontSize=15), height=280)
-        .configure_view(fill="#FFFFFF", stroke="#CBD5E1")
-        .configure(background="#FFFFFF")
-    )
-
-
-def module_svg(mod_key: str, accent: str, soft_bg: str) -> str:
-    """Returns a colorful, topic-specific inline SVG illustration for each module."""
+def module_animated_html(mod_key: str, accent: str, soft_bg: str, page_idx: int) -> str:
     if mod_key == "AG":
-        artwork = """
-        <rect x="34" y="34" width="76" height="92" rx="14" fill="#FFFFFF" stroke="#0284C7" stroke-width="3"/>
-        <circle cx="72" cy="64" r="14" fill="#BAE6FD"/>
-        <path d="M54 102 Q72 84 90 102 Z" fill="#38BDF8"/>
-        <path d="M148 56 Q168 38 188 56 Q188 84 168 96 Q148 84 148 56 Z" fill="#38BDF8"/>
-        <circle cx="226" cy="74" r="24" fill="#FFFFFF" stroke="#0284C7" stroke-width="3"/>
-        <path d="M216 74 L223 81 L237 67" fill="none" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
+        scene = """
+        <style>
+          @keyframes floatDrop {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+          }
+          @keyframes waveBubble {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+          }
+          .kid-float { animation: floatDrop 2.4s ease-in-out infinite; transform-origin: center; }
+          .drop-anim { animation: floatDrop 1.8s ease-in-out infinite; }
+          .check-pop { animation: waveBubble 2s ease-in-out infinite; transform-origin: 226px 78px; }
+        </style>
+        <rect x="0" y="0" width="320" height="164" rx="14" fill="#E0F2FE"/>
+        <circle cx="285" cy="28" r="16" fill="#FDE047" opacity="0.85"/>
+        <path d="M0 132 Q80 120 160 132 T320 128 L320 164 L0 164 Z" fill="#BAE6FD"/>
+        <!-- Friendly kid character -->
+        <g class="kid-float">
+          <circle cx="72" cy="62" r="20" fill="#FDBA74" stroke="#9A3412" stroke-width="2.5"/>
+          <path d="M53 56 Q72 36 91 56 Q82 46 72 48 Q62 46 53 56 Z" fill="#451A03"/>
+          <circle cx="65" cy="61" r="2.8" fill="#1E293B"/>
+          <circle cx="79" cy="61" r="2.8" fill="#1E293B"/>
+          <path d="M66 69 Q72 75 78 69" fill="none" stroke="#9A3412" stroke-width="2.5" stroke-linecap="round"/>
+          <rect x="54" y="84" width="36" height="34" rx="12" fill="#38BDF8" stroke="#0369A1" stroke-width="2.5"/>
+          <circle cx="72" cy="100" r="5" fill="#FFFFFF"/>
+        </g>
+        <!-- Water drop & soap -->
+        <g class="drop-anim">
+          <path d="M156 54 Q172 34 188 54 Q188 78 172 90 Q156 78 156 54 Z" fill="#0284C7"/>
+          <circle cx="167" cy="56" r="4" fill="#E0F2FE"/>
+        </g>
+        <!-- Happy star check -->
+        <g class="check-pop">
+          <circle cx="248" cy="78" r="24" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
+          <path d="M237 78 L245 86 L260 70" fill="none" stroke="#10B981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
         """
     elif mod_key == "AH":
-        artwork = """
-        <rect x="32" y="38" width="96" height="84" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="3"/>
-        <text x="80" y="64" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#7C3AED">FIRST</text>
-        <rect x="52" y="74" width="56" height="32" rx="6" fill="#DDD6FE"/>
-        <polygon points="144,72 162,80 144,88" fill="#7C3AED"/>
-        <rect x="174" y="38" width="96" height="84" rx="12" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
-        <text x="222" y="64" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#059669">THEN</text>
-        <circle cx="222" cy="90" r="16" fill="#A7F3D0"/>
+        scene = """
+        <style>
+          @keyframes hopKid {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(2deg); }
+          }
+          @keyframes pulseArrow {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(5px); }
+          }
+          .hop-kid { animation: hopKid 2.2s ease-in-out infinite; transform-origin: center; }
+          .arrow-move { animation: pulseArrow 1.5s ease-in-out infinite; }
+        </style>
+        <rect x="0" y="0" width="320" height="164" rx="14" fill="#EEF2FF"/>
+        <rect x="0" y="130" width="320" height="34" fill="#C7D2FE"/>
+        <!-- FIRST card -->
+        <rect x="20" y="34" width="96" height="84" rx="12" fill="#FFFFFF" stroke="#4F46E5" stroke-width="3"/>
+        <text x="68" y="56" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#4F46E5">FIRST</text>
+        <rect x="44" y="66" width="48" height="36" rx="8" fill="#F59E0B"/>
+        <path d="M54 66 Q68 54 82 66" fill="none" stroke="#B45309" stroke-width="3"/>
+        <!-- Arrow -->
+        <g class="arrow-move">
+          <path d="M126 76 L146 76" stroke="#4F46E5" stroke-width="4" stroke-linecap="round"/>
+          <polygon points="144,68 158,76 144,84" fill="#4F46E5"/>
+        </g>
+        <!-- THEN kid -->
+        <g class="hop-kid">
+          <rect x="168" y="34" width="128" height="84" rx="12" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
+          <text x="232" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#059669">THEN PLAY</text>
+          <circle cx="232" cy="76" r="14" fill="#FDBA74" stroke="#9A3412" stroke-width="2"/>
+          <circle cx="227" cy="75" r="2" fill="#1E293B"/>
+          <circle cx="237" cy="75" r="2" fill="#1E293B"/>
+          <path d="M227 81 Q232 86 237 81" fill="none" stroke="#9A3412" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="212" cy="102" r="7" fill="#F43F5E"/>
+          <circle cx="252" cy="102" r="7" fill="#3B82F6"/>
+        </g>
         """
     elif mod_key == "AI":
-        artwork = """
-        <circle cx="64" cy="54" r="18" fill="#FBBF24"/>
-        <path d="M28 124 Q85 96 145 112 T276 96 L276 142 L28 142 Z" fill="#A7F3D0"/>
-        <circle cx="152" cy="66" r="11" fill="#047857"/>
-        <path d="M152 77 L145 102 L134 118 M152 77 L160 102 L172 115 M152 84 L136 94 M152 84 L168 92" stroke="#047857" stroke-width="4" stroke-linecap="round" fill="none"/>
-        <circle cx="235" cy="64" r="20" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
-        <path d="M225 64 Q235 52 245 64 Q235 76 225 64" fill="#34D399"/>
+        scene = """
+        <style>
+          @keyframes spinSun {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          @keyframes strollKid {
+            0%, 100% { transform: translateX(-4px); }
+            50% { transform: translateX(6px); }
+          }
+          .sun-spin { animation: spinSun 12s linear infinite; transform-origin: 54px 46px; }
+          .stroll-kid { animation: strollKid 2.5s ease-in-out infinite; }
+        </style>
+        <rect x="0" y="0" width="320" height="164" rx="14" fill="#CCFBF1"/>
+        <g class="sun-spin">
+          <circle cx="54" cy="46" r="15" fill="#FBBF24"/>
+          <line x1="54" y1="22" x2="54" y2="28" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+          <line x1="54" y1="64" x2="54" y2="70" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+          <line x1="30" y1="46" x2="36" y2="46" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+          <line x1="72" y1="46" x2="78" y2="46" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <path d="M0 124 Q85 104 170 120 T320 112 L320 164 L0 164 Z" fill="#5EEAD4"/>
+        <!-- Walking kid -->
+        <g class="stroll-kid">
+          <circle cx="155" cy="72" r="16" fill="#FDBA74" stroke="#0F766E" stroke-width="2.5"/>
+          <circle cx="150" cy="71" r="2.2" fill="#1E293B"/>
+          <circle cx="160" cy="71" r="2.2" fill="#1E293B"/>
+          <path d="M150 77 Q155 82 160 77" fill="none" stroke="#0F766E" stroke-width="2" stroke-linecap="round"/>
+          <rect x="142" y="90" width="26" height="26" rx="8" fill="#14B8A6"/>
+          <line x1="149" y1="116" x2="142" y2="134" stroke="#0F766E" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="161" y1="116" x2="168" y2="134" stroke="#0F766E" stroke-width="3.5" stroke-linecap="round"/>
+        </g>
+        <!-- Calm headphones icon -->
+        <path d="M234 86 A22 22 0 0 1 278 86" fill="none" stroke="#0D9488" stroke-width="4" stroke-linecap="round"/>
+        <rect x="228" y="84" width="10" height="20" rx="5" fill="#0D9488"/>
+        <rect x="274" y="84" width="10" height="20" rx="5" fill="#0D9488"/>
         """
     else:
-        artwork = """
-        <rect x="34" y="38" width="84" height="84" rx="12" fill="#FFFFFF" stroke="#D97706" stroke-width="3"/>
-        <circle cx="76" cy="70" r="16" fill="#FDE68A"/>
-        <rect x="52" y="94" width="48" height="10" rx="5" fill="#F59E0B"/>
-        <path d="M132 80 L156 80" stroke="#D97706" stroke-width="4" stroke-linecap="round"/>
-        <polygon points="154,72 168,80 154,88" fill="#D97706"/>
-        <rect x="178" y="38" width="94" height="84" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="3"/>
-        <circle cx="212" cy="70" r="10" fill="#93C5FD"/>
-        <circle cx="242" cy="70" r="10" fill="#6EE7B7"/>
-        <rect x="196" y="92" width="58" height="12" rx="6" fill="#DBEAFE"/>
+        scene = """
+        <style>
+          @keyframes cardBounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+          }
+          @keyframes talkWave {
+            0%, 100% { transform: scale(0.95); }
+            50% { transform: scale(1.08); }
+          }
+          .card-bounce { animation: cardBounce 2.1s ease-in-out infinite; }
+          .talk-wave { animation: talkWave 1.8s ease-in-out infinite; transform-origin: 244px 76px; }
+        </style>
+        <rect x="0" y="0" width="320" height="164" rx="14" fill="#FEF3C7"/>
+        <rect x="0" y="132" width="320" height="32" fill="#FDE68A"/>
+        <!-- Picture card -->
+        <g class="card-bounce">
+          <rect x="26" y="34" width="88" height="86" rx="12" fill="#FFFFFF" stroke="#F59E0B" stroke-width="3"/>
+          <circle cx="70" cy="66" r="15" fill="#38BDF8"/>
+          <rect x="44" y="88" width="52" height="14" rx="7" fill="#FDE68A"/>
+          <text x="70" y="99" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#92400E">PECS CARD</text>
+        </g>
+        <path d="M126 78 L156 78" stroke="#D97706" stroke-width="4" stroke-linecap="round"/>
+        <polygon points="154,70 168,78 154,86" fill="#D97706"/>
+        <!-- Kid speaking -->
+        <g class="talk-wave">
+          <circle cx="236" cy="74" r="22" fill="#FDBA74" stroke="#B45309" stroke-width="2.5"/>
+          <circle cx="229" cy="72" r="2.5" fill="#1E293B"/>
+          <circle cx="243" cy="72" r="2.5" fill="#1E293B"/>
+          <ellipse cx="236" cy="82" rx="6" ry="4" fill="#EF4444"/>
+          <circle cx="272" cy="44" r="6" fill="#F59E0B" opacity="0.7"/>
+          <circle cx="286" cy="36" r="4" fill="#F59E0B" opacity="0.5"/>
+        </g>
         """
-
-    return f"""
-    <svg viewBox="0 0 304 156" width="100%" height="156" xmlns="http://www.w3.org/2000/svg" style="border-radius:12px;background:{soft_bg};display:block;">
-        {artwork}
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  html, body {{
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }}
+  .wrap {{
+    background: {soft_bg};
+    border: 2px solid {accent}33;
+    border-radius: 14px;
+    padding: 10px;
+  }}
+  .caption {{
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1E293B;
+    text-align: center;
+  }}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <svg viewBox="0 0 320 164" width="100%" height="156" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:12px;">
+      {scene}
     </svg>
-    """
-
-
+    <div class="caption">Animated Guide • Page {page_idx + 1}</div>
+  </div>
+</body>
+</html>
+"""
 def build_flipbook_html(mod: dict) -> str:
-    """Generates a standalone interactive HTML flipbook that users can download and open in any browser."""
     title_esc = html.escape(f"{mod['code']}: {mod['title']}")
     domain_esc = html.escape(mod["domain"])
     accent = mod["color"]
     soft_bg = mod["soft_bg"]
-    svg_art = module_svg(mod["key"], accent, soft_bg)
+    svg_art = module_animated_html(mod["key"], accent, soft_bg, 0)
 
     pages_js_items = []
     for p_title, p_summary, p_steps in mod["pages"]:
@@ -377,7 +527,7 @@ def build_flipbook_html(mod: dict) -> str:
     background: linear-gradient(135deg, #FEE2E2 0%, #FEF9C3 50%, #DBEAFE 100%);
     margin: 0;
     padding: 28px;
-    color: #0F172A;
+    color: #1E293B;
     display: flex;
     justify-content: center;
   }}
@@ -387,7 +537,7 @@ def build_flipbook_html(mod: dict) -> str:
     background: #FFFFFF;
     border-radius: 18px;
     padding: 26px;
-    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
     border-top: 8px solid {accent};
   }}
   .top-tag {{
@@ -399,34 +549,17 @@ def build_flipbook_html(mod: dict) -> str:
     padding: 5px 12px;
     border-radius: 999px;
   }}
-  h1 {{
-    margin: 10px 0 4px 0;
-    font-size: 24px;
-  }}
-  .domain {{
-    color: #475569;
-    font-size: 14px;
-    margin-bottom: 16px;
-  }}
+  h1 {{ margin: 10px 0 4px 0; font-size: 24px; }}
+  .domain {{ color: #475569; font-size: 14px; margin-bottom: 16px; }}
   .page-box {{
     background: {soft_bg};
     border-radius: 14px;
     padding: 20px;
     margin-top: 16px;
     min-height: 170px;
-    transition: transform 0.25s ease;
   }}
-  .page-heading {{
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: #0F172A;
-  }}
-  .page-summary {{
-    font-size: 15px;
-    margin-bottom: 12px;
-    line-height: 1.5;
-  }}
+  .page-heading {{ font-size: 18px; font-weight: 700; margin-bottom: 8px; }}
+  .page-summary {{ font-size: 15px; margin-bottom: 12px; line-height: 1.5; }}
   .page-steps {{
     background: #FFFFFF;
     padding: 14px 16px;
@@ -451,23 +584,17 @@ def build_flipbook_html(mod: dict) -> str:
     font-weight: 600;
     cursor: pointer;
   }}
-  button:disabled {{
-    background: #CBD5E1;
-    cursor: not-allowed;
-  }}
-  .indicator {{
-    font-weight: 700;
-    color: #334155;
-  }}
+  button:disabled {{ background: #CBD5E1; cursor: not-allowed; }}
+  .indicator {{ font-weight: 700; color: #334155; }}
 </style>
 </head>
 <body>
   <div class="book-shell">
     <span class="top-tag">INTERACTIVE FLIPBOOK</span>
     <h1>{title_esc}</h1>
-    <div class="domain">Focus Domain: {domain_esc} • Use buttons or Left/Right arrow keys to flip pages</div>
+    <div class="domain">Focus Domain: {domain_esc}</div>
     {svg_art}
-    <div class="page-box" id="pageBox">
+    <div class="page-box">
       <div class="page-heading" id="pageHeading"></div>
       <div class="page-summary" id="pageSummary"></div>
       <div class="page-steps" id="pageSteps"></div>
@@ -481,7 +608,6 @@ def build_flipbook_html(mod: dict) -> str:
 <script>
   const pages = {pages_json};
   let idx = 0;
-
   function render() {{
     const p = pages[idx];
     document.getElementById("pageHeading").innerHTML = p.heading;
@@ -491,23 +617,13 @@ def build_flipbook_html(mod: dict) -> str:
     document.getElementById("prevBtn").disabled = idx === 0;
     document.getElementById("nextBtn").disabled = idx === pages.length - 1;
   }}
-
   function turnPage(delta) {{
     const nextIdx = idx + delta;
     if (nextIdx >= 0 && nextIdx < pages.length) {{
       idx = nextIdx;
-      const box = document.getElementById("pageBox");
-      box.style.transform = "scale(0.98)";
-      setTimeout(() => {{ box.style.transform = "scale(1)"; }}, 120);
       render();
     }}
   }}
-
-  document.addEventListener("keydown", (e) => {{
-    if (e.key === "ArrowRight") turnPage(1);
-    if (e.key === "ArrowLeft") turnPage(-1);
-  }});
-
   render();
 </script>
 </body>
@@ -538,158 +654,193 @@ for mod in MODULES_4:
 
 df_students = st.session_state["student_df"].copy()
 
-st.markdown(
-    """
-    <div class="hero-banner">
-        <h2 style="margin:0;color:#FFFFFF;">🌈 Kelantan Autism GIS & Support Platform</h2>
-        <p style="margin:4px 0 0 0;color:#FFFFFF;font-size:14px;">
-            Red • Yellow • Blue Theme • Clear Labeled Charts • Live Student Registry • Tailored Centre Matcher • 4 Flipbooks
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Sidebar Multi-Page Navigation
-st.sidebar.title("🌈 Navigation")
+st.sidebar.markdown("### ⚡ Kelantan GIS")
 page = st.sidebar.radio(
-    "Choose a Page",
+    "Navigation",
     [
-        "1. Kelantan Zone Overview & Analytics",
-        "2. Student Registry (Edit & Insert)",
-        "3. Parents: Child & Centre Matcher",
-        "4. Parents: 4 Interactive Flipbook Modules",
+        "Dashboard",
+        "Student Registry",
+        "Child & Centre Matcher",
+        "4 Flipbook Modules",
     ],
 )
 
 counts_by_dist = df_students["District"].value_counts().to_dict()
 
 # ==============================================================================
-# PAGE 1: KELANTAN ZONE OVERVIEW (RED / GREEN / YELLOW) + INSPECTOR + GRAPHS
+# PAGE 1: DASHBOARD LAYOUT (RED / YELLOW / BLUE + CLEAR LABELED VISUALS)
 # ==============================================================================
-if page == "1. Kelantan Zone Overview & Analytics":
-    k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Total Students", len(df_students))
-    k2.metric("Verified Active", int((df_students["Status"] == "Verified Active").sum()))
-    k3.metric("Pending Verification", int((df_students["Status"] == "Pending Verification").sum()))
-    k4.metric("Red Zone Districts", sum(1 for v in DISTRICT_INFO.values() if v["zone"] == "Red Zone"))
+if page == "Dashboard":
+    total_students = len(df_students)
+    verified_cnt = int((df_students["Status"] == "Verified Active").sum())
+    red_zones = sum(1 for v in DISTRICT_INFO.values() if v["zone"] == "Red Zone")
 
-    st.divider()
-    zone_col, info_col = st.columns([7, 5], gap="large")
-
-    with zone_col:
-        st.subheader("🧭 Kelantan District Zone Overview")
-        st.caption("Clear summary of Red / Yellow / Green zones, student counts, centre counts, and recommended centres.")
-
-        zone_rows = []
-        for dist_name, info in DISTRICT_INFO.items():
-            stu_cnt = int(counts_by_dist.get(dist_name, 0))
-            zone_rows.append({
-                "District": dist_name,
-                "Zone": info["zone"],
-                "Students": stu_cnt,
-                "Centres": info["centres"],
-                "Recommended Centre": info["recommended_centre"],
-            })
-        zone_df = pd.DataFrame(zone_rows)
-        st.dataframe(zone_df, width="stretch", hide_index=True)
-
-        st.markdown("#### Quick District Zone Cards")
-        dist_items = list(DISTRICT_INFO.items())
-        for row_start in range(0, len(dist_items), 2):
-            c_left, c_right = st.columns(2)
-            for col_slot, (d_name, d_meta) in zip([c_left, c_right], dist_items[row_start:row_start + 2]):
-                stu_n = int(counts_by_dist.get(d_name, 0))
-                with col_slot:
-                    with st.container(border=True):
-                        st.markdown(
-                            f'<span class="module-badge" style="background:{d_meta["badge_bg"]};">{d_meta["zone"]}</span>',
-                            unsafe_allow_html=True,
-                        )
-                        st.markdown(f"**{d_name}** — `{stu_n}` students | `{d_meta['centres']}` centres")
-                        st.caption(d_meta["recommended_centre"])
-                        if st.button(f"Inspect {d_name}", key=f"insp_{d_name}", width="stretch"):
-                            st.session_state["selected_zone_district"] = d_name
-                            st.rerun()
-
-    with info_col:
-        st.subheader("📌 District Inspector")
-        selected_dist = st.selectbox(
-            "Select a Kelantan district to inspect",
-            options=list(DISTRICT_INFO.keys()),
-            index=list(DISTRICT_INFO.keys()).index(st.session_state["selected_zone_district"]),
+    top_l, top_r = st.columns([4, 8], gap="medium")
+    with top_l:
+        st.markdown(
+            f"""
+            <div class="ui-card" style="display:flex;align-items:center;gap:14px;min-height:112px;">
+                <div class="avatar-circle">KA</div>
+                <div>
+                    <div style="font-size:18px;font-weight:800;color:#0F172A;">Kelantan Autism GIS</div>
+                    <div style="font-size:11px;font-weight:700;letter-spacing:0.6px;color:#2563EB;">WELCOME TO DASHBOARD</div>
+                    <div style="font-size:12px;color:#475569;margin-top:4px;">{total_students} Registry Records • 7 Districts</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
-        st.session_state["selected_zone_district"] = selected_dist
 
-        d_info = DISTRICT_INFO[selected_dist]
-        d_rows = df_students[df_students["District"] == selected_dist]
+    with top_r:
+        st.markdown('<div class="ui-card" style="min-height:112px;">', unsafe_allow_html=True)
+        h_l, h_r = st.columns([8, 4])
+        with h_l:
+            st.markdown("<div style='font-size:16px;font-weight:800;color:#0F172A;'>Kelantan Zone & Registry Summary</div>", unsafe_allow_html=True)
+            st.caption("District student counts, diagnosis share, and service demand")
+        with h_r:
+            st.download_button(
+                label="⬇ Download CSV",
+                data=df_students.to_csv(index=False).encode("utf-8"),
+                file_name="kelantan_student_registry.csv",
+                mime="text/csv",
+                use_container_width=True,
+            )
 
-        with st.container(border=True):
+        k1, k2, k3 = st.columns(3, gap="medium")
+        with k1:
             st.markdown(
-                f'<span class="module-badge" style="background:{d_info["badge_bg"]};">{d_info["zone"]}</span>',
+                f'<div class="kpi-amber"><div class="kpi-title">Total Students</div><div class="kpi-num">{total_students}</div></div>',
                 unsafe_allow_html=True,
             )
-            st.markdown(f"### 📍 {selected_dist}")
-            st.write(d_info["place_summary"])
-            st.markdown(f"- **Coordinates:** `{d_info['lat']}, {d_info['lon']}`")
-            st.markdown(f"- **Students:** `{len(d_rows)}` | **Centres:** `{d_info['centres']}`")
+        with k2:
             st.markdown(
-                f"- **Diagnosis:** Mild `{int((d_rows['Diagnosis'] == 'Mild Autism').sum())}` • "
-                f"High-Function `{int((d_rows['Diagnosis'] == 'High-Function Autism').sum())}` • "
-                f"Severe `{int((d_rows['Diagnosis'] == 'Severe Autism').sum())}`"
+                f'<div class="kpi-indigo"><div class="kpi-title">Verified Active</div><div class="kpi-num">{verified_cnt}</div></div>',
+                unsafe_allow_html=True,
             )
-            st.markdown(f"- **Suitable Centre:** {d_info['recommended_centre']}")
-            st.markdown(f"- **Therapists:** {d_info['therapists']}")
+        with k3:
+            st.markdown(
+                f'<div class="kpi-blue"><div class="kpi-title">Red Zone Districts</div><div class="kpi-num">{red_zones}</div></div>',
+                unsafe_allow_html=True,
+            )
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    st.divider()
-    st.subheader("📊 Clear Visual Analytics (With Exact Numbers)")
-    g1, g2, g3 = st.columns(3)
+    mid_l, mid_r = st.columns([7, 5], gap="medium")
 
-    dist_chart_df = df_students.groupby("District").size().reset_index(name="Students")
-    serv_chart_df = df_students.groupby("Required Service").size().reset_index(name="Count")
-    diag_chart_df = (
-        df_students.groupby(["District", "Diagnosis"])
-        .size()
-        .reset_index(name="Students")
-    )
+    dist_df = df_students.groupby("District").size().reset_index(name="Students")
+    for d_name in DISTRICT_INFO:
+        if d_name not in dist_df["District"].values:
+            dist_df = pd.concat([dist_df, pd.DataFrame([{"District": d_name, "Students": 0}])], ignore_index=True)
+    dist_df["Order"] = dist_df["District"].map({k: i for i, k in enumerate(DISTRICT_INFO.keys())})
+    dist_df = dist_df.sort_values("Order")
 
-    with g1:
-        st.altair_chart(
-            labeled_bar_chart(dist_chart_df, "District", "Students", "#DC2626", "Students per District"),
-            use_container_width=True,
+    with mid_l:
+        st.markdown('<div class="ui-card">', unsafe_allow_html=True)
+        st.markdown("<div style='font-size:15px;font-weight:800;color:#0F172A;margin-bottom:6px;'>Students Across Kelantan Districts</div>", unsafe_allow_html=True)
+        area_base = alt.Chart(dist_df).encode(
+            x=alt.X("District:N", sort=list(DISTRICT_INFO.keys()), axis=alt.Axis(labelAngle=0, labelColor="#1E293B", title=None)),
+            y=alt.Y("Students:Q", axis=alt.Axis(labelColor="#1E293B", title=None, gridColor="#E2E8F0")),
+            tooltip=["District", "Students"],
         )
-    with g2:
-        diag_stacked = (
-            alt.Chart(diag_chart_df)
-            .mark_bar()
+        area_layer = area_base.mark_area(
+            line={"color": "#DC2626", "strokeWidth": 2.5},
+            color=alt.Gradient(
+                gradient="linear",
+                stops=[
+                    alt.GradientStop(color="rgba(251, 191, 36, 0.45)", offset=0),
+                    alt.GradientStop(color="rgba(37, 99, 235, 0.08)", offset=1),
+                ],
+                x1=1, x2=1, y1=1, y2=0,
+            ),
+        )
+        pts_layer = area_base.mark_point(size=85, filled=True, color="#FFFFFF", stroke="#2563EB", strokeWidth=2.5)
+        txt_layer = area_base.mark_text(dy=-13, fontSize=12, fontWeight="bold", color="#0F172A").encode(text="Students:Q")
+        st.altair_chart((area_layer + pts_layer + txt_layer).properties(height=250).configure_view(strokeWidth=0), use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with mid_r:
+        st.markdown('<div class="ui-card">', unsafe_allow_html=True)
+        st.markdown("<div style='font-size:15px;font-weight:800;color:#0F172A;margin-bottom:6px;'>Diagnosis Breakdown</div>", unsafe_allow_html=True)
+        diag_df = df_students.groupby("Diagnosis").size().reset_index(name="Count")
+        donut = (
+            alt.Chart(diag_df)
+            .mark_arc(innerRadius=52, outerRadius=82)
             .encode(
-                x=alt.X("District:N", title="District", axis=alt.Axis(labelAngle=-25, labelColor="#0F172A", titleColor="#0F172A")),
-                y=alt.Y("Students:Q", title="Students", axis=alt.Axis(labelColor="#0F172A", titleColor="#0F172A")),
+                theta=alt.Theta("Count:Q"),
                 color=alt.Color(
                     "Diagnosis:N",
                     scale=alt.Scale(
                         domain=["Mild Autism", "High-Function Autism", "Severe Autism"],
-                        range=["#2563EB", "#F59E0B", "#DC2626"],
+                        range=["#F59E0B", "#2563EB", "#DC2626"],
                     ),
+                    legend=alt.Legend(orient="bottom", title=None),
                 ),
-                tooltip=["District", "Diagnosis", "Students"],
+                tooltip=["Diagnosis", "Count"],
             )
-            .properties(title=alt.TitleParams(text="Diagnosis by District", color="#0F172A", fontSize=15), height=280)
-            .configure_view(fill="#FFFFFF", stroke="#CBD5E1")
-            .configure(background="#FFFFFF")
+            .properties(height=250)
+            .configure_view(strokeWidth=0)
         )
-        st.altair_chart(diag_stacked, use_container_width=True)
-    with g3:
-        st.altair_chart(
-            labeled_bar_chart(serv_chart_df, "Required Service", "Count", "#2563EB", "Required Services"),
-            use_container_width=True,
+        st.altair_chart(donut, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    bot_l, bot_r = st.columns([7, 5], gap="medium")
+
+    with bot_l:
+        st.markdown('<div class="ui-card">', unsafe_allow_html=True)
+        st.markdown("<div style='font-size:15px;font-weight:800;color:#0F172A;'>Service & Verification Rates</div>", unsafe_allow_html=True)
+        st.caption("Share of verified records and required therapy services")
+
+        verified_pct = round((verified_cnt / total_students) * 100) if total_students else 0
+        speech_cnt = int((df_students["Required Service"] == "Speech Therapy").sum())
+        speech_pct = round((speech_cnt / total_students) * 100) if total_students else 0
+
+        r1, r2, r3 = st.columns(3)
+        r1.metric("Verified Rate", f"{verified_pct}%", f"{verified_cnt} students")
+        r2.metric("Speech Therapy Share", f"{speech_pct}%", f"{speech_cnt} students")
+        r3.metric("Total Therapy Centres", sum(v["centres"] for v in DISTRICT_INFO.values()), "7 districts")
+
+        serv_df = df_students.groupby("Required Service").size().reset_index(name="Students")
+        s_bars = (
+            alt.Chart(serv_df)
+            .mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6, color="#2563EB")
+            .encode(
+                x=alt.X("Required Service:N", axis=alt.Axis(labelAngle=0, labelColor="#1E293B", title=None)),
+                y=alt.Y("Students:Q", axis=alt.Axis(labelColor="#1E293B", title=None)),
+                tooltip=["Required Service", "Students"],
+            )
         )
+        s_txt = s_bars.mark_text(dy=-8, fontSize=12, fontWeight="bold", color="#0F172A").encode(text="Students:Q")
+        st.altair_chart((s_bars + s_txt).properties(height=180).configure_view(strokeWidth=0), use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with bot_r:
+        st.markdown('<div class="ui-card">', unsafe_allow_html=True)
+        st.markdown("<div style='font-size:15px;font-weight:800;color:#0F172A;margin-bottom:8px;'>District Zone & Centre Inspector</div>", unsafe_allow_html=True)
+        selected_dist = st.selectbox(
+            "Select District",
+            options=list(DISTRICT_INFO.keys()),
+            index=list(DISTRICT_INFO.keys()).index(st.session_state["selected_zone_district"]),
+            label_visibility="collapsed",
+        )
+        st.session_state["selected_zone_district"] = selected_dist
+        d_info = DISTRICT_INFO[selected_dist]
+        d_rows = df_students[df_students["District"] == selected_dist]
+
+        st.markdown(
+            f'<span class="module-badge" style="background:{d_info["badge_bg"]};">{d_info["zone"]}</span> '
+            f'<strong>{selected_dist}</strong> — {len(d_rows)} students | {d_info["centres"]} centres',
+            unsafe_allow_html=True,
+        )
+        st.write(d_info["place_summary"])
+        st.markdown(f"**Suitable Centre:** {d_info['recommended_centre']}")
+        st.markdown(f"**Therapists:** {d_info['therapists']}")
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ==============================================================================
 # PAGE 2: STUDENT REGISTRY (EDIT & INSERT)
 # ==============================================================================
-elif page == "2. Student Registry (Edit & Insert)":
-    st.subheader("📋 Student Registry — Edit & Insert Records")
+elif page == "Student Registry":
+    st.markdown('<div class="ui-card">', unsafe_allow_html=True)
+    st.subheader("Student Registry — Edit & Insert Records")
 
     with st.expander("➕ Insert New Student Record", expanded=False):
         with st.form("insert_student_form", clear_on_submit=True):
@@ -705,7 +856,7 @@ elif page == "2. Student Registry (Edit & Insert)":
             new_date = c7.text_input("Date (YYYY-MM-DD)", value="2026-11-23")
             new_status = c8.selectbox("Status", ["Verified Active", "Pending Verification"])
 
-            if st.form_submit_button("✨ Add Record"):
+            if st.form_submit_button("Add Record"):
                 new_row = pd.DataFrame([{
                     "Record ID": new_id.strip(),
                     "Identifier": new_ident.strip(),
@@ -723,7 +874,7 @@ elif page == "2. Student Registry (Edit & Insert)":
     edited_df = st.data_editor(
         st.session_state["student_df"],
         num_rows="dynamic",
-        width="stretch",
+        use_container_width=True,
         hide_index=True,
         column_config={
             "District": st.column_config.SelectboxColumn("District", options=list(DISTRICT_INFO.keys()), required=True),
@@ -734,29 +885,31 @@ elif page == "2. Student Registry (Edit & Insert)":
     )
 
     b1, b2 = st.columns([2, 3])
-    if b1.button("💾 Save Table Edits", type="primary"):
+    if b1.button("Save Table Edits", type="primary"):
         st.session_state["student_df"] = edited_df.copy()
         st.success("Saved changes to registry!")
 
     b2.download_button(
-        label="⬇️ Download Updated CSV",
+        label="Download Updated CSV",
         data=st.session_state["student_df"].to_csv(index=False).encode("utf-8"),
         file_name="kelantan_student_registry_updated.csv",
         mime="text/csv",
     )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ==============================================================================
-# PAGE 3: PARENTS — CHILD RECORD, AUTISM TYPE, SUITABLE CENTRE & THERAPISTS
+# PAGE 3: PARENTS — CHILD & CENTRE MATCHER
 # ==============================================================================
-elif page == "3. Parents: Child & Centre Matcher":
-    st.subheader("🏥 Parents Portal — Child Profile, Suitable Centre & Therapists")
+elif page == "Child & Centre Matcher":
+    st.markdown('<div class="ui-card">', unsafe_allow_html=True)
+    st.subheader("Child Profile, Suitable Centre & Therapists")
 
     f1, f2 = st.columns([2, 4])
     dist_filter = f1.selectbox("Filter District", ["ALL"] + list(DISTRICT_INFO.keys()))
     pool_df = df_students if dist_filter == "ALL" else df_students[df_students["District"] == dist_filter]
 
     selected_rec_id = f2.selectbox(
-        "Click / Choose Child Record",
+        "Choose Child Record",
         options=pool_df["Record ID"].tolist(),
         format_func=lambda rid: f"{rid} — {pool_df.loc[pool_df['Record ID'] == rid, 'Identifier'].values[0]} ({pool_df.loc[pool_df['Record ID'] == rid, 'District'].values[0]})",
     )
@@ -768,35 +921,32 @@ elif page == "3. Parents: Child & Centre Matcher":
 
     left, right = st.columns([5, 7], gap="large")
     with left:
-        st.markdown("### 👶 Child Information")
-        with st.container(border=True):
-            st.markdown(f"**Record ID:** `{child_row['Record ID']}`")
-            st.markdown(f"**Identifier:** {child_row['Identifier']}")
-            st.markdown(f"**Age:** `{child_row['Age']}` years old")
-            st.markdown(f"**District:** `{c_dist}` (`{c_info['zone']}`)")
-            st.markdown(f"**Type of Autism:** `{c_diag}`")
-            st.markdown(f"**Required Service:** `{child_row['Required Service']}`")
-            st.markdown(f"**Date:** `{child_row['Date']}` | **Status:** `{child_row['Status']}`")
+        st.markdown("#### Child Information")
+        st.markdown(f"**Record ID:** `{child_row['Record ID']}`")
+        st.markdown(f"**Identifier:** {child_row['Identifier']}")
+        st.markdown(f"**Age:** `{child_row['Age']}` years old")
+        st.markdown(f"**District:** `{c_dist}` (`{c_info['zone']}`)")
+        st.markdown(f"**Type of Autism:** `{c_diag}`")
+        st.markdown(f"**Required Service:** `{child_row['Required Service']}`")
+        st.markdown(f"**Date:** `{child_row['Date']}` | **Status:** `{child_row['Status']}`")
 
     with right:
-        st.markdown("### 🌟 Suitable Centre & Therapists")
-        with st.container(border=True):
-            st.markdown(
-                f'<span class="module-badge" style="background:{c_info["badge_bg"]};">{c_info["zone"]}</span>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(f"#### ⭐ {c_info['recommended_centre']}")
-            st.markdown(f"**Why Suitable:** {c_info['why_suitable']}")
-            st.markdown(f"**Therapists Provided:** {c_info['therapists']}")
-            st.markdown(f"**Matched Required Service:** `{child_row['Required Service']}`")
+        st.markdown("#### Suitable Centre & Therapists")
+        st.markdown(
+            f'<span class="module-badge" style="background:{c_info["badge_bg"]};">{c_info["zone"]}</span>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(f"##### {c_info['recommended_centre']}")
+        st.markdown(f"**Why Suitable:** {c_info['why_suitable']}")
+        st.markdown(f"**Therapists Provided:** {c_info['therapists']}")
+        st.markdown(f"**Matched Required Service:** `{child_row['Required Service']}`")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ==============================================================================
-# PAGE 4: PARENTS — 4 COLORFUL INTERACTIVE FLIPBOOK MODULES
+# PAGE 4: PARENTS — 4 INTERACTIVE FLIPBOOK MODULES
 # ==============================================================================
 else:
-    st.subheader("📚 4 Interactive Flipbook Modules (Illustrated & Downloadable)")
-    st.caption("Flip through pages right here in the dashboard, or download each module as an interactive HTML flipbook.")
-
+    st.subheader("4 Interactive Flipbook Modules")
     cols = st.columns(2, gap="large")
     for idx, mod in enumerate(MODULES_4):
         p_key = f"flip_page_{mod['key']}"
@@ -805,45 +955,46 @@ else:
         p_heading, p_summary, p_steps = mod["pages"][cur_page]
 
         with cols[idx % 2]:
-            with st.container(border=True):
-                st.markdown(
-                    f'<span class="module-badge" style="background:{mod["color"]};">{mod["code"]} • {mod["domain"]}</span>',
-                    unsafe_allow_html=True,
-                )
-                st.markdown(f"### {mod['title']}")
-                st.markdown(module_svg(mod["key"], mod["color"], mod["soft_bg"]), unsafe_allow_html=True)
+            st.markdown('<div class="ui-card">', unsafe_allow_html=True)
+            st.markdown(
+                f'<span class="module-badge" style="background:{mod["color"]};">{mod["code"]} • {mod["domain"]}</span>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(f"#### {mod['title']}")
+            components.html(module_animated_html(mod["key"], mod["color"], mod["soft_bg"], cur_page), height=205)
 
-                st.markdown(
-                    f"""
-                    <div class="flip-card" style="background:{mod['soft_bg']};margin-top:12px;">
-                        <div style="font-weight:700;font-size:15px;margin-bottom:6px;">{p_heading}</div>
-                        <div style="font-size:13px;margin-bottom:10px;">{p_summary}</div>
-                        <div style="background:#FFFFFF;padding:10px 12px;border-radius:8px;font-size:12.5px;line-height:1.55;">
-                            {p_steps.replace(chr(10), "<br>")}
-                        </div>
+            st.markdown(
+                f"""
+                <div class="flip-card" style="margin-top:12px;">
+                    <div style="font-weight:700;font-size:15px;margin-bottom:6px;">{p_heading}</div>
+                    <div style="font-size:13px;margin-bottom:10px;">{p_summary}</div>
+                    <div style="background:#FFFFFF;padding:10px 12px;border-radius:8px;font-size:12.5px;line-height:1.55;">
+                        {p_steps.replace(chr(10), "<br>")}
                     </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-                nav1, nav2, nav3 = st.columns([1, 1.4, 1])
-                if nav1.button("◀ Prev", key=f"prev_{mod['key']}", disabled=(cur_page == 0), width="stretch"):
-                    st.session_state[p_key] = cur_page - 1
-                    st.rerun()
-                nav2.markdown(
-                    f"<div style='text-align:center;padding-top:8px;font-weight:700;'>Page {cur_page + 1} / {total_pages}</div>",
-                    unsafe_allow_html=True,
-                )
-                if nav3.button("Next ▶", key=f"next_{mod['key']}", disabled=(cur_page == total_pages - 1), width="stretch"):
-                    st.session_state[p_key] = cur_page + 1
-                    st.rerun()
+            nav1, nav2, nav3 = st.columns([1, 1.4, 1])
+            if nav1.button("◀ Prev", key=f"prev_{mod['key']}", disabled=(cur_page == 0), use_container_width=True):
+                st.session_state[p_key] = cur_page - 1
+                st.rerun()
+            nav2.markdown(
+                f"<div style='text-align:center;padding-top:8px;font-weight:700;'>Page {cur_page + 1} / {total_pages}</div>",
+                unsafe_allow_html=True,
+            )
+            if nav3.button("Next ▶", key=f"next_{mod['key']}", disabled=(cur_page == total_pages - 1), use_container_width=True):
+                st.session_state[p_key] = cur_page + 1
+                st.rerun()
 
-                flip_html = build_flipbook_html(mod)
-                st.download_button(
-                    label=f"📖 Download {mod['code']} Flipbook (.html)",
-                    data=flip_html.encode("utf-8"),
-                    file_name=f"{mod['code'].replace(' ', '_')}_Flipbook.html",
-                    mime="text/html",
-                    key=f"dl_flip_{mod['key']}",
-                    width="stretch",
-                )
+            flip_html = build_flipbook_html(mod)
+            st.download_button(
+                label=f"Download {mod['code']} Flipbook (.html)",
+                data=flip_html.encode("utf-8"),
+                file_name=f"{mod['code'].replace(' ', '_')}_Flipbook.html",
+                mime="text/html",
+                key=f"dl_flip_{mod['key']}",
+                use_container_width=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
