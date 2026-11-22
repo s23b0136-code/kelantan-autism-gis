@@ -193,6 +193,22 @@ st.markdown(
         border-radius: 10px !important;
         font-weight: 600 !important;
     }
+
+    @media (max-width: 768px) {
+        .kpi-tile-teal, .kpi-tile-navy, .kpi-tile-lavender {
+            margin-bottom: 8px;
+            padding: 12px 14px;
+        }
+        .kpi-value {
+            font-size: 24px;
+        }
+        .brand-header {
+            gap: 10px;
+        }
+        .section-title {
+            font-size: 15px;
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -747,13 +763,13 @@ def module_animated_html(mod_key: str, accent: str, soft_bg: str, page_idx: int)
 <meta charset="UTF-8" />
 <style>
   html, body {{ margin: 0; padding: 0; background: transparent; font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif; }}
-  .wrap {{ background: {soft_bg}; border: 1.5px solid {accent}44; border-radius: 14px; padding: 10px; }}
-  .caption {{ margin-top: 6px; font-size: 11.5px; font-weight: 700; color: #0F172A; text-align: center; }}
+  .wrap {{ background: {soft_bg}; border: 1.5px solid {accent}44; border-radius: 14px; padding: 8px; box-sizing: border-box; }}
+  .caption {{ margin-top: 6px; font-size: 11px; font-weight: 700; color: #0F172A; text-align: center; line-height: 1.35; word-break: break-word; }}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <svg viewBox="0 0 320 164" width="100%" height="156" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:12px;">
+    <svg viewBox="0 0 320 164" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;height:auto;max-height:152px;border-radius:12px;">
       {scene}
     </svg>
     <div class="caption">{html.escape(parent_act)} → {html.escape(kid_phrase)} (Page {page_idx + 1})</div>
@@ -976,6 +992,11 @@ def animated_admin_charts_html(dist_records: list[dict], diag_records: list[dict
   .grid-top {{
     display: grid; grid-template-columns: 1.45fr 1fr; gap: 14px; margin-bottom: 14px;
   }}
+  @media (max-width: 768px) {{
+    .grid-top {{ grid-template-columns: 1fr; }}
+    .card {{ padding: 12px 14px; }}
+    .donut-wrap {{ justify-content: center; }}
+  }}
   .card {{
     background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 16px;
     padding: 16px 18px; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
@@ -1022,7 +1043,7 @@ def animated_admin_charts_html(dist_records: list[dict], diag_records: list[dict
     <div class="card">
       <div class="title">Students Across Kelantan Districts</div>
       <div class="sub">Exact animated student count per district (hover any bar for details)</div>
-      <svg id="distChart" viewBox="0 0 560 235" width="100%" height="235"></svg>
+      <svg id="distChart" viewBox="0 0 560 235" width="100%" style="height:auto;max-height:245px;display:block;"></svg>
       <div class="tooltip-box" id="distTip">Hover a district bar to inspect exact student & centre count</div>
     </div>
 
@@ -1030,7 +1051,7 @@ def animated_admin_charts_html(dist_records: list[dict], diag_records: list[dict
       <div class="title">Diagnosis Breakdown</div>
       <div class="sub">Exact count and share of registered autism profiles</div>
       <div class="donut-wrap">
-        <svg id="diagChart" viewBox="0 0 190 190" width="175" height="175"></svg>
+        <svg id="diagChart" viewBox="0 0 190 190" width="160" style="height:auto;max-width:175px;flex-shrink:0;"></svg>
         <div class="legend-list" id="diagLegend"></div>
       </div>
     </div>
@@ -1039,7 +1060,7 @@ def animated_admin_charts_html(dist_records: list[dict], diag_records: list[dict
   <div class="card">
     <div class="title">Required Therapy Services Demand</div>
     <div class="sub">Clear animated count of students requiring each intervention service</div>
-    <svg id="servChart" viewBox="0 0 880 185" width="100%" height="185"></svg>
+    <svg id="servChart" viewBox="0 0 880 185" width="100%" style="height:auto;max-height:200px;display:block;"></svg>
   </div>
 
 <script>
@@ -1382,7 +1403,8 @@ if page == "Admin Dashboard":
 
     components.html(
         animated_admin_charts_html(dist_records, diag_records, serv_records),
-        height=495,
+        height=760,
+        scrolling=False,
     )
 
     with st.container(border=True):
@@ -1470,7 +1492,8 @@ elif page == "Parents Portal":
                 service=active_prof["service"],
                 options=d_entry["options"],
             ),
-            height=345,
+            height=780,
+            scrolling=False,
         )
 
         parent_map_records = []
@@ -1578,7 +1601,7 @@ else:
                     unsafe_allow_html=True,
                 )
                 st.markdown(f"#### {mod['title']}")
-                components.html(module_animated_html(mod["key"], mod["color"], mod["soft_bg"], cur_page), height=205)
+                components.html(module_animated_html(mod["key"], mod["color"], mod["soft_bg"], cur_page), height=215, scrolling=False)
 
                 st.markdown(
                     f"""
