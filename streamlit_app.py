@@ -863,6 +863,102 @@ def build_flipbook_html(mod: dict) -> str:
 """
 
 
+
+def kelantan_interactive_map_html(dist_records: list[dict], selected_district: str = "KOTA BHARU", mode_label: str = "Kelantan District Coverage & Centres") -> str:
+    d_json = json.dumps(dist_records)
+    sel_esc = html.escape(selected_district)
+    mode_esc = html.escape(mode_label)
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  html, body {{
+    margin: 0; padding: 0; background: transparent;
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+    color: #0F172A;
+  }}
+  .map-card {{
+    background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 16px;
+    padding: 14px 16px; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+  }}
+  .map-header {{
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
+  }}
+  .map-title {{ font-size: 15.5px; font-weight: 800; color: #0F172A; }}
+  .map-sub {{ font-size: 12px; color: #475569; }}
+  #kelantanMap {{
+    width: 100%; height: 320px; border-radius: 12px; border: 1px solid #CBD5E1; z-index: 1;
+  }}
+  .legend-row {{
+    display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px;
+    font-size: 12px; font-weight: 700; color: #334155;
+  }}
+  .lg-item {{ display: flex; align-items: center; gap: 6px; }}
+  .lg-dot {{ width: 12px; height: 12px; border-radius: 999px; display: inline-block; }}
+</style>
+</head>
+<body>
+  <div class="map-card">
+    <div class="map-header">
+      <div>
+        <div class="map-title">{mode_esc}</div>
+        <div class="map-sub">Highlighted district: <strong>{sel_esc}</strong> • Click any circle marker to inspect exact student & centre count</div>
+      </div>
+    </div>
+    <div id="kelantanMap"></div>
+    <div class="legend-row">
+      <div class="lg-item"><span class="lg-dot" style="background:#0D9488;"></span>Green Zone (Higher Centre Coverage)</div>
+      <div class="lg-item"><span class="lg-dot" style="background:#D97706;"></span>Yellow Zone (Moderate Coverage)</div>
+      <div class="lg-item"><span class="lg-dot" style="background:#BE123C;"></span>Red Zone (High Deficit / Priority)</div>
+    </div>
+  </div>
+<script>
+  const districts = {d_json};
+  const selectedName = {json.dumps(selected_district)};
+  const map = L.map('kelantanMap').setView([6.05, 102.22], 10);
+
+  L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+    maxZoom: 18,
+    attribution: '&copy; OpenStreetMap contributors'
+  }}).addTo(map);
+
+  districts.forEach(d => {{
+    const isSelected = d.district === selectedName;
+    const fillCol = d.zone === "Green Zone" ? "#0D9488" : (d.zone === "Yellow Zone" ? "#D97706" : "#BE123C");
+    const radius = Math.max(11, Math.min(26, 8 + d.students * 0.9));
+
+    const circle = L.circleMarker([d.lat, d.lon], {{
+      radius: radius,
+      fillColor: fillCol,
+      color: isSelected ? "#0F172A" : "#FFFFFF",
+      weight: isSelected ? 3.5 : 2,
+      opacity: 1,
+      fillOpacity: 0.86
+    }}).addTo(map);
+
+    circle.bindPopup(
+      `<div style="font-family:sans-serif;font-size:12.5px;line-height:1.45;">
+        <strong>${{d.district}}</strong><br/>
+        Zone: <strong>${{d.zone}}</strong><br/>
+        Students: <strong>${{d.students}}</strong> • Centres: <strong>${{d.centres}}</strong><br/>
+        1st Option: <strong>${{d.recommended_centre}}</strong>
+      </div>`
+    );
+
+    if (isSelected) {{
+      circle.openPopup();
+    }}
+  }});
+</script>
+</body>
+</html>
+"""
+
+
 def animated_admin_charts_html(dist_records: list[dict], diag_records: list[dict], serv_records: list[dict]) -> str:
     d_json = json.dumps(dist_records)
     g_json = json.dumps(diag_records)
@@ -1267,6 +1363,9 @@ if page == "Admin Dashboard":
             "students": cnt,
             "centres": info["centres"],
             "zone": info["zone"],
+            "lat": info["lat"],
+            "lon": info["lon"],
+            "recommended_centre": info["recommended_centre"],
         })
 
     diag_order = ["Mild Autism", "High-Function Autism", "Severe Autism"]
@@ -1306,6 +1405,15 @@ if page == "Admin Dashboard":
         )
         st.write(d_info["place_summary"])
         st.markdown(f"**1st Choice Centre:** {d_info['recommended_centre']}  |  **Therapists:** {d_info['therapists']}")
+
+    components.html(
+        kelantan_interactive_map_html(
+            dist_records=dist_records,
+            selected_district=st.session_state["selected_zone_district"],
+            mode_label="Kelantan District Map — Student Load, Zone Status & Centres",
+        ),
+        height=425,
+    )
 
 
 # ==============================================================================
@@ -1363,6 +1471,29 @@ elif page == "Parents Portal":
                 options=d_entry["options"],
             ),
             height=345,
+        )
+
+        parent_map_records = []
+        for d_name, info in DISTRICT_INFO.items():
+            cnt = int((df_students["District"] == d_name).sum())
+            parent_map_records.append({
+                "district": d_name,
+                "short": d_name[:8],
+                "students": cnt,
+                "centres": info["centres"],
+                "zone": info["zone"],
+                "lat": info["lat"],
+                "lon": info["lon"],
+                "recommended_centre": info["recommended_centre"],
+            })
+
+        components.html(
+            kelantan_interactive_map_html(
+                dist_records=parent_map_records,
+                selected_district=active_prof["district"],
+                mode_label=f"Nearby District Map for {active_prof['kid_name']} ({active_prof['district']})",
+            ),
+            height=425,
         )
 
 
