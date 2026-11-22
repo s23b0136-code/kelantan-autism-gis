@@ -6,91 +6,152 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="Kelantan Autism GIS — Dashboard",
+    page_title="Kelantan Autism GIS — Executive & Caregiver Portal",
     page_icon="📊",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
+# Theme Palette: Soft Teal + Navy Blue + Lavender
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+    }
+
     .stApp {
-        background: linear-gradient(135deg, #FEE2E2 0%, #FEF9C3 50%, #DBEAFE 100%) !important;
-        color: #1E293B !important;
+        background: linear-gradient(135deg, #CCFBF1 0%, #EDE9FE 52%, #DBEAFE 100%) !important;
+        color: #0F172A !important;
     }
+
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #DC2626 0%, #D97706 50%, #2563EB 100%) !important;
+        background: linear-gradient(180deg, #0F172A 0%, #1E3A8A 55%, #4C1D95 100%) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.14);
     }
+
     [data-testid="stSidebar"] * {
-        color: #FFFFFF !important;
+        color: #F8FAFC !important;
     }
-    .ui-card {
-        background: #FFFFFF;
-        border-radius: 16px;
-        padding: 18px 20px;
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
-        border: 2px solid #BFDBFE;
-        margin-bottom: 12px;
+
+    [data-testid="stSidebar"] .stRadio > label {
+        font-weight: 700 !important;
+        font-size: 13px !important;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        color: #99F6E4 !important;
     }
-    .kpi-amber {
-        background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
-        color: #FFFFFF;
+
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #FFFFFF !important;
+        border-radius: 16px !important;
+        border: 1px solid #CBD5E1 !important;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06) !important;
+        padding: 4px 6px;
+    }
+
+    .brand-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 4px 0;
+    }
+
+    .brand-mark {
+        width: 52px;
+        height: 52px;
         border-radius: 14px;
-        padding: 16px 18px;
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
-    }
-    .kpi-indigo {
-        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-        color: #FFFFFF;
-        border-radius: 14px;
-        padding: 16px 18px;
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
-    }
-    .kpi-blue {
-        background: linear-gradient(135deg, #38BDF8 0%, #2563EB 100%);
-        color: #FFFFFF;
-        border-radius: 14px;
-        padding: 16px 18px;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-    }
-    .kpi-title {
-        font-size: 13px;
-        font-weight: 600;
-        opacity: 0.98;
-        margin-bottom: 6px;
-    }
-    .kpi-num {
-        font-size: 28px;
-        font-weight: 800;
-        line-height: 1.1;
-    }
-    .avatar-circle {
-        width: 54px;
-        height: 54px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #DC2626 0%, #2563EB 100%);
+        background: linear-gradient(135deg, #0D9488 0%, #1E3A8A 60%, #7C3AED 100%);
         color: #FFFFFF;
         font-weight: 800;
-        font-size: 20px;
+        font-size: 18px;
+        letter-spacing: 0.5px;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.22);
     }
-    .module-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
+
+    .kpi-tile-teal {
+        background: linear-gradient(135deg, #0F766E 0%, #0D9488 100%);
+        color: #FFFFFF;
+        border-radius: 14px;
+        padding: 15px 18px;
+        box-shadow: 0 4px 14px rgba(13, 148, 136, 0.22);
+    }
+
+    .kpi-tile-navy {
+        background: linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 100%);
+        color: #FFFFFF;
+        border-radius: 14px;
+        padding: 15px 18px;
+        box-shadow: 0 4px 14px rgba(30, 58, 138, 0.22);
+    }
+
+    .kpi-tile-lavender {
+        background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%);
+        color: #FFFFFF;
+        border-radius: 14px;
+        padding: 15px 18px;
+        box-shadow: 0 4px 14px rgba(109, 40, 217, 0.22);
+    }
+
+    .kpi-label {
         font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        color: rgba(255, 255, 255, 0.92);
+        margin-bottom: 6px;
+    }
+
+    .kpi-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: #FFFFFF;
+        line-height: 1.1;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0F172A;
+        margin: 0 0 2px 0;
+    }
+
+    .section-sub {
+        font-size: 12.5px;
+        color: #475569;
+        margin: 0 0 10px 0;
+    }
+
+    .zone-pill {
+        display: inline-block;
+        padding: 4px 11px;
+        border-radius: 999px;
+        font-size: 11.5px;
         font-weight: 700;
         color: #FFFFFF;
-        margin-bottom: 8px;
+        letter-spacing: 0.2px;
     }
-    .flip-card {
+
+    .flip-panel {
         border-radius: 14px;
-        padding: 18px;
+        padding: 16px;
         border: 1px solid #E2E8F0;
         background: #F8FAFC;
         color: #0F172A;
+        margin-top: 10px;
+    }
+
+    [data-testid="stDownloadButton"] button {
+        background: linear-gradient(135deg, #1E3A8A 0%, #0F766E 100%) !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
     }
     </style>
     """,
@@ -104,7 +165,7 @@ DISTRICT_INFO = {
         "centres": 4,
         "zone": "Green Zone",
         "color": "green",
-        "badge_bg": "#10B981",
+        "badge_bg": "#0D9488",
         "place_summary": "Kota Bharu Central & Kubang Kerian Hub (4 centres, 15 students).",
         "recommended_centre": "NASOM Malaysia - Kota Bharu",
         "therapists": "Speech-Language Pathologists (SLP), Occupational Therapists (OT), ABA Therapists, Special Educators",
@@ -116,7 +177,7 @@ DISTRICT_INFO = {
         "centres": 2,
         "zone": "Yellow Zone",
         "color": "orange",
-        "badge_bg": "#F59E0B",
+        "badge_bg": "#D97706",
         "place_summary": "Bachok Coastal & Tembila/Melawi Zone (2 centres, 15 students).",
         "recommended_centre": "Bachok Autism Outreach Clinic",
         "therapists": "Early Intervention Specialists, Speech Therapy Support, Behavioral Coaches",
@@ -128,7 +189,7 @@ DISTRICT_INFO = {
         "centres": 2,
         "zone": "Yellow Zone",
         "color": "orange",
-        "badge_bg": "#F59E0B",
+        "badge_bg": "#D97706",
         "place_summary": "Pasir Mas Town & Western Corridor (2 centres, 15 students).",
         "recommended_centre": "Pasir Mas Early Intervention Centre",
         "therapists": "Early Childhood Special Educators, Speech & Language Therapists, Sensory-Motor Therapists",
@@ -140,7 +201,7 @@ DISTRICT_INFO = {
         "centres": 1,
         "zone": "Red Zone",
         "color": "red",
-        "badge_bg": "#EF4444",
+        "badge_bg": "#BE123C",
         "place_summary": "Pasir Puteh Southern Zone (High deficit: 15 students to 1 centre).",
         "recommended_centre": "Pasir Puteh Special Needs Center",
         "therapists": "Developmental Therapists, Motor & Play Specialists, Caregiver Counselors",
@@ -152,7 +213,7 @@ DISTRICT_INFO = {
         "centres": 1,
         "zone": "Red Zone",
         "color": "red",
-        "badge_bg": "#EF4444",
+        "badge_bg": "#BE123C",
         "place_summary": "Wakaf Bharu Border Zone (High deficit: 15 students to 1 centre).",
         "recommended_centre": "Wakaf Bharu Care & Intervention Hub",
         "therapists": "Occupational Therapy Practitioners, Daily Living Skills Coaches, Sensory Facilitators",
@@ -164,7 +225,7 @@ DISTRICT_INFO = {
         "centres": 1,
         "zone": "Red Zone",
         "color": "red",
-        "badge_bg": "#EF4444",
+        "badge_bg": "#BE123C",
         "place_summary": "Tumpat Northern Delta Zone (High deficit: 15 students to 1 centre).",
         "recommended_centre": "Tumpat Pediatric Therapy Unit",
         "therapists": "Pediatric Speech Therapists, Play-Based Interventionists, Social Communication Coaches",
@@ -176,7 +237,7 @@ DISTRICT_INFO = {
         "centres": 1,
         "zone": "Yellow Zone",
         "color": "orange",
-        "badge_bg": "#F59E0B",
+        "badge_bg": "#D97706",
         "place_summary": "Rantau Panjang Border Zone (14 students to 1 support hub).",
         "recommended_centre": "Rantau Panjang Autism Support Hub",
         "therapists": "Outreach Special Educators, Speech & Communication Coaches, Parent Training Advisors",
@@ -190,8 +251,8 @@ MODULES_4 = [
         "code": "Module AG",
         "title": "Toilet Training & Hygiene",
         "domain": "Self-Care & Daily Routine",
-        "color": "#0284C7",
-        "soft_bg": "#E0F2FE",
+        "color": "#0F766E",
+        "soft_bg": "#CCFBF1",
         "pages": [
             (
                 "Page 1 • Welcome & Goal",
@@ -220,8 +281,8 @@ MODULES_4 = [
         "code": "Module AH",
         "title": "Arrival Routine & Classroom Transition",
         "domain": "Home & Learning Transitions",
-        "color": "#4F46E5",
-        "soft_bg": "#EEF2FF",
+        "color": "#1E3A8A",
+        "soft_bg": "#DBEAFE",
         "pages": [
             (
                 "Page 1 • Welcome & Goal",
@@ -280,8 +341,8 @@ MODULES_4 = [
         "code": "Module SK",
         "title": "Speech & Picture Exchange (PECS)",
         "domain": "Communication Support",
-        "color": "#F59E0B",
-        "soft_bg": "#FEF3C7",
+        "color": "#6D28D9",
+        "soft_bg": "#EDE9FE",
         "pages": [
             (
                 "Page 1 • Welcome & Goal",
@@ -631,6 +692,292 @@ def build_flipbook_html(mod: dict) -> str:
 """
 
 
+def module_animated_html(mod_key: str, accent: str, soft_bg: str, page_idx: int) -> str:
+    if mod_key == "AG":
+        scene = """
+        <style>
+          @keyframes floatDrop { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-7px); } }
+          @keyframes popBadge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+          .kid-float { animation: floatDrop 2.4s ease-in-out infinite; }
+          .drop-anim { animation: floatDrop 1.8s ease-in-out infinite; }
+          .check-pop { animation: popBadge 2.1s ease-in-out infinite; transform-origin: 252px 80px; }
+        </style>
+        <rect x="0" y="0" width="320" height="164" rx="14" fill="#CCFBF1"/>
+        <circle cx="284" cy="28" r="14" fill="#99F6E4"/>
+        <path d="M0 132 Q80 120 160 132 T320 128 L320 164 L0 164 Z" fill="#5EEAD4"/>
+        <g class="kid-float">
+          <circle cx="72" cy="62" r="20" fill="#FDBA74" stroke="#0F172A" stroke-width="2.5"/>
+          <path d="M53 56 Q72 36 91 56 Q82 46 72 48 Q62 46 53 56 Z" fill="#1E293B"/>
+          <circle cx="65" cy="61" r="2.8" fill="#0F172A"/>
+          <circle cx="79" cy="61" r="2.8" fill="#0F172A"/>
+          <path d="M66 69 Q72 75 78 69" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round"/>
+          <rect x="54" y="84" width="36" height="34" rx="12" fill="#0F766E" stroke="#1E3A8A" stroke-width="2"/>
+          <circle cx="72" cy="100" r="5" fill="#FFFFFF"/>
+        </g>
+        <g class="drop-anim">
+          <path d="M156 54 Q172 34 188 54 Q188 78 172 90 Q156 78 156 54 Z" fill="#1E3A8A"/>
+          <circle cx="167" cy="56" r="4" fill="#DBEAFE"/>
+        </g>
+        <g class="check-pop">
+          <circle cx="252" cy="80" r="23" fill="#FFFFFF" stroke="#0D9488" stroke-width="3"/>
+          <path d="M241 80 L249 88 L264 72" fill="none" stroke="#0D9488" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+        """
+    elif mod_key == "AH":
+        scene = """
+        <style>
+          @keyframes hopKid { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
+          @keyframes slideArrow { 0%, 100% { transform: translateX(0px); } 50% { transform: translateX(5px); } }
+          .hop-kid { animation: hopKid 2.2s ease-in-out infinite; }
+          .arrow-move { animation: slideArrow 1.5s ease-in-out infinite; }
+        </style>
+        <rect x="0" y="0" width="320" height="164" rx="14" fill="#DBEAFE"/>
+        <rect x="0" y="130" width="320" height="34" fill="#BFDBFE"/>
+        <rect x="20" y="34" width="96" height="84" rx="12" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2.5"/>
+        <text x="68" y="56" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="12" font-weight="800" fill="#1E3A8A">FIRST</text>
+        <rect x="44" y="66" width="48" height="36" rx="8" fill="#0D9488"/>
+        <path d="M54 66 Q68 54 82 66" fill="none" stroke="#0F172A" stroke-width="2.5"/>
+        <g class="arrow-move">
+          <path d="M126 76 L146 76" stroke="#1E3A8A" stroke-width="3.5" stroke-linecap="round"/>
+          <polygon points="144,68 158,76 144,84" fill="#1E3A8A"/>
+        </g>
+        <g class="hop-kid">
+          <rect x="168" y="34" width="128" height="84" rx="12" fill="#FFFFFF" stroke="#6D28D9" stroke-width="2.5"/>
+          <text x="232" y="55" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="12" font-weight="800" fill="#5B21B6">THEN PLAY</text>
+          <circle cx="232" cy="76" r="14" fill="#FDBA74" stroke="#0F172A" stroke-width="2"/>
+          <circle cx="227" cy="75" r="2" fill="#0F172A"/>
+          <circle cx="237" cy="75" r="2" fill="#0F172A"/>
+          <path d="M227 81 Q232 86 237 81" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="212" cy="102" r="6.5" fill="#0D9488"/>
+          <circle cx="252" cy="102" r="6.5" fill="#7C3AED"/>
+        </g>
+        """
+    elif mod_key == "AI":
+        scene = """
+        <style>
+          @keyframes spinSun { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+          @keyframes strollKid { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(6px); } }
+          .sun-spin { animation: spinSun 14s linear infinite; transform-origin: 54px 46px; }
+          .stroll-kid { animation: strollKid 2.5s ease-in-out infinite; }
+        </style>
+        <rect x="0" y="0" width="320" height="164" rx="14" fill="#CCFBF1"/>
+        <g class="sun-spin">
+          <circle cx="54" cy="46" r="14" fill="#0D9488"/>
+          <line x1="54" y1="23" x2="54" y2="29" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
+          <line x1="54" y1="63" x2="54" y2="69" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
+          <line x1="31" y1="46" x2="37" y2="46" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
+          <line x1="71" y1="46" x2="77" y2="46" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <path d="M0 124 Q85 104 170 120 T320 112 L320 164 L0 164 Z" fill="#99F6E4"/>
+        <g class="stroll-kid">
+          <circle cx="155" cy="72" r="16" fill="#FDBA74" stroke="#0F172A" stroke-width="2.2"/>
+          <circle cx="150" cy="71" r="2.2" fill="#0F172A"/>
+          <circle cx="160" cy="71" r="2.2" fill="#0F172A"/>
+          <path d="M150 77 Q155 82 160 77" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+          <rect x="142" y="90" width="26" height="26" rx="8" fill="#1E3A8A"/>
+          <line x1="149" y1="116" x2="142" y2="134" stroke="#0F172A" stroke-width="3.2" stroke-linecap="round"/>
+          <line x1="161" y1="116" x2="168" y2="134" stroke="#0F172A" stroke-width="3.2" stroke-linecap="round"/>
+        </g>
+        <path d="M234 86 A22 22 0 0 1 278 86" fill="none" stroke="#6D28D9" stroke-width="4" stroke-linecap="round"/>
+        <rect x="228" y="84" width="10" height="20" rx="5" fill="#6D28D9"/>
+        <rect x="274" y="84" width="10" height="20" rx="5" fill="#6D28D9"/>
+        """
+    else:
+        scene = """
+        <style>
+          @keyframes cardBounce { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
+          @keyframes wavePulse { 0%, 100% { transform: scale(0.96); } 50% { transform: scale(1.07); } }
+          .card-bounce { animation: cardBounce 2.1s ease-in-out infinite; }
+          .talk-wave { animation: wavePulse 1.8s ease-in-out infinite; transform-origin: 244px 76px; }
+        </style>
+        <rect x="0" y="0" width="320" height="164" rx="14" fill="#EDE9FE"/>
+        <rect x="0" y="132" width="320" height="32" fill="#DDD6FE"/>
+        <g class="card-bounce">
+          <rect x="26" y="34" width="90" height="86" rx="12" fill="#FFFFFF" stroke="#6D28D9" stroke-width="2.5"/>
+          <circle cx="71" cy="66" r="15" fill="#0D9488"/>
+          <rect x="42" y="88" width="58" height="15" rx="7.5" fill="#EDE9FE"/>
+          <text x="71" y="99" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="9.5" font-weight="800" fill="#5B21B6">PECS CARD</text>
+        </g>
+        <path d="M126 78 L156 78" stroke="#1E3A8A" stroke-width="3.5" stroke-linecap="round"/>
+        <polygon points="154,70 168,78 154,86" fill="#1E3A8A"/>
+        <g class="talk-wave">
+          <circle cx="236" cy="74" r="22" fill="#FDBA74" stroke="#0F172A" stroke-width="2.2"/>
+          <circle cx="229" cy="72" r="2.5" fill="#0F172A"/>
+          <circle cx="243" cy="72" r="2.5" fill="#0F172A"/>
+          <ellipse cx="236" cy="82" rx="6" ry="4" fill="#6D28D9"/>
+          <circle cx="272" cy="44" r="5.5" fill="#0D9488" opacity="0.8"/>
+          <circle cx="286" cy="36" r="3.8" fill="#1E3A8A" opacity="0.65"/>
+        </g>
+        """
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  html, body {{
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+  }}
+  .wrap {{
+    background: {soft_bg};
+    border: 1.5px solid {accent}44;
+    border-radius: 14px;
+    padding: 10px;
+  }}
+  .caption {{
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0F172A;
+    text-align: center;
+  }}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <svg viewBox="0 0 320 164" width="100%" height="156" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:12px;">
+      {scene}
+    </svg>
+    <div class="caption">Animated Kids Guide • Page {page_idx + 1}</div>
+  </div>
+</body>
+</html>
+"""
+
+def build_flipbook_html(mod: dict) -> str:
+    title_esc = html.escape(f"{mod['code']}: {mod['title']}")
+    domain_esc = html.escape(mod["domain"])
+    accent = mod["color"]
+    soft_bg = mod["soft_bg"]
+    svg_art = module_animated_html(mod["key"], accent, soft_bg, 0)
+
+    pages_js_items = []
+    for p_title, p_summary, p_steps in mod["pages"]:
+        pages_js_items.append(
+            "{"
+            f'"heading": "{html.escape(p_title)}", '
+            f'"summary": "{html.escape(p_summary)}", '
+            f'"steps": "{html.escape(p_steps).replace(chr(10), "<br>")}"'
+            "}"
+        )
+    pages_json = "[" + ", ".join(pages_js_items) + "]"
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title_esc} — Interactive Flipbook</title>
+<style>
+  body {{
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #CCFBF1 0%, #EDE9FE 52%, #DBEAFE 100%);
+    margin: 0;
+    padding: 28px;
+    color: #0F172A;
+    display: flex;
+    justify-content: center;
+  }}
+  .book-shell {{
+    max-width: 720px;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 18px;
+    padding: 26px;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+    border-top: 8px solid {accent};
+  }}
+  .top-tag {{
+    display: inline-block;
+    background: {accent};
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 999px;
+  }}
+  h1 {{ margin: 10px 0 4px 0; font-size: 24px; }}
+  .domain {{ color: #475569; font-size: 14px; margin-bottom: 16px; }}
+  .page-box {{
+    background: {soft_bg};
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 16px;
+    min-height: 170px;
+  }}
+  .page-heading {{ font-size: 18px; font-weight: 700; margin-bottom: 8px; }}
+  .page-summary {{ font-size: 15px; margin-bottom: 12px; line-height: 1.5; }}
+  .page-steps {{
+    background: #FFFFFF;
+    padding: 14px 16px;
+    border-radius: 10px;
+    line-height: 1.65;
+    font-size: 14px;
+  }}
+  .controls {{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    gap: 12px;
+  }}
+  button {{
+    background: {accent};
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }}
+  button:disabled {{ background: #CBD5E1; cursor: not-allowed; }}
+  .indicator {{ font-weight: 700; color: #334155; }}
+</style>
+</head>
+<body>
+  <div class="book-shell">
+    <span class="top-tag">INTERACTIVE FLIPBOOK</span>
+    <h1>{title_esc}</h1>
+    <div class="domain">Focus Domain: {domain_esc}</div>
+    {svg_art}
+    <div class="page-box">
+      <div class="page-heading" id="pageHeading"></div>
+      <div class="page-summary" id="pageSummary"></div>
+      <div class="page-steps" id="pageSteps"></div>
+    </div>
+    <div class="controls">
+      <button id="prevBtn" onclick="turnPage(-1)">← Previous Page</button>
+      <span class="indicator" id="pageIndicator"></span>
+      <button id="nextBtn" onclick="turnPage(1)">Next Page →</button>
+    </div>
+  </div>
+<script>
+  const pages = {pages_json};
+  let idx = 0;
+  function render() {{
+    const p = pages[idx];
+    document.getElementById("pageHeading").innerHTML = p.heading;
+    document.getElementById("pageSummary").innerHTML = p.summary;
+    document.getElementById("pageSteps").innerHTML = p.steps;
+    document.getElementById("pageIndicator").innerText = `Page ${{idx + 1}} of ${{pages.length}}`;
+    document.getElementById("prevBtn").disabled = idx === 0;
+    document.getElementById("nextBtn").disabled = idx === pages.length - 1;
+  }}
+  function turnPage(delta) {{
+    const nextIdx = idx + delta;
+    if (nextIdx >= 0 && nextIdx < pages.length) {{
+      idx = nextIdx;
+      render();
+    }}
+  }}
+  render();
+</script>
+</body>
+</html>
+"""
 @st.cache_data
 def load_initial_csv(path: str = "Kelantan_Student_Registry_104.csv") -> pd.DataFrame:
     try:
@@ -668,7 +1015,7 @@ page = st.sidebar.radio(
 counts_by_dist = df_students["District"].value_counts().to_dict()
 
 # ==============================================================================
-# PAGE 1: DASHBOARD LAYOUT (RED / YELLOW / BLUE + CLEAR LABELED VISUALS)
+# PAGE 1: EXECUTIVE DASHBOARD (SOFT TEAL + NAVY BLUE + LAVENDER)
 # ==============================================================================
 if page == "Dashboard":
     total_students = len(df_students)
@@ -677,52 +1024,52 @@ if page == "Dashboard":
 
     top_l, top_r = st.columns([4, 8], gap="medium")
     with top_l:
-        st.markdown(
-            f"""
-            <div class="ui-card" style="display:flex;align-items:center;gap:14px;min-height:112px;">
-                <div class="avatar-circle">KA</div>
-                <div>
-                    <div style="font-size:18px;font-weight:800;color:#0F172A;">Kelantan Autism GIS</div>
-                    <div style="font-size:11px;font-weight:700;letter-spacing:0.6px;color:#2563EB;">WELCOME TO DASHBOARD</div>
-                    <div style="font-size:12px;color:#475569;margin-top:4px;">{total_students} Registry Records • 7 Districts</div>
+        with st.container(border=True):
+            st.markdown(
+                f"""
+                <div class="brand-header">
+                    <div class="brand-mark">KA</div>
+                    <div>
+                        <div style="font-size:18px;font-weight:800;color:#0F172A;">Kelantan Autism GIS</div>
+                        <div style="font-size:11px;font-weight:700;letter-spacing:0.6px;color:#0F766E;">SPATIAL & CAREGIVER ANALYTICS</div>
+                        <div style="font-size:12.5px;color:#475569;margin-top:3px;">{total_students} Registry Records • 7 Districts</div>
+                    </div>
                 </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+                """,
+                unsafe_allow_html=True,
+            )
 
     with top_r:
-        st.markdown('<div class="ui-card" style="min-height:112px;">', unsafe_allow_html=True)
-        h_l, h_r = st.columns([8, 4])
-        with h_l:
-            st.markdown("<div style='font-size:16px;font-weight:800;color:#0F172A;'>Kelantan Zone & Registry Summary</div>", unsafe_allow_html=True)
-            st.caption("District student counts, diagnosis share, and service demand")
-        with h_r:
-            st.download_button(
-                label="⬇ Download CSV",
-                data=df_students.to_csv(index=False).encode("utf-8"),
-                file_name="kelantan_student_registry.csv",
-                mime="text/csv",
-                use_container_width=True,
-            )
+        with st.container(border=True):
+            h_l, h_r = st.columns([8, 4], vertical_alignment="center")
+            with h_l:
+                st.markdown('<div class="section-title">Kelantan Zone & Registry Summary</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-sub">District student distribution, diagnosis mix, and intervention demand</div>', unsafe_allow_html=True)
+            with h_r:
+                st.download_button(
+                    label="⬇ Download CSV",
+                    data=df_students.to_csv(index=False).encode("utf-8"),
+                    file_name="kelantan_student_registry.csv",
+                    mime="text/csv",
+                    use_container_width=True,
+                )
 
-        k1, k2, k3 = st.columns(3, gap="medium")
-        with k1:
-            st.markdown(
-                f'<div class="kpi-amber"><div class="kpi-title">Total Students</div><div class="kpi-num">{total_students}</div></div>',
-                unsafe_allow_html=True,
-            )
-        with k2:
-            st.markdown(
-                f'<div class="kpi-indigo"><div class="kpi-title">Verified Active</div><div class="kpi-num">{verified_cnt}</div></div>',
-                unsafe_allow_html=True,
-            )
-        with k3:
-            st.markdown(
-                f'<div class="kpi-blue"><div class="kpi-title">Red Zone Districts</div><div class="kpi-num">{red_zones}</div></div>',
-                unsafe_allow_html=True,
-            )
-        st.markdown("</div>", unsafe_allow_html=True)
+            k1, k2, k3 = st.columns(3, gap="medium")
+            with k1:
+                st.markdown(
+                    f'<div class="kpi-tile-teal"><div class="kpi-label">Total Students</div><div class="kpi-value">{total_students}</div></div>',
+                    unsafe_allow_html=True,
+                )
+            with k2:
+                st.markdown(
+                    f'<div class="kpi-tile-navy"><div class="kpi-label">Verified Active</div><div class="kpi-value">{verified_cnt}</div></div>',
+                    unsafe_allow_html=True,
+                )
+            with k3:
+                st.markdown(
+                    f'<div class="kpi-tile-lavender"><div class="kpi-label">Red Zone Districts</div><div class="kpi-value">{red_zones}</div></div>',
+                    unsafe_allow_html=True,
+                )
 
     mid_l, mid_r = st.columns([7, 5], gap="medium")
 
@@ -734,112 +1081,131 @@ if page == "Dashboard":
     dist_df = dist_df.sort_values("Order")
 
     with mid_l:
-        st.markdown('<div class="ui-card">', unsafe_allow_html=True)
-        st.markdown("<div style='font-size:15px;font-weight:800;color:#0F172A;margin-bottom:6px;'>Students Across Kelantan Districts</div>", unsafe_allow_html=True)
-        area_base = alt.Chart(dist_df).encode(
-            x=alt.X("District:N", sort=list(DISTRICT_INFO.keys()), axis=alt.Axis(labelAngle=0, labelColor="#1E293B", title=None)),
-            y=alt.Y("Students:Q", axis=alt.Axis(labelColor="#1E293B", title=None, gridColor="#E2E8F0")),
-            tooltip=["District", "Students"],
-        )
-        area_layer = area_base.mark_area(
-            line={"color": "#DC2626", "strokeWidth": 2.5},
-            color=alt.Gradient(
-                gradient="linear",
-                stops=[
-                    alt.GradientStop(color="rgba(251, 191, 36, 0.45)", offset=0),
-                    alt.GradientStop(color="rgba(37, 99, 235, 0.08)", offset=1),
-                ],
-                x1=1, x2=1, y1=1, y2=0,
-            ),
-        )
-        pts_layer = area_base.mark_point(size=85, filled=True, color="#FFFFFF", stroke="#2563EB", strokeWidth=2.5)
-        txt_layer = area_base.mark_text(dy=-13, fontSize=12, fontWeight="bold", color="#0F172A").encode(text="Students:Q")
-        st.altair_chart((area_layer + pts_layer + txt_layer).properties(height=250).configure_view(strokeWidth=0), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown('<div class="section-title">Students Across Kelantan Districts</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-sub">Registered student count per administrative district</div>', unsafe_allow_html=True)
+            area_base = alt.Chart(dist_df).encode(
+                x=alt.X(
+                    "District:N",
+                    sort=list(DISTRICT_INFO.keys()),
+                    axis=alt.Axis(labelAngle=0, labelColor="#0F172A", labelFontSize=11, title=None),
+                ),
+                y=alt.Y(
+                    "Students:Q",
+                    axis=alt.Axis(labelColor="#0F172A", title=None, gridColor="#E2E8F0"),
+                ),
+                tooltip=["District", "Students"],
+            )
+            area_layer = area_base.mark_area(
+                line={"color": "#1E3A8A", "strokeWidth": 2.5},
+                color=alt.Gradient(
+                    gradient="linear",
+                    stops=[
+                        alt.GradientStop(color="rgba(13, 148, 136, 0.36)", offset=0),
+                        alt.GradientStop(color="rgba(124, 58, 237, 0.06)", offset=1),
+                    ],
+                    x1=1, x2=1, y1=1, y2=0,
+                ),
+            )
+            pts_layer = area_base.mark_point(size=80, filled=True, color="#FFFFFF", stroke="#6D28D9", strokeWidth=2.5)
+            txt_layer = area_base.mark_text(dy=-13, fontSize=12, fontWeight="bold", color="#0F172A").encode(text="Students:Q")
+            st.altair_chart(
+                (area_layer + pts_layer + txt_layer)
+                .properties(height=245)
+                .configure(background="#FFFFFF")
+                .configure_view(fill="#FFFFFF", strokeWidth=0),
+                use_container_width=True,
+            )
 
     with mid_r:
-        st.markdown('<div class="ui-card">', unsafe_allow_html=True)
-        st.markdown("<div style='font-size:15px;font-weight:800;color:#0F172A;margin-bottom:6px;'>Diagnosis Breakdown</div>", unsafe_allow_html=True)
-        diag_df = df_students.groupby("Diagnosis").size().reset_index(name="Count")
-        donut = (
-            alt.Chart(diag_df)
-            .mark_arc(innerRadius=52, outerRadius=82)
-            .encode(
-                theta=alt.Theta("Count:Q"),
-                color=alt.Color(
-                    "Diagnosis:N",
-                    scale=alt.Scale(
-                        domain=["Mild Autism", "High-Function Autism", "Severe Autism"],
-                        range=["#F59E0B", "#2563EB", "#DC2626"],
+        with st.container(border=True):
+            st.markdown('<div class="section-title">Diagnosis Breakdown</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-sub">Proportion of registered autism profiles</div>', unsafe_allow_html=True)
+            diag_df = df_students.groupby("Diagnosis").size().reset_index(name="Count")
+            donut = (
+                alt.Chart(diag_df)
+                .mark_arc(innerRadius=54, outerRadius=84)
+                .encode(
+                    theta=alt.Theta("Count:Q"),
+                    color=alt.Color(
+                        "Diagnosis:N",
+                        scale=alt.Scale(
+                            domain=["Mild Autism", "High-Function Autism", "Severe Autism"],
+                            range=["#0D9488", "#1E3A8A", "#7C3AED"],
+                        ),
+                        legend=alt.Legend(orient="bottom", title=None, labelColor="#0F172A"),
                     ),
-                    legend=alt.Legend(orient="bottom", title=None),
-                ),
-                tooltip=["Diagnosis", "Count"],
+                    tooltip=["Diagnosis", "Count"],
+                )
+                .properties(height=245)
+                .configure(background="#FFFFFF")
+                .configure_view(fill="#FFFFFF", strokeWidth=0)
             )
-            .properties(height=250)
-            .configure_view(strokeWidth=0)
-        )
-        st.altair_chart(donut, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.altair_chart(donut, use_container_width=True)
 
     bot_l, bot_r = st.columns([7, 5], gap="medium")
 
     with bot_l:
-        st.markdown('<div class="ui-card">', unsafe_allow_html=True)
-        st.markdown("<div style='font-size:15px;font-weight:800;color:#0F172A;'>Service & Verification Rates</div>", unsafe_allow_html=True)
-        st.caption("Share of verified records and required therapy services")
+        with st.container(border=True):
+            st.markdown('<div class="section-title">Service & Verification Rates</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-sub">Verification status and required therapy distribution</div>', unsafe_allow_html=True)
 
-        verified_pct = round((verified_cnt / total_students) * 100) if total_students else 0
-        speech_cnt = int((df_students["Required Service"] == "Speech Therapy").sum())
-        speech_pct = round((speech_cnt / total_students) * 100) if total_students else 0
+            verified_pct = round((verified_cnt / total_students) * 100) if total_students else 0
+            speech_cnt = int((df_students["Required Service"] == "Speech Therapy").sum())
+            speech_pct = round((speech_cnt / total_students) * 100) if total_students else 0
 
-        r1, r2, r3 = st.columns(3)
-        r1.metric("Verified Rate", f"{verified_pct}%", f"{verified_cnt} students")
-        r2.metric("Speech Therapy Share", f"{speech_pct}%", f"{speech_cnt} students")
-        r3.metric("Total Therapy Centres", sum(v["centres"] for v in DISTRICT_INFO.values()), "7 districts")
+            r1, r2, r3 = st.columns(3)
+            r1.metric("Verified Rate", f"{verified_pct}%", f"{verified_cnt} students")
+            r2.metric("Speech Therapy Share", f"{speech_pct}%", f"{speech_cnt} students")
+            r3.metric("Total Therapy Centres", sum(v["centres"] for v in DISTRICT_INFO.values()), "7 districts")
 
-        serv_df = df_students.groupby("Required Service").size().reset_index(name="Students")
-        s_bars = (
-            alt.Chart(serv_df)
-            .mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6, color="#2563EB")
-            .encode(
-                x=alt.X("Required Service:N", axis=alt.Axis(labelAngle=0, labelColor="#1E293B", title=None)),
-                y=alt.Y("Students:Q", axis=alt.Axis(labelColor="#1E293B", title=None)),
-                tooltip=["Required Service", "Students"],
+            serv_df = df_students.groupby("Required Service").size().reset_index(name="Students")
+            s_bars = (
+                alt.Chart(serv_df)
+                .mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6, color="#0F766E")
+                .encode(
+                    x=alt.X("Required Service:N", axis=alt.Axis(labelAngle=0, labelColor="#0F172A", title=None)),
+                    y=alt.Y("Students:Q", axis=alt.Axis(labelColor="#0F172A", title=None, gridColor="#E2E8F0")),
+                    tooltip=["Required Service", "Students"],
+                )
             )
-        )
-        s_txt = s_bars.mark_text(dy=-8, fontSize=12, fontWeight="bold", color="#0F172A").encode(text="Students:Q")
-        st.altair_chart((s_bars + s_txt).properties(height=180).configure_view(strokeWidth=0), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+            s_txt = s_bars.mark_text(dy=-8, fontSize=12, fontWeight="bold", color="#0F172A").encode(text="Students:Q")
+            st.altair_chart(
+                (s_bars + s_txt)
+                .properties(height=180)
+                .configure(background="#FFFFFF")
+                .configure_view(fill="#FFFFFF", strokeWidth=0),
+                use_container_width=True,
+            )
 
     with bot_r:
-        st.markdown('<div class="ui-card">', unsafe_allow_html=True)
-        st.markdown("<div style='font-size:15px;font-weight:800;color:#0F172A;margin-bottom:8px;'>District Zone & Centre Inspector</div>", unsafe_allow_html=True)
-        selected_dist = st.selectbox(
-            "Select District",
-            options=list(DISTRICT_INFO.keys()),
-            index=list(DISTRICT_INFO.keys()).index(st.session_state["selected_zone_district"]),
-            label_visibility="collapsed",
-        )
-        st.session_state["selected_zone_district"] = selected_dist
-        d_info = DISTRICT_INFO[selected_dist]
-        d_rows = df_students[df_students["District"] == selected_dist]
+        with st.container(border=True):
+            st.markdown('<div class="section-title">District Zone & Centre Inspector</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-sub">Inspect zone classification, recommended centre, and therapy team</div>', unsafe_allow_html=True)
+            selected_dist = st.selectbox(
+                "Select District",
+                options=list(DISTRICT_INFO.keys()),
+                index=list(DISTRICT_INFO.keys()).index(st.session_state["selected_zone_district"]),
+                label_visibility="collapsed",
+            )
+            st.session_state["selected_zone_district"] = selected_dist
+            d_info = DISTRICT_INFO[selected_dist]
+            d_rows = df_students[df_students["District"] == selected_dist]
 
-        st.markdown(
-            f'<span class="module-badge" style="background:{d_info["badge_bg"]};">{d_info["zone"]}</span> '
-            f'<strong>{selected_dist}</strong> — {len(d_rows)} students | {d_info["centres"]} centres',
-            unsafe_allow_html=True,
-        )
-        st.write(d_info["place_summary"])
-        st.markdown(f"**Suitable Centre:** {d_info['recommended_centre']}")
-        st.markdown(f"**Therapists:** {d_info['therapists']}")
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown(
+                f'<span class="zone-pill" style="background:{d_info["badge_bg"]};">{d_info["zone"]}</span> '
+                f'<strong style="color:#0F172A;">{selected_dist}</strong> — {len(d_rows)} students • {d_info["centres"]} centres',
+                unsafe_allow_html=True,
+            )
+            st.write(d_info["place_summary"])
+            st.markdown(f"**Suitable Centre:** {d_info['recommended_centre']}")
+            st.markdown(f"**Therapists:** {d_info['therapists']}")
 
 # ==============================================================================
 # PAGE 2: STUDENT REGISTRY (EDIT & INSERT)
 # ==============================================================================
 elif page == "Student Registry":
-    st.markdown('<div class="ui-card">', unsafe_allow_html=True)
+    with st.container(border=True):
     st.subheader("Student Registry — Edit & Insert Records")
 
     with st.expander("➕ Insert New Student Record", expanded=False):
@@ -895,13 +1261,13 @@ elif page == "Student Registry":
         file_name="kelantan_student_registry_updated.csv",
         mime="text/csv",
     )
-    st.markdown("</div>", unsafe_allow_html=True)
+    
 
 # ==============================================================================
 # PAGE 3: PARENTS — CHILD & CENTRE MATCHER
 # ==============================================================================
 elif page == "Child & Centre Matcher":
-    st.markdown('<div class="ui-card">', unsafe_allow_html=True)
+    with st.container(border=True):
     st.subheader("Child Profile, Suitable Centre & Therapists")
 
     f1, f2 = st.columns([2, 4])
@@ -940,7 +1306,7 @@ elif page == "Child & Centre Matcher":
         st.markdown(f"**Why Suitable:** {c_info['why_suitable']}")
         st.markdown(f"**Therapists Provided:** {c_info['therapists']}")
         st.markdown(f"**Matched Required Service:** `{child_row['Required Service']}`")
-    st.markdown("</div>", unsafe_allow_html=True)
+    
 
 # ==============================================================================
 # PAGE 4: PARENTS — 4 INTERACTIVE FLIPBOOK MODULES
@@ -955,7 +1321,7 @@ else:
         p_heading, p_summary, p_steps = mod["pages"][cur_page]
 
         with cols[idx % 2]:
-            st.markdown('<div class="ui-card">', unsafe_allow_html=True)
+            with st.container(border=True):
             st.markdown(
                 f'<span class="module-badge" style="background:{mod["color"]};">{mod["code"]} • {mod["domain"]}</span>',
                 unsafe_allow_html=True,
@@ -997,4 +1363,4 @@ else:
                 key=f"dl_flip_{mod['key']}",
                 use_container_width=True,
             )
-            st.markdown("</div>", unsafe_allow_html=True)
+            
