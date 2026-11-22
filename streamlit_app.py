@@ -371,444 +371,158 @@ MODULES_4 = [
 EMBEDDED_RECORDS = json.loads("""[{"Record ID": "KOD-1000", "Identifier": "Child Record #1 (Anonymized)", "Age": 4, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1001", "Identifier": "Child Record #2 (Anonymized)", "Age": 5, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1002", "Identifier": "Child Record #3 (Anonymized)", "Age": 6, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1003", "Identifier": "Child Record #4 (Anonymized)", "Age": 7, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1004", "Identifier": "Child Record #5 (Anonymized)", "Age": 8, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1005", "Identifier": "Child Record #6 (Anonymized)", "Age": 9, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1006", "Identifier": "Child Record #7 (Anonymized)", "Age": 10, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1007", "Identifier": "Child Record #8 (Anonymized)", "Age": 11, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1008", "Identifier": "Child Record #9 (Anonymized)", "Age": 12, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1009", "Identifier": "Child Record #10 (Anonymized)", "Age": 13, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1010", "Identifier": "Child Record #11 (Anonymized)", "Age": 14, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1011", "Identifier": "Child Record #12 (Anonymized)", "Age": 15, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1012", "Identifier": "Child Record #13 (Anonymized)", "Age": 4, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1013", "Identifier": "Child Record #14 (Anonymized)", "Age": 5, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1014", "Identifier": "Child Record #15 (Anonymized)", "Age": 6, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1015", "Identifier": "Child Record #16 (Anonymized)", "Age": 7, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1016", "Identifier": "Child Record #17 (Anonymized)", "Age": 8, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1017", "Identifier": "Child Record #18 (Anonymized)", "Age": 9, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1018", "Identifier": "Child Record #19 (Anonymized)", "Age": 10, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1019", "Identifier": "Child Record #20 (Anonymized)", "Age": 11, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1020", "Identifier": "Child Record #21 (Anonymized)", "Age": 12, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1021", "Identifier": "Child Record #22 (Anonymized)", "Age": 13, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1022", "Identifier": "Child Record #23 (Anonymized)", "Age": 14, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1023", "Identifier": "Child Record #24 (Anonymized)", "Age": 15, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1024", "Identifier": "Child Record #25 (Anonymized)", "Age": 4, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1025", "Identifier": "Child Record #26 (Anonymized)", "Age": 5, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1026", "Identifier": "Child Record #27 (Anonymized)", "Age": 6, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1027", "Identifier": "Child Record #28 (Anonymized)", "Age": 7, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1028", "Identifier": "Child Record #29 (Anonymized)", "Age": 8, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1029", "Identifier": "Child Record #30 (Anonymized)", "Age": 9, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1030", "Identifier": "Child Record #31 (Anonymized)", "Age": 10, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1031", "Identifier": "Child Record #32 (Anonymized)", "Age": 11, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1032", "Identifier": "Child Record #33 (Anonymized)", "Age": 12, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1033", "Identifier": "Child Record #34 (Anonymized)", "Age": 13, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1034", "Identifier": "Child Record #35 (Anonymized)", "Age": 14, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1035", "Identifier": "Child Record #36 (Anonymized)", "Age": 15, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1036", "Identifier": "Child Record #37 (Anonymized)", "Age": 4, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1037", "Identifier": "Child Record #38 (Anonymized)", "Age": 5, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1038", "Identifier": "Child Record #39 (Anonymized)", "Age": 6, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1039", "Identifier": "Child Record #40 (Anonymized)", "Age": 7, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1040", "Identifier": "Child Record #41 (Anonymized)", "Age": 8, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1041", "Identifier": "Child Record #42 (Anonymized)", "Age": 9, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1042", "Identifier": "Child Record #43 (Anonymized)", "Age": 10, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1043", "Identifier": "Child Record #44 (Anonymized)", "Age": 11, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1044", "Identifier": "Child Record #45 (Anonymized)", "Age": 12, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1045", "Identifier": "Child Record #46 (Anonymized)", "Age": 13, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1046", "Identifier": "Child Record #47 (Anonymized)", "Age": 14, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1047", "Identifier": "Child Record #48 (Anonymized)", "Age": 15, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1048", "Identifier": "Child Record #49 (Anonymized)", "Age": 4, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1049", "Identifier": "Child Record #50 (Anonymized)", "Age": 5, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1050", "Identifier": "Child Record #51 (Anonymized)", "Age": 6, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1051", "Identifier": "Child Record #52 (Anonymized)", "Age": 7, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1052", "Identifier": "Child Record #53 (Anonymized)", "Age": 8, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1053", "Identifier": "Child Record #54 (Anonymized)", "Age": 9, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1054", "Identifier": "Child Record #55 (Anonymized)", "Age": 10, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1055", "Identifier": "Child Record #56 (Anonymized)", "Age": 11, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1056", "Identifier": "Child Record #57 (Anonymized)", "Age": 12, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1057", "Identifier": "Child Record #58 (Anonymized)", "Age": 13, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1058", "Identifier": "Child Record #59 (Anonymized)", "Age": 14, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1059", "Identifier": "Child Record #60 (Anonymized)", "Age": 15, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1060", "Identifier": "Child Record #61 (Anonymized)", "Age": 4, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1061", "Identifier": "Child Record #62 (Anonymized)", "Age": 5, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1062", "Identifier": "Child Record #63 (Anonymized)", "Age": 6, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1063", "Identifier": "Child Record #64 (Anonymized)", "Age": 7, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1064", "Identifier": "Child Record #65 (Anonymized)", "Age": 8, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1065", "Identifier": "Child Record #66 (Anonymized)", "Age": 9, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1066", "Identifier": "Child Record #67 (Anonymized)", "Age": 10, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1067", "Identifier": "Child Record #68 (Anonymized)", "Age": 11, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1068", "Identifier": "Child Record #69 (Anonymized)", "Age": 12, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1069", "Identifier": "Child Record #70 (Anonymized)", "Age": 13, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1070", "Identifier": "Child Record #71 (Anonymized)", "Age": 14, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1071", "Identifier": "Child Record #72 (Anonymized)", "Age": 15, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1072", "Identifier": "Child Record #73 (Anonymized)", "Age": 4, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1073", "Identifier": "Child Record #74 (Anonymized)", "Age": 5, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1074", "Identifier": "Child Record #75 (Anonymized)", "Age": 6, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1075", "Identifier": "Child Record #76 (Anonymized)", "Age": 7, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1076", "Identifier": "Child Record #77 (Anonymized)", "Age": 8, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1077", "Identifier": "Child Record #78 (Anonymized)", "Age": 9, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1078", "Identifier": "Child Record #79 (Anonymized)", "Age": 10, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1079", "Identifier": "Child Record #80 (Anonymized)", "Age": 11, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1080", "Identifier": "Child Record #81 (Anonymized)", "Age": 12, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1081", "Identifier": "Child Record #82 (Anonymized)", "Age": 13, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1082", "Identifier": "Child Record #83 (Anonymized)", "Age": 14, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1083", "Identifier": "Child Record #84 (Anonymized)", "Age": 15, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1084", "Identifier": "Child Record #85 (Anonymized)", "Age": 4, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1085", "Identifier": "Child Record #86 (Anonymized)", "Age": 5, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1086", "Identifier": "Child Record #87 (Anonymized)", "Age": 6, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1087", "Identifier": "Child Record #88 (Anonymized)", "Age": 7, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1088", "Identifier": "Child Record #89 (Anonymized)", "Age": 8, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1089", "Identifier": "Child Record #90 (Anonymized)", "Age": 9, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1090", "Identifier": "Child Record #91 (Anonymized)", "Age": 10, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1091", "Identifier": "Child Record #92 (Anonymized)", "Age": 11, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1092", "Identifier": "Child Record #93 (Anonymized)", "Age": 12, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1093", "Identifier": "Child Record #94 (Anonymized)", "Age": 13, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1094", "Identifier": "Child Record #95 (Anonymized)", "Age": 14, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1095", "Identifier": "Child Record #96 (Anonymized)", "Age": 15, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1096", "Identifier": "Child Record #97 (Anonymized)", "Age": 4, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1097", "Identifier": "Child Record #98 (Anonymized)", "Age": 5, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1098", "Identifier": "Child Record #99 (Anonymized)", "Age": 6, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1099", "Identifier": "Child Record #100 (Anonymized)", "Age": 7, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1100", "Identifier": "Child Record #101 (Anonymized)", "Age": 8, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1101", "Identifier": "Child Record #102 (Anonymized)", "Age": 9, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1102", "Identifier": "Child Record #103 (Anonymized)", "Age": 10, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1103", "Identifier": "Child Record #104 (Anonymized)", "Age": 11, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}]""")
 
 
-def module_animated_html(mod_key: str, accent: str, soft_bg: str, page_idx: int) -> str:
+def get_parent_kid_phrase(mod_key: str, page_idx: int) -> tuple[str, str]:
+    phrases = {
+        "AG": [
+            ("Parent Shows Cue", "Child Sees: Time for Toilet & Wash"),
+            ("Parent Holds Card", "Child Sees: 'Time for toilet.'"),
+            ("Parent Guides Steps", "Child Sees: Soap, Rinse & Dry"),
+            ("Parent Cheers Effort", "Child Sees: Great Job! ✓"),
+        ],
+        "AH": [
+            ("Parent Sets Routine", "Child Sees: Calm Morning Steps"),
+            ("Parent Gives Countdown", "Child Sees: 3... 2... 1... Ready"),
+            ("Parent Shows Board", "Child Sees: FIRST Bag → THEN Play"),
+            ("Parent Welcomes Calmly", "Child Sees: Safe & Settled Here"),
+        ],
+        "AI": [
+            ("Parent Leads Walk", "Child Sees: Gentle Morning Walk"),
+            ("Parent Checks Noise", "Child Sees: Quiet Corner / Ear Cue"),
+            ("Parent Models Breath", "Child Sees: Slow Breath & Reset"),
+            ("Parent Praises Calm", "Child Sees: Ready to Learn!"),
+        ],
+        "SK": [
+            ("Parent Offers Card", "Child Sees: Picture Card Choice"),
+            ("Parent Receives Card", "Child Sees: Kid Gives Card → Gets Item"),
+            ("Parent Models Word", "Child Sees: Clear Word + Picture"),
+            ("Parent Practices Daily", "Child Sees: Easy Everyday Asking"),
+        ],
+    }
+    mod_list = phrases.get(mod_key, phrases["AG"])
+    return mod_list[page_idx % len(mod_list)]
+
+
+def module_animated_scene_svg(mod_key: str, accent: str, page_idx: int = 0) -> str:
+    parent_act, kid_phrase = get_parent_phrase_tuple = get_parent_kid_phrase(mod_key, page_idx)
+    p_esc = html.escape(parent_act)
+    k_esc = html.escape(kid_phrase)
+
     if mod_key == "AG":
-        scene = """
-        <style>
-          @keyframes floatDrop {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-7px); }
-          }
-          @keyframes waveBubble {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.12); }
-          }
-          .kid-float { animation: floatDrop 2.4s ease-in-out infinite; transform-origin: center; }
-          .drop-anim { animation: floatDrop 1.8s ease-in-out infinite; }
-          .check-pop { animation: waveBubble 2s ease-in-out infinite; transform-origin: 226px 78px; }
-        </style>
-        <rect x="0" y="0" width="320" height="164" rx="14" fill="#E0F2FE"/>
-        <circle cx="285" cy="28" r="16" fill="#FDE047" opacity="0.85"/>
-        <path d="M0 132 Q80 120 160 132 T320 128 L320 164 L0 164 Z" fill="#BAE6FD"/>
-        <!-- Friendly kid character -->
-        <g class="kid-float">
-          <circle cx="72" cy="62" r="20" fill="#FDBA74" stroke="#9A3412" stroke-width="2.5"/>
-          <path d="M53 56 Q72 36 91 56 Q82 46 72 48 Q62 46 53 56 Z" fill="#451A03"/>
-          <circle cx="65" cy="61" r="2.8" fill="#1E293B"/>
-          <circle cx="79" cy="61" r="2.8" fill="#1E293B"/>
-          <path d="M66 69 Q72 75 78 69" fill="none" stroke="#9A3412" stroke-width="2.5" stroke-linecap="round"/>
-          <rect x="54" y="84" width="36" height="34" rx="12" fill="#38BDF8" stroke="#0369A1" stroke-width="2.5"/>
-          <circle cx="72" cy="100" r="5" fill="#FFFFFF"/>
-        </g>
-        <!-- Water drop & soap -->
-        <g class="drop-anim">
-          <path d="M156 54 Q172 34 188 54 Q188 78 172 90 Q156 78 156 54 Z" fill="#0284C7"/>
-          <circle cx="167" cy="56" r="4" fill="#E0F2FE"/>
-        </g>
-        <!-- Happy star check -->
-        <g class="check-pop">
-          <circle cx="248" cy="78" r="24" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
-          <path d="M237 78 L245 86 L260 70" fill="none" stroke="#10B981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        action_art = """
+        <!-- Visual card held between parent and kid -->
+        <g class="card-pulse">
+          <rect x="126" y="40" width="68" height="50" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="2.5"/>
+          <path d="M153 49 Q160 41 167 49 Q167 59 160 64 Q153 59 153 49 Z" fill="#1E3A8A"/>
+          <rect x="134" y="70" width="52" height="12" rx="6" fill="#CCFBF1"/>
+          <text x="160" y="79" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="7.5" font-weight="800" fill="#0F766E">TOILET & WASH</text>
         </g>
         """
+        bg_fill, floor_fill, parent_shirt, kid_shirt = "#CCFBF1", "#99F6E4", "#1E3A8A", "#0D9488"
     elif mod_key == "AH":
-        scene = """
-        <style>
-          @keyframes hopKid {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-6px) rotate(2deg); }
-          }
-          @keyframes pulseArrow {
-            0%, 100% { transform: translateX(0px); }
-            50% { transform: translateX(5px); }
-          }
-          .hop-kid { animation: hopKid 2.2s ease-in-out infinite; transform-origin: center; }
-          .arrow-move { animation: pulseArrow 1.5s ease-in-out infinite; }
-        </style>
-        <rect x="0" y="0" width="320" height="164" rx="14" fill="#EEF2FF"/>
-        <rect x="0" y="130" width="320" height="34" fill="#C7D2FE"/>
-        <!-- FIRST card -->
-        <rect x="20" y="34" width="96" height="84" rx="12" fill="#FFFFFF" stroke="#4F46E5" stroke-width="3"/>
-        <text x="68" y="56" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#4F46E5">FIRST</text>
-        <rect x="44" y="66" width="48" height="36" rx="8" fill="#F59E0B"/>
-        <path d="M54 66 Q68 54 82 66" fill="none" stroke="#B45309" stroke-width="3"/>
-        <!-- Arrow -->
-        <g class="arrow-move">
-          <path d="M126 76 L146 76" stroke="#4F46E5" stroke-width="4" stroke-linecap="round"/>
-          <polygon points="144,68 158,76 144,84" fill="#4F46E5"/>
-        </g>
-        <!-- THEN kid -->
-        <g class="hop-kid">
-          <rect x="168" y="34" width="128" height="84" rx="12" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
-          <text x="232" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#059669">THEN PLAY</text>
-          <circle cx="232" cy="76" r="14" fill="#FDBA74" stroke="#9A3412" stroke-width="2"/>
-          <circle cx="227" cy="75" r="2" fill="#1E293B"/>
-          <circle cx="237" cy="75" r="2" fill="#1E293B"/>
-          <path d="M227 81 Q232 86 237 81" fill="none" stroke="#9A3412" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="212" cy="102" r="7" fill="#F43F5E"/>
-          <circle cx="252" cy="102" r="7" fill="#3B82F6"/>
+        action_art = """
+        <!-- FIRST -> THEN transition card shown by parent -->
+        <g class="card-pulse">
+          <rect x="118" y="38" width="84" height="52" rx="9" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2.5"/>
+          <text x="160" y="54" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="8" font-weight="800" fill="#1E3A8A">FIRST: BAG</text>
+          <path d="M154 61 L164 61" stroke="#6D28D9" stroke-width="2.5" stroke-linecap="round"/>
+          <polygon points="163,57 170,61 163,65" fill="#6D28D9"/>
+          <text x="160" y="78" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="8" font-weight="800" fill="#6D28D9">THEN: PLAY</text>
         </g>
         """
+        bg_fill, floor_fill, parent_shirt, kid_shirt = "#DBEAFE", "#BFDBFE", "#1E3A8A", "#0D9488"
     elif mod_key == "AI":
-        scene = """
-        <style>
-          @keyframes spinSun {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          @keyframes strollKid {
-            0%, 100% { transform: translateX(-4px); }
-            50% { transform: translateX(6px); }
-          }
-          .sun-spin { animation: spinSun 12s linear infinite; transform-origin: 54px 46px; }
-          .stroll-kid { animation: strollKid 2.5s ease-in-out infinite; }
-        </style>
-        <rect x="0" y="0" width="320" height="164" rx="14" fill="#CCFBF1"/>
-        <g class="sun-spin">
-          <circle cx="54" cy="46" r="15" fill="#FBBF24"/>
-          <line x1="54" y1="22" x2="54" y2="28" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
-          <line x1="54" y1="64" x2="54" y2="70" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
-          <line x1="30" y1="46" x2="36" y2="46" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
-          <line x1="72" y1="46" x2="78" y2="46" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+        action_art = """
+        <!-- Walk & calm sensory cue shown by parent -->
+        <g class="card-pulse">
+          <rect x="122" y="38" width="76" height="52" rx="9" fill="#FFFFFF" stroke="#0D9488" stroke-width="2.5"/>
+          <circle cx="145" cy="60" r="10" fill="#CCFBF1" stroke="#0F766E" stroke-width="2"/>
+          <path d="M141 60 Q145 55 149 60 Q145 65 141 60 Z" fill="#0F766E"/>
+          <text x="172" y="58" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="7.5" font-weight="800" fill="#0F172A">CALM</text>
+          <text x="172" y="69" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="7.5" font-weight="800" fill="#0F766E">WALK</text>
+          <rect x="130" y="75" width="60" height="10" rx="5" fill="#EDE9FE"/>
+          <text x="160" y="83" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="6.8" font-weight="700" fill="#5B21B6">BREATHE & GO</text>
         </g>
-        <path d="M0 124 Q85 104 170 120 T320 112 L320 164 L0 164 Z" fill="#5EEAD4"/>
-        <!-- Walking kid -->
-        <g class="stroll-kid">
-          <circle cx="155" cy="72" r="16" fill="#FDBA74" stroke="#0F766E" stroke-width="2.5"/>
-          <circle cx="150" cy="71" r="2.2" fill="#1E293B"/>
-          <circle cx="160" cy="71" r="2.2" fill="#1E293B"/>
-          <path d="M150 77 Q155 82 160 77" fill="none" stroke="#0F766E" stroke-width="2" stroke-linecap="round"/>
-          <rect x="142" y="90" width="26" height="26" rx="8" fill="#14B8A6"/>
-          <line x1="149" y1="116" x2="142" y2="134" stroke="#0F766E" stroke-width="3.5" stroke-linecap="round"/>
-          <line x1="161" y1="116" x2="168" y2="134" stroke="#0F766E" stroke-width="3.5" stroke-linecap="round"/>
-        </g>
-        <!-- Calm headphones icon -->
-        <path d="M234 86 A22 22 0 0 1 278 86" fill="none" stroke="#0D9488" stroke-width="4" stroke-linecap="round"/>
-        <rect x="228" y="84" width="10" height="20" rx="5" fill="#0D9488"/>
-        <rect x="274" y="84" width="10" height="20" rx="5" fill="#0D9488"/>
         """
+        bg_fill, floor_fill, parent_shirt, kid_shirt = "#CCFBF1", "#5EEAD4", "#0F766E", "#1E3A8A"
     else:
-        scene = """
-        <style>
-          @keyframes cardBounce {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-6px); }
-          }
-          @keyframes talkWave {
-            0%, 100% { transform: scale(0.95); }
-            50% { transform: scale(1.08); }
-          }
-          .card-bounce { animation: cardBounce 2.1s ease-in-out infinite; }
-          .talk-wave { animation: talkWave 1.8s ease-in-out infinite; transform-origin: 244px 76px; }
-        </style>
-        <rect x="0" y="0" width="320" height="164" rx="14" fill="#FEF3C7"/>
-        <rect x="0" y="132" width="320" height="32" fill="#FDE68A"/>
-        <!-- Picture card -->
-        <g class="card-bounce">
-          <rect x="26" y="34" width="88" height="86" rx="12" fill="#FFFFFF" stroke="#F59E0B" stroke-width="3"/>
-          <circle cx="70" cy="66" r="15" fill="#38BDF8"/>
-          <rect x="44" y="88" width="52" height="14" rx="7" fill="#FDE68A"/>
-          <text x="70" y="99" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#92400E">PECS CARD</text>
-        </g>
-        <path d="M126 78 L156 78" stroke="#D97706" stroke-width="4" stroke-linecap="round"/>
-        <polygon points="154,70 168,78 154,86" fill="#D97706"/>
-        <!-- Kid speaking -->
-        <g class="talk-wave">
-          <circle cx="236" cy="74" r="22" fill="#FDBA74" stroke="#B45309" stroke-width="2.5"/>
-          <circle cx="229" cy="72" r="2.5" fill="#1E293B"/>
-          <circle cx="243" cy="72" r="2.5" fill="#1E293B"/>
-          <ellipse cx="236" cy="82" rx="6" ry="4" fill="#EF4444"/>
-          <circle cx="272" cy="44" r="6" fill="#F59E0B" opacity="0.7"/>
-          <circle cx="286" cy="36" r="4" fill="#F59E0B" opacity="0.5"/>
+        action_art = """
+        <!-- PECS phrase card shown by parent to kid -->
+        <g class="card-pulse">
+          <rect x="120" y="38" width="80" height="52" rx="9" fill="#FFFFFF" stroke="#6D28D9" stroke-width="2.5"/>
+          <text x="160" y="55" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="7.5" font-weight="800" fill="#6D28D9">PECS PHRASE</text>
+          <rect x="128" y="61" width="64" height="18" rx="6" fill="#EDE9FE"/>
+          <text x="160" y="73" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="8" font-weight="800" fill="#1E3A8A">"I WANT..."</text>
         </g>
         """
-    return f"""<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8" />
-<style>
-  html, body {{
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    font-family: 'Segoe UI', Arial, sans-serif;
-  }}
-  .wrap {{
-    background: {soft_bg};
-    border: 2px solid {accent}33;
-    border-radius: 14px;
-    padding: 10px;
-  }}
-  .caption {{
-    margin-top: 6px;
-    font-size: 12px;
-    font-weight: 700;
-    color: #1E293B;
-    text-align: center;
-  }}
-</style>
-</head>
-<body>
-  <div class="wrap">
-    <svg viewBox="0 0 320 164" width="100%" height="156" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:12px;">
-      {scene}
-    </svg>
-    <div class="caption">Animated Guide • Page {page_idx + 1}</div>
-  </div>
-</body>
-</html>
-"""
-def build_flipbook_html(mod: dict) -> str:
-    title_esc = html.escape(f"{mod['code']}: {mod['title']}")
-    domain_esc = html.escape(mod["domain"])
-    accent = mod["color"]
-    soft_bg = mod["soft_bg"]
-    svg_art = module_animated_html(mod["key"], accent, soft_bg, 0)
+        bg_fill, floor_fill, parent_shirt, kid_shirt = "#EDE9FE", "#DDD6FE", "#6D28D9", "#0D9488"
 
-    pages_js_items = []
-    for p_title, p_summary, p_steps in mod["pages"]:
-        pages_js_items.append(
-            "{"
-            f'"heading": "{html.escape(p_title)}", '
-            f'"summary": "{html.escape(p_summary)}", '
-            f'"steps": "{html.escape(p_steps).replace(chr(10), "<br>")}"'
-            "}"
-        )
-    pages_json = "[" + ", ".join(pages_js_items) + "]"
+    return f"""
+    <style>
+      @keyframes parentShow {{
+        0%, 100% {{ transform: translateY(0px); }}
+        50% {{ transform: translateY(-4px); }}
+      }}
+      @keyframes kidNotice {{
+        0%, 100% {{ transform: scale(1); }}
+        50% {{ transform: scale(1.05); }}
+      }}
+      @keyframes phrasePop {{
+        0%, 100% {{ transform: translateY(0px); }}
+        50% {{ transform: translateY(-3px); }}
+      }}
+      .parent-anim {{ animation: parentShow 2.2s ease-in-out infinite; }}
+      .kid-anim {{ animation: kidNotice 2.2s ease-in-out infinite; transform-origin: 256px 76px; }}
+      .card-pulse {{ animation: phrasePop 2s ease-in-out infinite; }}
+    </style>
+    <rect x="0" y="0" width="320" height="164" rx="14" fill="{bg_fill}"/>
+    <rect x="0" y="122" width="320" height="42" fill="{floor_fill}"/>
 
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>{title_esc} — Interactive Flipbook</title>
-<style>
-  body {{
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(135deg, #FEE2E2 0%, #FEF9C3 50%, #DBEAFE 100%);
-    margin: 0;
-    padding: 28px;
-    color: #1E293B;
-    display: flex;
-    justify-content: center;
-  }}
-  .book-shell {{
-    max-width: 720px;
-    width: 100%;
-    background: #FFFFFF;
-    border-radius: 18px;
-    padding: 26px;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-    border-top: 8px solid {accent};
-  }}
-  .top-tag {{
-    display: inline-block;
-    background: {accent};
-    color: #FFFFFF;
-    font-weight: 700;
-    font-size: 12px;
-    padding: 5px 12px;
-    border-radius: 999px;
-  }}
-  h1 {{ margin: 10px 0 4px 0; font-size: 24px; }}
-  .domain {{ color: #475569; font-size: 14px; margin-bottom: 16px; }}
-  .page-box {{
-    background: {soft_bg};
-    border-radius: 14px;
-    padding: 20px;
-    margin-top: 16px;
-    min-height: 170px;
-  }}
-  .page-heading {{ font-size: 18px; font-weight: 700; margin-bottom: 8px; }}
-  .page-summary {{ font-size: 15px; margin-bottom: 12px; line-height: 1.5; }}
-  .page-steps {{
-    background: #FFFFFF;
-    padding: 14px 16px;
-    border-radius: 10px;
-    line-height: 1.65;
-    font-size: 14px;
-  }}
-  .controls {{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-    gap: 12px;
-  }}
-  button {{
-    background: {accent};
-    color: #FFFFFF;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }}
-  button:disabled {{ background: #CBD5E1; cursor: not-allowed; }}
-  .indicator {{ font-weight: 700; color: #334155; }}
-</style>
-</head>
-<body>
-  <div class="book-shell">
-    <span class="top-tag">INTERACTIVE FLIPBOOK</span>
-    <h1>{title_esc}</h1>
-    <div class="domain">Focus Domain: {domain_esc}</div>
-    {svg_art}
-    <div class="page-box">
-      <div class="page-heading" id="pageHeading"></div>
-      <div class="page-summary" id="pageSummary"></div>
-      <div class="page-steps" id="pageSteps"></div>
-    </div>
-    <div class="controls">
-      <button id="prevBtn" onclick="turnPage(-1)">← Previous Page</button>
-      <span class="indicator" id="pageIndicator"></span>
-      <button id="nextBtn" onclick="turnPage(1)">Next Page →</button>
-    </div>
-  </div>
-<script>
-  const pages = {pages_json};
-  let idx = 0;
-  function render() {{
-    const p = pages[idx];
-    document.getElementById("pageHeading").innerHTML = p.heading;
-    document.getElementById("pageSummary").innerHTML = p.summary;
-    document.getElementById("pageSteps").innerHTML = p.steps;
-    document.getElementById("pageIndicator").innerText = `Page ${{idx + 1}} of ${{pages.length}}`;
-    document.getElementById("prevBtn").disabled = idx === 0;
-    document.getElementById("nextBtn").disabled = idx === pages.length - 1;
-  }}
-  function turnPage(delta) {{
-    const nextIdx = idx + delta;
-    if (nextIdx >= 0 && nextIdx < pages.length) {{
-      idx = nextIdx;
-      render();
-    }}
-  }}
-  render();
-</script>
-</body>
-</html>
-"""
+    <!-- Top phrase banner showing what parent says/shows and kid sees -->
+    <rect x="14" y="8" width="292" height="22" rx="11" fill="#0F172A"/>
+    <text x="160" y="22" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="9.5" font-weight="700" fill="#FFFFFF">
+      {p_esc}  •  {k_esc}
+    </text>
+
+    <!-- Parent character on left showing the card/phrase -->
+    <g class="parent-anim">
+      <circle cx="62" cy="62" r="17" fill="#FDBA74" stroke="#0F172A" stroke-width="2.2"/>
+      <path d="M46 57 Q62 40 78 57 Q70 49 62 50 Q54 49 46 57 Z" fill="#0F172A"/>
+      <circle cx="57" cy="61" r="2.2" fill="#0F172A"/>
+      <circle cx="67" cy="61" r="2.2" fill="#0F172A"/>
+      <path d="M58 68 Q62 72 66 68" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+      <rect x="46" y="81" width="32" height="36" rx="10" fill="{parent_shirt}"/>
+      <!-- Arm pointing/showing toward center -->
+      <path d="M78 90 L116 70" stroke="#FDBA74" stroke-width="6.5" stroke-linecap="round"/>
+      <circle cx="116" cy="70" r="4.5" fill="#FDBA74" stroke="#0F172A" stroke-width="1.5"/>
+    </g>
+
+    {action_art}
+
+    <!-- Arrow from visual cue to kid seeing it -->
+    <path d="M204 66 L224 66" stroke="#0F172A" stroke-width="2.8" stroke-linecap="round"/>
+    <polygon points="222,61 232,66 222,71" fill="#0F172A"/>
+
+    <!-- Kid character on right seeing the cue -->
+    <g class="kid-anim">
+      <circle cx="258" cy="70" r="15" fill="#FDBA74" stroke="#0F172A" stroke-width="2.2"/>
+      <path d="M244 65 Q258 50 272 65 Q265 58 258 59 Q251 58 244 65 Z" fill="#1E293B"/>
+      <circle cx="253" cy="69" r="2.2" fill="#0F172A"/>
+      <circle cx="263" cy="69" r="2.2" fill="#0F172A"/>
+      <circle cx="258" cy="76" r="3" fill="#0F172A"/>
+      <rect x="245" y="87" width="26" height="30" rx="9" fill="{kid_shirt}"/>
+    </g>
+
+    <!-- Bottom phrase strip -->
+    <rect x="24" y="131" width="272" height="24" rx="8" fill="#FFFFFF" stroke="{accent}" stroke-width="1.5"/>
+    <text x="160" y="147" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="10" font-weight="800" fill="#0F172A">
+      Kid Sees: {k_esc}
+    </text>
+    """
 
 
 def module_animated_html(mod_key: str, accent: str, soft_bg: str, page_idx: int) -> str:
-    if mod_key == "AG":
-        scene = """
-        <style>
-          @keyframes floatDrop { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-7px); } }
-          @keyframes popBadge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-          .kid-float { animation: floatDrop 2.4s ease-in-out infinite; }
-          .drop-anim { animation: floatDrop 1.8s ease-in-out infinite; }
-          .check-pop { animation: popBadge 2.1s ease-in-out infinite; transform-origin: 252px 80px; }
-        </style>
-        <rect x="0" y="0" width="320" height="164" rx="14" fill="#CCFBF1"/>
-        <circle cx="284" cy="28" r="14" fill="#99F6E4"/>
-        <path d="M0 132 Q80 120 160 132 T320 128 L320 164 L0 164 Z" fill="#5EEAD4"/>
-        <g class="kid-float">
-          <circle cx="72" cy="62" r="20" fill="#FDBA74" stroke="#0F172A" stroke-width="2.5"/>
-          <path d="M53 56 Q72 36 91 56 Q82 46 72 48 Q62 46 53 56 Z" fill="#1E293B"/>
-          <circle cx="65" cy="61" r="2.8" fill="#0F172A"/>
-          <circle cx="79" cy="61" r="2.8" fill="#0F172A"/>
-          <path d="M66 69 Q72 75 78 69" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round"/>
-          <rect x="54" y="84" width="36" height="34" rx="12" fill="#0F766E" stroke="#1E3A8A" stroke-width="2"/>
-          <circle cx="72" cy="100" r="5" fill="#FFFFFF"/>
-        </g>
-        <g class="drop-anim">
-          <path d="M156 54 Q172 34 188 54 Q188 78 172 90 Q156 78 156 54 Z" fill="#1E3A8A"/>
-          <circle cx="167" cy="56" r="4" fill="#DBEAFE"/>
-        </g>
-        <g class="check-pop">
-          <circle cx="252" cy="80" r="23" fill="#FFFFFF" stroke="#0D9488" stroke-width="3"/>
-          <path d="M241 80 L249 88 L264 72" fill="none" stroke="#0D9488" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        </g>
-        """
-    elif mod_key == "AH":
-        scene = """
-        <style>
-          @keyframes hopKid { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
-          @keyframes slideArrow { 0%, 100% { transform: translateX(0px); } 50% { transform: translateX(5px); } }
-          .hop-kid { animation: hopKid 2.2s ease-in-out infinite; }
-          .arrow-move { animation: slideArrow 1.5s ease-in-out infinite; }
-        </style>
-        <rect x="0" y="0" width="320" height="164" rx="14" fill="#DBEAFE"/>
-        <rect x="0" y="130" width="320" height="34" fill="#BFDBFE"/>
-        <rect x="20" y="34" width="96" height="84" rx="12" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2.5"/>
-        <text x="68" y="56" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="12" font-weight="800" fill="#1E3A8A">FIRST</text>
-        <rect x="44" y="66" width="48" height="36" rx="8" fill="#0D9488"/>
-        <path d="M54 66 Q68 54 82 66" fill="none" stroke="#0F172A" stroke-width="2.5"/>
-        <g class="arrow-move">
-          <path d="M126 76 L146 76" stroke="#1E3A8A" stroke-width="3.5" stroke-linecap="round"/>
-          <polygon points="144,68 158,76 144,84" fill="#1E3A8A"/>
-        </g>
-        <g class="hop-kid">
-          <rect x="168" y="34" width="128" height="84" rx="12" fill="#FFFFFF" stroke="#6D28D9" stroke-width="2.5"/>
-          <text x="232" y="55" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="12" font-weight="800" fill="#5B21B6">THEN PLAY</text>
-          <circle cx="232" cy="76" r="14" fill="#FDBA74" stroke="#0F172A" stroke-width="2"/>
-          <circle cx="227" cy="75" r="2" fill="#0F172A"/>
-          <circle cx="237" cy="75" r="2" fill="#0F172A"/>
-          <path d="M227 81 Q232 86 237 81" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="212" cy="102" r="6.5" fill="#0D9488"/>
-          <circle cx="252" cy="102" r="6.5" fill="#7C3AED"/>
-        </g>
-        """
-    elif mod_key == "AI":
-        scene = """
-        <style>
-          @keyframes spinSun { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-          @keyframes strollKid { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(6px); } }
-          .sun-spin { animation: spinSun 14s linear infinite; transform-origin: 54px 46px; }
-          .stroll-kid { animation: strollKid 2.5s ease-in-out infinite; }
-        </style>
-        <rect x="0" y="0" width="320" height="164" rx="14" fill="#CCFBF1"/>
-        <g class="sun-spin">
-          <circle cx="54" cy="46" r="14" fill="#0D9488"/>
-          <line x1="54" y1="23" x2="54" y2="29" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
-          <line x1="54" y1="63" x2="54" y2="69" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
-          <line x1="31" y1="46" x2="37" y2="46" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
-          <line x1="71" y1="46" x2="77" y2="46" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
-        </g>
-        <path d="M0 124 Q85 104 170 120 T320 112 L320 164 L0 164 Z" fill="#99F6E4"/>
-        <g class="stroll-kid">
-          <circle cx="155" cy="72" r="16" fill="#FDBA74" stroke="#0F172A" stroke-width="2.2"/>
-          <circle cx="150" cy="71" r="2.2" fill="#0F172A"/>
-          <circle cx="160" cy="71" r="2.2" fill="#0F172A"/>
-          <path d="M150 77 Q155 82 160 77" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
-          <rect x="142" y="90" width="26" height="26" rx="8" fill="#1E3A8A"/>
-          <line x1="149" y1="116" x2="142" y2="134" stroke="#0F172A" stroke-width="3.2" stroke-linecap="round"/>
-          <line x1="161" y1="116" x2="168" y2="134" stroke="#0F172A" stroke-width="3.2" stroke-linecap="round"/>
-        </g>
-        <path d="M234 86 A22 22 0 0 1 278 86" fill="none" stroke="#6D28D9" stroke-width="4" stroke-linecap="round"/>
-        <rect x="228" y="84" width="10" height="20" rx="5" fill="#6D28D9"/>
-        <rect x="274" y="84" width="10" height="20" rx="5" fill="#6D28D9"/>
-        """
-    else:
-        scene = """
-        <style>
-          @keyframes cardBounce { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
-          @keyframes wavePulse { 0%, 100% { transform: scale(0.96); } 50% { transform: scale(1.07); } }
-          .card-bounce { animation: cardBounce 2.1s ease-in-out infinite; }
-          .talk-wave { animation: wavePulse 1.8s ease-in-out infinite; transform-origin: 244px 76px; }
-        </style>
-        <rect x="0" y="0" width="320" height="164" rx="14" fill="#EDE9FE"/>
-        <rect x="0" y="132" width="320" height="32" fill="#DDD6FE"/>
-        <g class="card-bounce">
-          <rect x="26" y="34" width="90" height="86" rx="12" fill="#FFFFFF" stroke="#6D28D9" stroke-width="2.5"/>
-          <circle cx="71" cy="66" r="15" fill="#0D9488"/>
-          <rect x="42" y="88" width="58" height="15" rx="7.5" fill="#EDE9FE"/>
-          <text x="71" y="99" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="9.5" font-weight="800" fill="#5B21B6">PECS CARD</text>
-        </g>
-        <path d="M126 78 L156 78" stroke="#1E3A8A" stroke-width="3.5" stroke-linecap="round"/>
-        <polygon points="154,70 168,78 154,86" fill="#1E3A8A"/>
-        <g class="talk-wave">
-          <circle cx="236" cy="74" r="22" fill="#FDBA74" stroke="#0F172A" stroke-width="2.2"/>
-          <circle cx="229" cy="72" r="2.5" fill="#0F172A"/>
-          <circle cx="243" cy="72" r="2.5" fill="#0F172A"/>
-          <ellipse cx="236" cy="82" rx="6" ry="4" fill="#6D28D9"/>
-          <circle cx="272" cy="44" r="5.5" fill="#0D9488" opacity="0.8"/>
-          <circle cx="286" cy="36" r="3.8" fill="#1E3A8A" opacity="0.65"/>
-        </g>
-        """
+    parent_act, kid_phrase = get_parent_kid_phrase(mod_key, page_idx)
+    scene = module_animated_scene_svg(mod_key, accent, page_idx)
     return f"""<!DOCTYPE html>
 <html>
 <head>
@@ -828,7 +542,7 @@ def module_animated_html(mod_key: str, accent: str, soft_bg: str, page_idx: int)
   }}
   .caption {{
     margin-top: 6px;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
     color: #0F172A;
     text-align: center;
@@ -840,29 +554,33 @@ def module_animated_html(mod_key: str, accent: str, soft_bg: str, page_idx: int)
     <svg viewBox="0 0 320 164" width="100%" height="156" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:12px;">
       {scene}
     </svg>
-    <div class="caption">Animated Kids Guide • Page {page_idx + 1}</div>
+    <div class="caption">{html.escape(parent_act)} → {html.escape(kid_phrase)} (Page {page_idx + 1})</div>
   </div>
 </body>
 </html>
 """
+
 
 def build_flipbook_html(mod: dict) -> str:
     title_esc = html.escape(f"{mod['code']}: {mod['title']}")
     domain_esc = html.escape(mod["domain"])
     accent = mod["color"]
     soft_bg = mod["soft_bg"]
-    svg_art = module_animated_html(mod["key"], accent, soft_bg, 0)
 
-    pages_js_items = []
-    for p_title, p_summary, p_steps in mod["pages"]:
-        pages_js_items.append(
+    scenes_js_items = []
+    for idx_p, (p_title, p_summary, p_steps) in enumerate(mod["pages"]):
+        p_act, k_phr = get_parent_kid_phrase(mod["key"], idx_p)
+        svg_p = module_animated_scene_svg(mod["key"], accent, idx_p)
+        scenes_js_items.append(
             "{"
             f'"heading": "{html.escape(p_title)}", '
             f'"summary": "{html.escape(p_summary)}", '
-            f'"steps": "{html.escape(p_steps).replace(chr(10), "<br>")}"'
+            f'"steps": "{html.escape(p_steps).replace(chr(10), "<br>")}", '
+            f'"badge": "{html.escape(p_act)} → {html.escape(k_phr)} (Page {idx_p + 1})", '
+            f'"svg": {json.dumps(svg_p)}'
             "}"
         )
-    pages_json = "[" + ", ".join(pages_js_items) + "]"
+    pages_json = "[" + ", ".join(scenes_js_items) + "]"
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -900,6 +618,19 @@ def build_flipbook_html(mod: dict) -> str:
   }}
   h1 {{ margin: 10px 0 4px 0; font-size: 24px; }}
   .domain {{ color: #475569; font-size: 14px; margin-bottom: 16px; }}
+  .anim-card {{
+    background: {soft_bg};
+    border: 1.5px solid {accent}44;
+    border-radius: 14px;
+    padding: 12px;
+  }}
+  .anim-caption {{
+    margin-top: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #0F172A;
+    text-align: center;
+  }}
   .page-box {{
     background: {soft_bg};
     border-radius: 14px;
@@ -942,7 +673,10 @@ def build_flipbook_html(mod: dict) -> str:
     <span class="top-tag">INTERACTIVE FLIPBOOK</span>
     <h1>{title_esc}</h1>
     <div class="domain">Focus Domain: {domain_esc}</div>
-    {svg_art}
+    <div class="anim-card">
+      <svg id="animSvg" viewBox="0 0 320 164" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:12px;"></svg>
+      <div class="anim-caption" id="animCaption"></div>
+    </div>
     <div class="page-box">
       <div class="page-heading" id="pageHeading"></div>
       <div class="page-summary" id="pageSummary"></div>
@@ -959,6 +693,8 @@ def build_flipbook_html(mod: dict) -> str:
   let idx = 0;
   function render() {{
     const p = pages[idx];
+    document.getElementById("animSvg").innerHTML = p.svg;
+    document.getElementById("animCaption").innerText = p.badge;
     document.getElementById("pageHeading").innerHTML = p.heading;
     document.getElementById("pageSummary").innerHTML = p.summary;
     document.getElementById("pageSteps").innerHTML = p.steps;
@@ -978,6 +714,7 @@ def build_flipbook_html(mod: dict) -> str:
 </body>
 </html>
 """
+
 @st.cache_data
 def load_initial_csv(path: str = "Kelantan_Student_Registry_104.csv") -> pd.DataFrame:
     try:
