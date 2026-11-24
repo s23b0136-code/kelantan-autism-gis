@@ -1,831 +1,841 @@
-import html
 import json
 import os
-import pandas as pd
+import sqlite3
+from urllib.parse import quote
+
 import folium
-from streamlit_folium import st_folium
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
+import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="Kelantan Autism GIS — Interactive Dashboard",
-    page_icon="🌈",
+    page_title="Kelantan Autism GIS Analytics Dashboard",
+    page_icon="🗺️",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
-# Colorful UI styling
-st.markdown(
-    """
-    <style>
-    .hero-banner {
-        background: linear-gradient(120deg, #0F172A 0%, #1D4ED8 55%, #059669 100%);
-        padding: 18px 22px;
-        border-radius: 14px;
-        color: #FFFFFF;
-        margin-bottom: 14px;
-        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16);
-    }
-    .module-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        color: #FFFFFF;
-        margin-bottom: 8px;
-    }
-    .flip-card {
-        border-radius: 14px;
-        padding: 20px;
-        border: 2px solid #E2E8F0;
-        background: #FFFFFF;
-        color: #0F172A;
-        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.environ.get("AUTISM_GIS_DB_PATH", os.path.join(BASE_DIR, "kelantan_autism_gis.db"))
+GEOJSON_PATH = os.path.join(BASE_DIR, "data", "kelantan_districts.geojson")
 
-DISTRICT_INFO = {
-    "KOTA BHARU": {
-        "lat": 6.1254,
-        "lon": 102.2381,
-        "centres": 4,
-        "zone": "Green Zone",
-        "color": "green",
-        "badge_bg": "#10B981",
-        "place_summary": "Kota Bharu Central & Kubang Kerian Hub (4 centres, 15 students).",
-        "recommended_centre": "NASOM Malaysia - Kota Bharu",
-        "therapists": "Speech-Language Pathologists (SLP), Occupational Therapists (OT), ABA Therapists, Special Educators",
-        "why_suitable": "Strongest concentration of therapy specialists and structured programs in the registry.",
-    },
-    "BACHOK": {
-        "lat": 6.0610,
-        "lon": 102.3976,
-        "centres": 2,
-        "zone": "Yellow Zone",
-        "color": "orange",
-        "badge_bg": "#F59E0B",
-        "place_summary": "Bachok Coastal & Tembila/Melawi Zone (2 centres, 15 students).",
-        "recommended_centre": "Bachok Autism Outreach Clinic",
-        "therapists": "Early Intervention Specialists, Speech Therapy Support, Behavioral Coaches",
-        "why_suitable": "Keeps travel short within Bachok to reduce travel fatigue and support daily routine consistency.",
-    },
-    "PASIR MAS": {
-        "lat": 6.1042,
-        "lon": 102.1412,
-        "centres": 2,
-        "zone": "Yellow Zone",
-        "color": "orange",
-        "badge_bg": "#F59E0B",
-        "place_summary": "Pasir Mas Town & Western Corridor (2 centres, 15 students).",
-        "recommended_centre": "Pasir Mas Early Intervention Centre",
-        "therapists": "Early Childhood Special Educators, Speech & Language Therapists, Sensory-Motor Therapists",
-        "why_suitable": "Offers local early intervention and structured skill development close to home.",
-    },
-    "PASIR PUTEH": {
-        "lat": 5.8361,
-        "lon": 102.4042,
-        "centres": 1,
-        "zone": "Red Zone",
-        "color": "red",
-        "badge_bg": "#EF4444",
-        "place_summary": "Pasir Puteh Southern Zone (High deficit: 15 students to 1 centre).",
-        "recommended_centre": "Pasir Puteh Special Needs Center",
-        "therapists": "Developmental Therapists, Motor & Play Specialists, Caregiver Counselors",
-        "why_suitable": "Closest local option in Pasir Puteh for foundational therapy and parent guidance.",
-    },
-    "WAKAF BHARU": {
-        "lat": 6.1400,
-        "lon": 102.2100,
-        "centres": 1,
-        "zone": "Red Zone",
-        "color": "red",
-        "badge_bg": "#EF4444",
-        "place_summary": "Wakaf Bharu Border Zone (High deficit: 15 students to 1 centre).",
-        "recommended_centre": "Wakaf Bharu Care & Intervention Hub",
-        "therapists": "Occupational Therapy Practitioners, Daily Living Skills Coaches, Sensory Facilitators",
-        "why_suitable": "Supports daily living routines, sensory regulation, and practical skill carryover.",
-    },
-    "TUMPAT": {
-        "lat": 6.1990,
-        "lon": 102.1700,
-        "centres": 1,
-        "zone": "Red Zone",
-        "color": "red",
-        "badge_bg": "#EF4444",
-        "place_summary": "Tumpat Northern Delta Zone (High deficit: 15 students to 1 centre).",
-        "recommended_centre": "Tumpat Pediatric Therapy Unit",
-        "therapists": "Pediatric Speech Therapists, Play-Based Interventionists, Social Communication Coaches",
-        "why_suitable": "Provides child-friendly speech and play-based communication support in Tumpat.",
-    },
-    "RANTAU PANJANG": {
-        "lat": 6.0200,
-        "lon": 101.9800,
-        "centres": 1,
-        "zone": "Yellow Zone",
-        "color": "orange",
-        "badge_bg": "#F59E0B",
-        "place_summary": "Rantau Panjang Border Zone (14 students to 1 support hub).",
-        "recommended_centre": "Rantau Panjang Autism Support Hub",
-        "therapists": "Outreach Special Educators, Speech & Communication Coaches, Parent Training Advisors",
-        "why_suitable": "Reduces long travel distances for border families and supports home-based routines.",
-    },
-}
-
-MODULES_4 = [
-    {
-        "key": "AG",
-        "code": "Module AG",
-        "title": "Toilet Training & Hygiene",
-        "domain": "Self-Care & Daily Routine",
-        "color": "#0284C7",
-        "soft_bg": "#E0F2FE",
-        "pages": [
-            (
-                "Page 1 • Welcome & Goal",
-                "Build calm, predictable toilet and handwashing habits at home and at the centre.",
-                "• Use clear picture cues for each step.\n• Keep bathroom visits calm and unhurried.\n• Praise effort right after each step.",
-            ),
-            (
-                "Page 2 • Visual Cue Card",
-                "Show the toilet visual card before walking into the bathroom.",
-                "• Hold or point to the card at eye level.\n• Say a short phrase: 'Time for toilet.'\n• Avoid long explanations during transitions.",
-            ),
-            (
-                "Page 3 • Hygiene & Handwashing",
-                "Follow a steady 4-step sequence: sit, wipe/flush, soap, rinse & dry.",
-                "• Count gently to 10 or sing a short 10-second song while washing.\n• Keep soap and towel within easy reach.",
-            ),
-            (
-                "Page 4 • Encouragement & Tracking",
-                "Celebrate progress and stay patient if an accident happens.",
-                "• Use a sticker chart or high-five for completed steps.\n• If an accident happens, stay calm and clean up neutrally.",
-            ),
-        ],
-    },
-    {
-        "key": "AH",
-        "code": "Module AH",
-        "title": "Arrival Routine & Classroom Transition",
-        "domain": "Home & Learning Transitions",
-        "color": "#7C3AED",
-        "soft_bg": "#EDE9FE",
-        "pages": [
-            (
-                "Page 1 • Welcome & Goal",
-                "Help your child move smoothly from home to car, centre, or classroom.",
-                "• Give advance countdowns before changes.\n• Use a 'First / Then' visual board.\n• Keep morning greetings warm and low-pressure.",
-            ),
-            (
-                "Page 2 • Countdown Cue",
-                "Let your child know a transition is coming 3 to 5 minutes ahead.",
-                "• Use a visual timer or count down slowly.\n• Repeat the cue once when time is almost up.",
-            ),
-            (
-                "Page 3 • 'First / Then' Board",
-                "Pair a routine task ('First: Bag & shoes') with a motivating step ('Then: Play').",
-                "• Point to 'First' while doing the task.\n• Move to 'Then' right after completion.",
-            ),
-            (
-                "Page 4 • Calm Arrival Check-In",
-                "Give a few quiet moments to settle in when arriving at a new space.",
-                "• Allow your child to hold a comfort item or visual card.\n• Avoid rushing questions right at the door.",
-            ),
-        ],
-    },
-    {
-        "key": "AI",
-        "code": "Module AI",
-        "title": "Morning Walk & Sensory Regulation",
-        "domain": "Physical, Motor & Sensory",
-        "color": "#059669",
-        "soft_bg": "#D1FAE5",
-        "pages": [
-            (
-                "Page 1 • Welcome & Goal",
-                "Use gentle morning movement and sensory awareness to support calm focus.",
-                "• Walk at your child's comfortable pace.\n• Notice early signs of sensory overload.\n• Include a calm reset before learning tasks.",
-            ),
-            (
-                "Page 2 • Morning Walk Routine",
-                "Take a short, predictable walk along a quiet path or yard.",
-                "• Focus on steady footsteps and fresh air.\n• Keep talking light and encouraging.",
-            ),
-            (
-                "Page 3 • Sensory Environment Check",
-                "Adjust sound, brightness, or crowding before discomfort builds.",
-                "• Offer ear defenders/headphones or a quiet corner early.\n• Watch for signs of noise or crowd overload.",
-            ),
-            (
-                "Page 4 • Calm Reset Before Tasks",
-                "Take 1–2 minutes for slow breathing, stretching, or water sip.",
-                "• A regulated body makes listening and learning easier.",
-            ),
-        ],
-    },
-    {
-        "key": "SK",
-        "code": "Module SK",
-        "title": "Speech & Picture Exchange (PECS)",
-        "domain": "Communication Support",
-        "color": "#D97706",
-        "soft_bg": "#FEF3C7",
-        "pages": [
-            (
-                "Page 1 • Welcome & Goal",
-                "Support everyday communication using picture cards, gestures, and clear speech.",
-                "• Honor picture/card requests immediately.\n• Pair spoken words with visual cues.\n• Keep communication fun and stress-free.",
-            ),
-            (
-                "Page 2 • Exchanging Picture Cards",
-                "Teach your child to hand over or tap a card for a desired item.",
-                "• Start with 2–3 high-interest items (water, snack, toy, break).\n• Give the item right away so the connection is clear.",
-            ),
-            (
-                "Page 3 • Pairing Clear Spoken Words",
-                "Say the target word clearly right as the card is shared.",
-                "• Use short, clear models like 'Water' or 'More'.\n• Avoid forcing long sentences if your child feels stuck.",
-            ),
-            (
-                "Page 4 • Daily Home Practice",
-                "Keep key communication cards handy during meals, play, and therapy.",
-                "• Add new cards gradually as your child's needs and interests grow.",
-            ),
-        ],
-    },
+GRAPH_PALETTE = [
+    "#17365D",  # Navy Blue
+    "#0F8B8D",  # Teal
+    "#6D28D9",  # Purple
+    "#1E3A5F",  # Dark Blue
+    "#0284C7",  # Sky Blue
+    "#0D9488",  # Deep Teal
+    "#7C3AED",  # Violet
+    "#475569",  # Slate
 ]
 
-EMBEDDED_RECORDS = json.loads("""[{"Record ID": "KOD-1000", "Identifier": "Child Record #1 (Anonymized)", "Age": 4, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1001", "Identifier": "Child Record #2 (Anonymized)", "Age": 5, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1002", "Identifier": "Child Record #3 (Anonymized)", "Age": 6, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1003", "Identifier": "Child Record #4 (Anonymized)", "Age": 7, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1004", "Identifier": "Child Record #5 (Anonymized)", "Age": 8, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1005", "Identifier": "Child Record #6 (Anonymized)", "Age": 9, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1006", "Identifier": "Child Record #7 (Anonymized)", "Age": 10, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1007", "Identifier": "Child Record #8 (Anonymized)", "Age": 11, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1008", "Identifier": "Child Record #9 (Anonymized)", "Age": 12, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1009", "Identifier": "Child Record #10 (Anonymized)", "Age": 13, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1010", "Identifier": "Child Record #11 (Anonymized)", "Age": 14, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1011", "Identifier": "Child Record #12 (Anonymized)", "Age": 15, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1012", "Identifier": "Child Record #13 (Anonymized)", "Age": 4, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1013", "Identifier": "Child Record #14 (Anonymized)", "Age": 5, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1014", "Identifier": "Child Record #15 (Anonymized)", "Age": 6, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1015", "Identifier": "Child Record #16 (Anonymized)", "Age": 7, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1016", "Identifier": "Child Record #17 (Anonymized)", "Age": 8, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1017", "Identifier": "Child Record #18 (Anonymized)", "Age": 9, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1018", "Identifier": "Child Record #19 (Anonymized)", "Age": 10, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1019", "Identifier": "Child Record #20 (Anonymized)", "Age": 11, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1020", "Identifier": "Child Record #21 (Anonymized)", "Age": 12, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1021", "Identifier": "Child Record #22 (Anonymized)", "Age": 13, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1022", "Identifier": "Child Record #23 (Anonymized)", "Age": 14, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1023", "Identifier": "Child Record #24 (Anonymized)", "Age": 15, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1024", "Identifier": "Child Record #25 (Anonymized)", "Age": 4, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1025", "Identifier": "Child Record #26 (Anonymized)", "Age": 5, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1026", "Identifier": "Child Record #27 (Anonymized)", "Age": 6, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1027", "Identifier": "Child Record #28 (Anonymized)", "Age": 7, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1028", "Identifier": "Child Record #29 (Anonymized)", "Age": 8, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1029", "Identifier": "Child Record #30 (Anonymized)", "Age": 9, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1030", "Identifier": "Child Record #31 (Anonymized)", "Age": 10, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1031", "Identifier": "Child Record #32 (Anonymized)", "Age": 11, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1032", "Identifier": "Child Record #33 (Anonymized)", "Age": 12, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1033", "Identifier": "Child Record #34 (Anonymized)", "Age": 13, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1034", "Identifier": "Child Record #35 (Anonymized)", "Age": 14, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1035", "Identifier": "Child Record #36 (Anonymized)", "Age": 15, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1036", "Identifier": "Child Record #37 (Anonymized)", "Age": 4, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1037", "Identifier": "Child Record #38 (Anonymized)", "Age": 5, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1038", "Identifier": "Child Record #39 (Anonymized)", "Age": 6, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1039", "Identifier": "Child Record #40 (Anonymized)", "Age": 7, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1040", "Identifier": "Child Record #41 (Anonymized)", "Age": 8, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1041", "Identifier": "Child Record #42 (Anonymized)", "Age": 9, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1042", "Identifier": "Child Record #43 (Anonymized)", "Age": 10, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1043", "Identifier": "Child Record #44 (Anonymized)", "Age": 11, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1044", "Identifier": "Child Record #45 (Anonymized)", "Age": 12, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1045", "Identifier": "Child Record #46 (Anonymized)", "Age": 13, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1046", "Identifier": "Child Record #47 (Anonymized)", "Age": 14, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1047", "Identifier": "Child Record #48 (Anonymized)", "Age": 15, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1048", "Identifier": "Child Record #49 (Anonymized)", "Age": 4, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1049", "Identifier": "Child Record #50 (Anonymized)", "Age": 5, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1050", "Identifier": "Child Record #51 (Anonymized)", "Age": 6, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1051", "Identifier": "Child Record #52 (Anonymized)", "Age": 7, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1052", "Identifier": "Child Record #53 (Anonymized)", "Age": 8, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1053", "Identifier": "Child Record #54 (Anonymized)", "Age": 9, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1054", "Identifier": "Child Record #55 (Anonymized)", "Age": 10, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1055", "Identifier": "Child Record #56 (Anonymized)", "Age": 11, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1056", "Identifier": "Child Record #57 (Anonymized)", "Age": 12, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1057", "Identifier": "Child Record #58 (Anonymized)", "Age": 13, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1058", "Identifier": "Child Record #59 (Anonymized)", "Age": 14, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1059", "Identifier": "Child Record #60 (Anonymized)", "Age": 15, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1060", "Identifier": "Child Record #61 (Anonymized)", "Age": 4, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1061", "Identifier": "Child Record #62 (Anonymized)", "Age": 5, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1062", "Identifier": "Child Record #63 (Anonymized)", "Age": 6, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1063", "Identifier": "Child Record #64 (Anonymized)", "Age": 7, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1064", "Identifier": "Child Record #65 (Anonymized)", "Age": 8, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1065", "Identifier": "Child Record #66 (Anonymized)", "Age": 9, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1066", "Identifier": "Child Record #67 (Anonymized)", "Age": 10, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1067", "Identifier": "Child Record #68 (Anonymized)", "Age": 11, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1068", "Identifier": "Child Record #69 (Anonymized)", "Age": 12, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1069", "Identifier": "Child Record #70 (Anonymized)", "Age": 13, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1070", "Identifier": "Child Record #71 (Anonymized)", "Age": 14, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1071", "Identifier": "Child Record #72 (Anonymized)", "Age": 15, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1072", "Identifier": "Child Record #73 (Anonymized)", "Age": 4, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1073", "Identifier": "Child Record #74 (Anonymized)", "Age": 5, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1074", "Identifier": "Child Record #75 (Anonymized)", "Age": 6, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1075", "Identifier": "Child Record #76 (Anonymized)", "Age": 7, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1076", "Identifier": "Child Record #77 (Anonymized)", "Age": 8, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1077", "Identifier": "Child Record #78 (Anonymized)", "Age": 9, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1078", "Identifier": "Child Record #79 (Anonymized)", "Age": 10, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1079", "Identifier": "Child Record #80 (Anonymized)", "Age": 11, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1080", "Identifier": "Child Record #81 (Anonymized)", "Age": 12, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1081", "Identifier": "Child Record #82 (Anonymized)", "Age": 13, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1082", "Identifier": "Child Record #83 (Anonymized)", "Age": 14, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1083", "Identifier": "Child Record #84 (Anonymized)", "Age": 15, "District": "RANTAU PANJANG", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1084", "Identifier": "Child Record #85 (Anonymized)", "Age": 4, "District": "KOTA BHARU", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1085", "Identifier": "Child Record #86 (Anonymized)", "Age": 5, "District": "BACHOK", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1086", "Identifier": "Child Record #87 (Anonymized)", "Age": 6, "District": "PASIR MAS", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1087", "Identifier": "Child Record #88 (Anonymized)", "Age": 7, "District": "PASIR PUTEH", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1088", "Identifier": "Child Record #89 (Anonymized)", "Age": 8, "District": "WAKAF BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1089", "Identifier": "Child Record #90 (Anonymized)", "Age": 9, "District": "TUMPAT", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1090", "Identifier": "Child Record #91 (Anonymized)", "Age": 10, "District": "RANTAU PANJANG", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1091", "Identifier": "Child Record #92 (Anonymized)", "Age": 11, "District": "KOTA BHARU", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1092", "Identifier": "Child Record #93 (Anonymized)", "Age": 12, "District": "BACHOK", "Diagnosis": "Severe Autism", "Required Service": "Speech Therapy", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1093", "Identifier": "Child Record #94 (Anonymized)", "Age": 13, "District": "PASIR MAS", "Diagnosis": "Mild Autism", "Required Service": "ABA Therapy", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1094", "Identifier": "Child Record #95 (Anonymized)", "Age": 14, "District": "PASIR PUTEH", "Diagnosis": "High-Function Autism", "Required Service": "Occupational Sensory", "Date": "2026-05-15", "Status": "Verified Active"}, {"Record ID": "KOD-1095", "Identifier": "Child Record #96 (Anonymized)", "Age": 15, "District": "WAKAF BHARU", "Diagnosis": "Severe Autism", "Required Service": "Early Intervention", "Date": "2026-06-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1096", "Identifier": "Child Record #97 (Anonymized)", "Age": 4, "District": "TUMPAT", "Diagnosis": "Mild Autism", "Required Service": "Speech Therapy", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1097", "Identifier": "Child Record #98 (Anonymized)", "Age": 5, "District": "RANTAU PANJANG", "Diagnosis": "High-Function Autism", "Required Service": "ABA Therapy", "Date": "2026-02-15", "Status": "Verified Active"}, {"Record ID": "KOD-1098", "Identifier": "Child Record #99 (Anonymized)", "Age": 6, "District": "KOTA BHARU", "Diagnosis": "Severe Autism", "Required Service": "Occupational Sensory", "Date": "2026-03-15", "Status": "Verified Active"}, {"Record ID": "KOD-1099", "Identifier": "Child Record #100 (Anonymized)", "Age": 7, "District": "BACHOK", "Diagnosis": "Mild Autism", "Required Service": "Early Intervention", "Date": "2026-04-15", "Status": "Verified Active"}, {"Record ID": "KOD-1100", "Identifier": "Child Record #101 (Anonymized)", "Age": 8, "District": "PASIR MAS", "Diagnosis": "High-Function Autism", "Required Service": "Speech Therapy", "Date": "2026-05-15", "Status": "Pending Verification"}, {"Record ID": "KOD-1101", "Identifier": "Child Record #102 (Anonymized)", "Age": 9, "District": "PASIR PUTEH", "Diagnosis": "Severe Autism", "Required Service": "ABA Therapy", "Date": "2026-06-15", "Status": "Verified Active"}, {"Record ID": "KOD-1102", "Identifier": "Child Record #103 (Anonymized)", "Age": 10, "District": "WAKAF BHARU", "Diagnosis": "Mild Autism", "Required Service": "Occupational Sensory", "Date": "2026-01-15", "Status": "Verified Active"}, {"Record ID": "KOD-1103", "Identifier": "Child Record #104 (Anonymized)", "Age": 11, "District": "TUMPAT", "Diagnosis": "High-Function Autism", "Required Service": "Early Intervention", "Date": "2026-02-15", "Status": "Verified Active"}]""")
+ACCESSIBILITY_COLORS = {
+    "Good": "#16A34A",
+    "Moderate": "#EAB308",
+    "Poor": "#DC2626",
+}
 
 
-def module_svg(mod_key: str, accent: str, soft_bg: str) -> str:
-    """Returns a colorful, topic-specific inline SVG illustration for each module."""
-    if mod_key == "AG":
-        artwork = """
-        <rect x="34" y="34" width="76" height="92" rx="14" fill="#FFFFFF" stroke="#0284C7" stroke-width="3"/>
-        <circle cx="72" cy="64" r="14" fill="#BAE6FD"/>
-        <path d="M54 102 Q72 84 90 102 Z" fill="#38BDF8"/>
-        <path d="M148 56 Q168 38 188 56 Q188 84 168 96 Q148 84 148 56 Z" fill="#38BDF8"/>
-        <circle cx="226" cy="74" r="24" fill="#FFFFFF" stroke="#0284C7" stroke-width="3"/>
-        <path d="M216 74 L223 81 L237 67" fill="none" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
+def get_conn():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute(
         """
-    elif mod_key == "AH":
-        artwork = """
-        <rect x="32" y="38" width="96" height="84" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="3"/>
-        <text x="80" y="64" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#7C3AED">FIRST</text>
-        <rect x="52" y="74" width="56" height="32" rx="6" fill="#DDD6FE"/>
-        <polygon points="144,72 162,80 144,88" fill="#7C3AED"/>
-        <rect x="174" y="38" width="96" height="84" rx="12" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
-        <text x="222" y="64" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#059669">THEN</text>
-        <circle cx="222" cy="90" r="16" fill="#A7F3D0"/>
-        """
-    elif mod_key == "AI":
-        artwork = """
-        <circle cx="64" cy="54" r="18" fill="#FBBF24"/>
-        <path d="M28 124 Q85 96 145 112 T276 96 L276 142 L28 142 Z" fill="#A7F3D0"/>
-        <circle cx="152" cy="66" r="11" fill="#047857"/>
-        <path d="M152 77 L145 102 L134 118 M152 77 L160 102 L172 115 M152 84 L136 94 M152 84 L168 92" stroke="#047857" stroke-width="4" stroke-linecap="round" fill="none"/>
-        <circle cx="235" cy="64" r="20" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
-        <path d="M225 64 Q235 52 245 64 Q235 76 225 64" fill="#34D399"/>
-        """
-    else:
-        artwork = """
-        <rect x="34" y="38" width="84" height="84" rx="12" fill="#FFFFFF" stroke="#D97706" stroke-width="3"/>
-        <circle cx="76" cy="70" r="16" fill="#FDE68A"/>
-        <rect x="52" y="94" width="48" height="10" rx="5" fill="#F59E0B"/>
-        <path d="M132 80 L156 80" stroke="#D97706" stroke-width="4" stroke-linecap="round"/>
-        <polygon points="154,72 168,80 154,88" fill="#D97706"/>
-        <rect x="178" y="38" width="94" height="84" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="3"/>
-        <circle cx="212" cy="70" r="10" fill="#93C5FD"/>
-        <circle cx="242" cy="70" r="10" fill="#6EE7B7"/>
-        <rect x="196" y="92" width="58" height="12" rx="6" fill="#DBEAFE"/>
-        """
-
-    return f"""
-    <svg viewBox="0 0 304 156" width="100%" height="156" xmlns="http://www.w3.org/2000/svg" style="border-radius:12px;background:{soft_bg};display:block;">
-        {artwork}
-    </svg>
-    """
-
-
-def build_flipbook_html(mod: dict) -> str:
-    """Generates a standalone interactive HTML flipbook that users can download and open in any browser."""
-    title_esc = html.escape(f"{mod['code']}: {mod['title']}")
-    domain_esc = html.escape(mod["domain"])
-    accent = mod["color"]
-    soft_bg = mod["soft_bg"]
-    svg_art = module_svg(mod["key"], accent, soft_bg)
-
-    pages_js_items = []
-    for p_title, p_summary, p_steps in mod["pages"]:
-        pages_js_items.append(
-            "{"
-            f'"heading": "{html.escape(p_title)}", '
-            f'"summary": "{html.escape(p_summary)}", '
-            f'"steps": "{html.escape(p_steps).replace(chr(10), "<br>")}"'
-            "}"
+        CREATE TABLE IF NOT EXISTS districts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE NOT NULL,
+            accessibility_status TEXT NOT NULL CHECK(accessibility_status IN ('Good', 'Moderate', 'Poor')),
+            lat REAL NOT NULL,
+            lng REAL NOT NULL
         )
-    pages_json = "[" + ", ".join(pages_js_items) + "]"
+        """
+    )
 
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>{title_esc} — Interactive Flipbook</title>
-<style>
-  body {{
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(135deg, #EFF6FF 0%, #ECFDF5 100%);
-    margin: 0;
-    padding: 28px;
-    color: #0F172A;
-    display: flex;
-    justify-content: center;
-  }}
-  .book-shell {{
-    max-width: 720px;
-    width: 100%;
-    background: #FFFFFF;
-    border-radius: 18px;
-    padding: 26px;
-    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
-    border-top: 8px solid {accent};
-  }}
-  .top-tag {{
-    display: inline-block;
-    background: {accent};
-    color: #FFFFFF;
-    font-weight: 700;
-    font-size: 12px;
-    padding: 5px 12px;
-    border-radius: 999px;
-  }}
-  h1 {{
-    margin: 10px 0 4px 0;
-    font-size: 24px;
-  }}
-  .domain {{
-    color: #475569;
-    font-size: 14px;
-    margin-bottom: 16px;
-  }}
-  .page-box {{
-    background: {soft_bg};
-    border-radius: 14px;
-    padding: 20px;
-    margin-top: 16px;
-    min-height: 170px;
-    transition: transform 0.25s ease;
-  }}
-  .page-heading {{
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: #0F172A;
-  }}
-  .page-summary {{
-    font-size: 15px;
-    margin-bottom: 12px;
-    line-height: 1.5;
-  }}
-  .page-steps {{
-    background: #FFFFFF;
-    padding: 14px 16px;
-    border-radius: 10px;
-    line-height: 1.65;
-    font-size: 14px;
-  }}
-  .controls {{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-    gap: 12px;
-  }}
-  button {{
-    background: {accent};
-    color: #FFFFFF;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }}
-  button:disabled {{
-    background: #CBD5E1;
-    cursor: not-allowed;
-  }}
-  .indicator {{
-    font-weight: 700;
-    color: #334155;
-  }}
-</style>
-</head>
-<body>
-  <div class="book-shell">
-    <span class="top-tag">INTERACTIVE FLIPBOOK</span>
-    <h1>{title_esc}</h1>
-    <div class="domain">Focus Domain: {domain_esc} • Use buttons or Left/Right arrow keys to flip pages</div>
-    {svg_art}
-    <div class="page-box" id="pageBox">
-      <div class="page-heading" id="pageHeading"></div>
-      <div class="page-summary" id="pageSummary"></div>
-      <div class="page-steps" id="pageSteps"></div>
-    </div>
-    <div class="controls">
-      <button id="prevBtn" onclick="turnPage(-1)">← Previous Page</button>
-      <span class="indicator" id="pageIndicator"></span>
-      <button id="nextBtn" onclick="turnPage(1)">Next Page →</button>
-    </div>
-  </div>
-<script>
-  const pages = {pages_json};
-  let idx = 0;
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS centres (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            district_name TEXT NOT NULL,
+            lat REAL NOT NULL,
+            lng REAL NOT NULL,
+            therapies_offered TEXT NOT NULL,
+            FOREIGN KEY (district_name) REFERENCES districts(name)
+        )
+        """
+    )
 
-  function render() {{
-    const p = pages[idx];
-    document.getElementById("pageHeading").innerHTML = p.heading;
-    document.getElementById("pageSummary").innerHTML = p.summary;
-    document.getElementById("pageSteps").innerHTML = p.steps;
-    document.getElementById("pageIndicator").innerText = `Page ${{idx + 1}} of ${{pages.length}}`;
-    document.getElementById("prevBtn").disabled = idx === 0;
-    document.getElementById("nextBtn").disabled = idx === pages.length - 1;
-  }}
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS students (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_code TEXT UNIQUE NOT NULL,
+            full_name TEXT NOT NULL,
+            district_name TEXT NOT NULL,
+            diagnosis TEXT NOT NULL,
+            therapy_required TEXT NOT NULL,
+            is_verified INTEGER NOT NULL DEFAULT 1,
+            FOREIGN KEY (district_name) REFERENCES districts(name)
+        )
+        """
+    )
 
-  function turnPage(delta) {{
-    const nextIdx = idx + delta;
-    if (nextIdx >= 0 && nextIdx < pages.length) {{
-      idx = nextIdx;
-      const box = document.getElementById("pageBox");
-      box.style.transform = "scale(0.98)";
-      setTimeout(() => {{ box.style.transform = "scale(1)"; }}, 120);
-      render();
-    }}
-  }}
-
-  document.addEventListener("keydown", (e) => {{
-    if (e.key === "ArrowRight") turnPage(1);
-    if (e.key === "ArrowLeft") turnPage(-1);
-  }});
-
-  render();
-</script>
-</body>
-</html>
-"""
-
-
-def add_kelantan_boundary_layer(fmap: folium.Map, selected_dist: str) -> str:
-    """Loads kelantan_districts.geojson or malaysia.min.geojson if available and draws boundary polygons."""
-    candidate_files = ["kelantan_districts.geojson", "malaysia.district.min.geojson", "malaysia.min.geojson"]
-    found_path = next((p for p in candidate_files if os.path.exists(p)), None)
-    if not found_path:
-        return "District markers & zone rings active (upload kelantan_districts.geojson or malaysia.min.geojson for polygon borders)."
-
-    try:
-        with open(found_path, "r", encoding="utf-8") as f:
-            gj = json.load(f)
-
-        features = gj.get("features", []) if isinstance(gj, dict) else []
-        kel_features = [
-            feat for feat in features
-            if "KELANTAN" in json.dumps(feat.get("properties", {})).upper()
-            or any(d in json.dumps(feat.get("properties", {})).upper() for d in DISTRICT_INFO.keys())
+    cur.execute("SELECT COUNT(*) AS cnt FROM districts")
+    if cur.fetchone()["cnt"] == 0:
+        kelantan_districts = [
+            ("Kota Bharu", "Good", 6.1254, 102.2381),
+            ("Pasir Mas", "Moderate", 6.0406, 102.1422),
+            ("Tumpat", "Moderate", 6.1978, 102.1708),
+            ("Bachok", "Moderate", 6.0636, 102.3989),
+            ("Tanah Merah", "Moderate", 5.8069, 102.1475),
+            ("Pasir Puteh", "Moderate", 5.8356, 102.4036),
+            ("Machang", "Poor", 5.7647, 102.2189),
+            ("Kuala Krai", "Poor", 5.5314, 102.2006),
+            ("Gua Musang", "Poor", 4.8844, 101.9686),
+            ("Jeli", "Poor", 5.6947, 101.8414),
         ]
-        target_gj = {"type": "FeatureCollection", "features": kel_features if kel_features else features}
+        cur.executemany(
+            "INSERT INTO districts (name, accessibility_status, lat, lng) VALUES (?, ?, ?, ?)",
+            kelantan_districts,
+        )
+
+    cur.execute("SELECT COUNT(*) AS cnt FROM centres")
+    if cur.fetchone()["cnt"] == 0:
+        sample_centres = [
+            ("Pusat Intervensi Autisme Kota Bharu", "Kota Bharu", 6.1185, 102.2442, "Speech Therapy, Occupational Therapy, ABA Therapy"),
+            ("Pusat Pemulihan & Terapi Kubang Kerian", "Kota Bharu", 6.0942, 102.2836, "Occupational Therapy, Sensory Integration"),
+            ("Unit Sokongan Pembelajaran Pasir Mas", "Pasir Mas", 6.0361, 102.1389, "Speech Therapy, Behavioral Support"),
+            ("Pusat Terapi Kanak-Kanak Tumpat", "Tumpat", 6.1920, 102.1640, "Occupational Therapy, Speech Therapy"),
+            ("Pusat Sokongan Autisme Tanah Merah", "Tanah Merah", 5.8042, 102.1451, "Speech Therapy, Occupational Therapy"),
+            ("Pusat Intervensi Kuala Krai", "Kuala Krai", 5.5345, 102.2030, "Speech Therapy"),
+        ]
+        cur.executemany(
+            "INSERT INTO centres (name, district_name, lat, lng, therapies_offered) VALUES (?, ?, ?, ?, ?)",
+            sample_centres,
+        )
+
+    cur.execute("SELECT COUNT(*) AS cnt FROM students")
+    if cur.fetchone()["cnt"] == 0:
+        sample_students = [
+            ("KLT-001", "Student A", "Kota Bharu", "ASD Level 1", "Speech Therapy", 1),
+            ("KLT-002", "Student B", "Kota Bharu", "ASD Level 2", "Occupational Therapy", 1),
+            ("KLT-003", "Student C", "Kota Bharu", "ASD Level 1", "ABA Therapy", 1),
+            ("KLT-004", "Student D", "Kota Bharu", "Speech & Language Delay (ASD)", "Speech Therapy", 0),
+            ("KLT-005", "Student E", "Pasir Mas", "ASD Level 2", "Speech Therapy", 1),
+            ("KLT-006", "Student F", "Pasir Mas", "ASD Level 1", "Behavioral Support", 1),
+            ("KLT-007", "Student G", "Tumpat", "ASD Level 2", "Occupational Therapy", 1),
+            ("KLT-008", "Student H", "Bachok", "ASD Level 1", "Speech Therapy", 1),
+            ("KLT-009", "Student I", "Tanah Merah", "ASD Level 2", "Occupational Therapy", 1),
+            ("KLT-010", "Student J", "Pasir Puteh", "ASD Level 3", "Sensory Integration", 1),
+            ("KLT-011", "Student K", "Machang", "ASD Level 2", "Speech Therapy", 1),
+            ("KLT-012", "Student L", "Kuala Krai", "ASD Level 2", "Speech Therapy", 1),
+            ("KLT-013", "Student M", "Kuala Krai", "ASD Level 3", "Occupational Therapy", 0),
+            ("KLT-014", "Student N", "Gua Musang", "ASD Level 2", "Speech Therapy", 1),
+            ("KLT-015", "Student O", "Jeli", "ASD Level 1", "Behavioral Support", 1),
+        ]
+        cur.executemany(
+            """
+            INSERT INTO students (student_code, full_name, district_name, diagnosis, therapy_required, is_verified)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            sample_students,
+        )
+
+    conn.commit()
+    conn.close()
+
+
+def load_dashboard_data():
+    conn = get_conn()
+    districts_df = pd.read_sql_query(
+        "SELECT id, name, accessibility_status, lat, lng FROM districts ORDER BY name ASC", conn
+    )
+    centres_df = pd.read_sql_query(
+        "SELECT id, name, district_name, lat, lng, therapies_offered FROM centres ORDER BY name ASC", conn
+    )
+    students_df = pd.read_sql_query(
+        "SELECT id, student_code, full_name, district_name, diagnosis, therapy_required, is_verified FROM students ORDER BY id DESC",
+        conn,
+    )
+    conn.close()
+
+    student_counts = (
+        students_df.groupby("district_name").size().to_dict() if not students_df.empty else {}
+    )
+    centre_counts = (
+        centres_df.groupby("district_name").size().to_dict() if not centres_df.empty else {}
+    )
+
+    district_rows = []
+    for _, row in districts_df.iterrows():
+        d_name = row["name"]
+        d_centres = centres_df[centres_df["district_name"] == d_name] if not centres_df.empty else pd.DataFrame()
+        d_students = students_df[students_df["district_name"] == d_name] if not students_df.empty else pd.DataFrame()
+
+        therapies_set = set()
+        if not d_centres.empty:
+            for raw in d_centres["therapies_offered"].fillna(""):
+                for part in str(raw).split(","):
+                    clean = part.strip()
+                    if clean:
+                        therapies_set.add(clean)
+
+        therapy_demand = []
+        if not d_students.empty:
+            vc = d_students["therapy_required"].value_counts()
+            for svc, cnt in vc.items():
+                therapy_demand.append({"service": svc, "students": int(cnt)})
+
+        district_rows.append(
+            {
+                "District": d_name,
+                "Registered Students": int(student_counts.get(d_name, 0)),
+                "Autism Centres": int(centre_counts.get(d_name, 0)),
+                "Accessibility Status": row["accessibility_status"],
+                "Available Therapies": ", ".join(sorted(therapies_set)) if therapies_set else "No data available",
+                "Therapy Demand": therapy_demand,
+            }
+        )
+
+    summary_df = pd.DataFrame(district_rows)
+    return {
+        "districts_df": districts_df,
+        "centres_df": centres_df,
+        "students_df": students_df,
+        "summary_df": summary_df,
+        "total_students": int(len(students_df)),
+        "verified_students": int(students_df["is_verified"].sum()) if not students_df.empty else 0,
+        "total_centres": int(len(centres_df)),
+        "total_districts": int(len(districts_df)),
+    }
+
+
+def add_student_record(student_code, full_name, district_name, diagnosis, therapy_required, is_verified):
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        INSERT INTO students (student_code, full_name, district_name, diagnosis, therapy_required, is_verified)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (
+            student_code.strip(),
+            full_name.strip(),
+            district_name.strip(),
+            diagnosis.strip(),
+            therapy_required.strip(),
+            1 if is_verified else 0,
+        ),
+    )
+    conn.commit()
+    conn.close()
+
+
+def add_centre_record(name, district_name, lat, lng, therapies_offered):
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        INSERT INTO centres (name, district_name, lat, lng, therapies_offered)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (
+            name.strip(),
+            district_name.strip(),
+            float(lat),
+            float(lng),
+            therapies_offered.strip(),
+        ),
+    )
+    conn.commit()
+    conn.close()
+
+
+def apply_custom_theme():
+    font_svg = quote(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#172033" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'
+    )
+    st.markdown(
+        f"""
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+            html, body, [class*="css"], .stApp {{
+                font-family: 'Inter', 'Roboto', Arial, sans-serif;
+                color: #000000;
+                background-color: #F4F7FB;
+            }}
+
+            .stApp {{
+                background-color: #F4F7FB;
+            }}
+
+            [data-testid="stSidebar"] {{
+                background-color: #FFFFFF;
+                border-right: 1px solid #CBD5E1;
+            }}
+
+            [data-testid="stSidebar"] * {{
+                color: #000000 !important;
+            }}
+
+            h1, h2, h3, h4, h5, h6 {{
+                color: #000000 !important;
+                font-weight: 700 !important;
+            }}
+
+            p, span, label, div, li {{
+                color: #000000;
+            }}
+
+            [data-testid="stMarkdownContainer"] *,
+            [data-testid="stWidgetLabel"] *,
+            [data-testid="stCaptionContainer"] *,
+            .caption-muted, small {{
+                color: #000000 !important;
+            }}
+
+            [data-testid="stMetric"] {{
+                background-color: #FFFFFF;
+                border: 1px solid #CBD5E1;
+                border-top: 4px solid #17365D;
+                border-radius: 10px;
+                padding: 0.85rem 1rem;
+            }}
+
+            [data-testid="stMetricLabel"] *,
+            [data-testid="stMetricValue"] * {{
+                color: #000000 !important;
+                font-weight: 700 !important;
+            }}
+
+            .section-card {{
+                background-color: #FFFFFF;
+                border: 1px solid #CBD5E1;
+                border-radius: 10px;
+                padding: 1.1rem 1.25rem;
+                margin-bottom: 1rem;
+            }}
+
+            .detail-box {{
+                background-color: #FFFFFF;
+                border: 1px solid #0F8B8D;
+                border-left: 5px solid #17365D;
+                border-radius: 10px;
+                padding: 1.1rem 1.3rem;
+                margin-top: 0.75rem;
+                margin-bottom: 1.25rem;
+            }}
+
+            .stButton > button {{
+                background-color: #17365D;
+                color: #FFFFFF !important;
+                border: none;
+                border-radius: 6px;
+                font-weight: 600;
+            }}
+
+            .stButton > button * {{
+                color: #FFFFFF !important;
+            }}
+
+            .stButton > button:hover {{
+                background-color: #1E3A5F;
+            }}
+
+            input, textarea, select, [data-baseweb="select"] > div {{
+                background-color: #FFFFFF !important;
+                color: #000000 !important;
+                border-color: #94A3B8 !important;
+            }}
+
+            [data-baseweb="select"] span, [data-baseweb="popover"] li {{
+                color: #000000 !important;
+                background-color: #FFFFFF !important;
+            }}
+
+            .map-legend {{
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1.1rem;
+                margin-top: 0.65rem;
+                font-size: 0.9rem;
+                font-weight: 500;
+                color: #000000;
+            }}
+
+            .swatch {{
+                display: inline-block;
+                width: 14px;
+                height: 14px;
+                border-radius: 3px;
+                margin-right: 6px;
+                vertical-align: middle;
+                border: 1px solid rgba(17, 24, 39, 0.25);
+            }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def style_plotly_fig(fig, x_title="", y_title="", is_pie=False):
+    fig.update_layout(
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#FFFFFF",
+        font=dict(family="Inter, Roboto, Arial, sans-serif", color="#1F2937", size=12),
+        title=dict(font=dict(color="#111827", size=16)),
+        legend=dict(font=dict(color="#111827", size=12)),
+        margin=dict(t=45, b=45, l=45, r=25),
+    )
+    if not is_pie:
+        fig.update_xaxes(
+            title_text=x_title,
+            title_font=dict(color="#111827", size=12),
+            tickfont=dict(color="#1F2937", size=11),
+            showgrid=True,
+            gridcolor="#E2E8F0",
+            linecolor="#CBD5E1",
+        )
+        fig.update_yaxes(
+            title_text=y_title,
+            title_font=dict(color="#111827", size=12),
+            tickfont=dict(color="#1F2937", size=11),
+            showgrid=True,
+            gridcolor="#E2E8F0",
+            linecolor="#CBD5E1",
+        )
+    return fig
+
+
+def render_kelantan_map(summary_df, centres_df):
+    try:
+        if not os.path.exists(GEOJSON_PATH):
+            st.info("Map temporarily unavailable")
+            return
+
+        with open(GEOJSON_PATH, "r", encoding="utf-8") as f:
+            geo_data = json.load(f)
+
+        stats_lookup = {}
+        if not summary_df.empty:
+            for _, r in summary_df.iterrows():
+                stats_lookup[r["District"]] = r.to_dict()
+
+        fmap = folium.Map(location=[5.65, 102.15], zoom_start=9, tiles="OpenStreetMap")
 
         def style_fn(feature):
-            blob = json.dumps(feature.get("properties", {})).upper()
-            fill_col = "#3B82F6"
-            for d_name, d_meta in DISTRICT_INFO.items():
-                if d_name in blob:
-                    fill_col = d_meta["badge_bg"]
-                    break
-            is_sel = selected_dist in blob
+            d_name = feature.get("properties", {}).get("district", "")
+            status = stats_lookup.get(d_name, {}).get("Accessibility Status", "")
+            fill_col = ACCESSIBILITY_COLORS.get(status, "#64748B")
             return {
                 "fillColor": fill_col,
-                "color": "#FFFFFF" if is_sel else "#1E293B",
-                "weight": 3 if is_sel else 1.5,
-                "fillOpacity": 0.36 if is_sel else 0.18,
+                "color": "#17365D",
+                "weight": 1.8,
+                "fillOpacity": 0.58,
             }
 
-        folium.GeoJson(
-            target_gj,
-            name="Kelantan Boundaries",
-            style_function=style_fn,
-        ).add_to(fmap)
-        return f"Boundary layer loaded from {found_path} ({len(target_gj.get('features', []))} features)."
-    except Exception as exc:
-        return f"Using zone markers fallback ({exc})."
-
-
-@st.cache_data
-def load_initial_csv(path: str = "Kelantan_Student_Registry_104.csv") -> pd.DataFrame:
-    try:
-        df = pd.read_csv(path)
-    except Exception:
-        df = pd.DataFrame(EMBEDDED_RECORDS)
-    df["District"] = df["District"].astype(str).str.strip().str.upper()
-    return df
-
-
-if "student_df" not in st.session_state:
-    st.session_state["student_df"] = load_initial_csv().copy()
-
-if "selected_zone_district" not in st.session_state:
-    st.session_state["selected_zone_district"] = "PASIR PUTEH"
-
-for mod in MODULES_4:
-    p_key = f"flip_page_{mod['key']}"
-    if p_key not in st.session_state:
-        st.session_state[p_key] = 0
-
-df_students = st.session_state["student_df"].copy()
-
-st.markdown(
-    """
-    <div class="hero-banner">
-        <h2 style="margin:0;color:#FFFFFF;">🌈 Kelantan Autism GIS & Support Platform</h2>
-        <p style="margin:4px 0 0 0;color:#E2E8F0;font-size:14px;">
-            Interactive Kelantan Zone Map • Live Student Registry • Tailored Centre Matcher • 4 Illustrated Flipbook Modules
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Sidebar Multi-Page Navigation
-st.sidebar.title("🌈 Navigation")
-page = st.sidebar.radio(
-    "Choose a Page",
-    [
-        "1. Kelantan Zone Map & Analytics",
-        "2. Student Registry (Edit & Insert)",
-        "3. Parents: Child & Centre Matcher",
-        "4. Parents: 4 Interactive Flipbook Modules",
-    ],
-)
-
-counts_by_dist = df_students["District"].value_counts().to_dict()
-
-# ==============================================================================
-# PAGE 1: KELANTAN ZONE MAP (RED / GREEN / YELLOW) + POP-UP + GRAPHS
-# ==============================================================================
-if page == "1. Kelantan Zone Map & Analytics":
-    k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Total Students", len(df_students))
-    k2.metric("Verified Active", int((df_students["Status"] == "Verified Active").sum()))
-    k3.metric("Pending Verification", int((df_students["Status"] == "Pending Verification").sum()))
-    k4.metric("Red Zone Districts", sum(1 for v in DISTRICT_INFO.values() if v["zone"] == "Red Zone"))
-
-    st.divider()
-    map_col, info_col = st.columns([7, 5], gap="large")
-
-    with map_col:
-        st.subheader("🗺️ Kelantan Map (Red / Green / Yellow Zones)")
-        fmap = folium.Map(location=[6.02, 102.22], zoom_start=10, tiles="OpenStreetMap")
-        layer_status = add_kelantan_boundary_layer(fmap, st.session_state["selected_zone_district"])
-
-        for dist_name, info in DISTRICT_INFO.items():
-            stu_cnt = int(counts_by_dist.get(dist_name, 0))
-            is_active = dist_name == st.session_state["selected_zone_district"]
-            popup_html = (
-                f"<b>{dist_name}</b><br>"
-                f"Zone: <b>{info['zone']}</b><br>"
-                f"Students: <b>{stu_cnt}</b> | Centres: <b>{info['centres']}</b><br>"
-                f"Centre: {info['recommended_centre']}"
+        for feat in geo_data.get("features", []):
+            d_name = feat.get("properties", {}).get("district", "District")
+            info = stats_lookup.get(
+                d_name,
+                {
+                    "Registered Students": 0,
+                    "Autism Centres": 0,
+                    "Accessibility Status": "No data available",
+                },
             )
-            folium.CircleMarker(
-                location=[info["lat"], info["lon"]],
-                radius=18 if is_active else 15,
-                color="#0F172A" if is_active else info["color"],
-                weight=3 if is_active else 2,
-                fill=True,
-                fill_color=info["color"],
-                fill_opacity=0.88,
-                tooltip=f"{dist_name} ({info['zone']})",
-                popup=folium.Popup(popup_html, max_width=260),
+            tooltip_html = (
+                f"<b>{d_name}</b><br/>"
+                f"Students: {info['Registered Students']}<br/>"
+                f"Autism Centres: {info['Autism Centres']}<br/>"
+                f"Accessibility: {info['Accessibility Status']}"
+            )
+            folium.GeoJson(
+                {"type": "FeatureCollection", "features": [feat]},
+                style_function=style_fn,
+                tooltip=folium.Tooltip(tooltip_html),
             ).add_to(fmap)
 
-        map_out = st_folium(
-            fmap,
-            use_container_width=True,
-            height=400,
-            returned_objects=["last_object_clicked_tooltip"],
+        if not centres_df.empty:
+            for _, c in centres_df.iterrows():
+                popup_html = (
+                    f"<b>{c['name']}</b><br/>"
+                    f"District: {c['district_name']}<br/>"
+                    f"Therapies: {c['therapies_offered']}"
+                )
+                folium.CircleMarker(
+                    location=[float(c["lat"]), float(c["lng"])],
+                    radius=7,
+                    color="#FFFFFF",
+                    weight=2,
+                    fill=True,
+                    fill_color="#17365D",
+                    fill_opacity=0.95,
+                    popup=folium.Popup(popup_html, max_width=260),
+                ).add_to(fmap)
+
+        components.html(fmap._repr_html_(), height=430, scrolling=False)
+        st.markdown(
+            """
+            <div class="map-legend">
+                <span><span class="swatch" style="background:#16A34A;"></span>Good Accessibility</span>
+                <span><span class="swatch" style="background:#EAB308;"></span>Moderate Accessibility</span>
+                <span><span class="swatch" style="background:#DC2626;"></span>Poor Accessibility</span>
+                <span><span class="swatch" style="background:#17365D;border-radius:50%;"></span>Autism Centre</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
-        clicked = map_out.get("last_object_clicked_tooltip") if isinstance(map_out, dict) else None
-        if clicked:
-            for d_key in DISTRICT_INFO:
-                if clicked.upper().startswith(d_key):
-                    st.session_state["selected_zone_district"] = d_key
-                    break
+    except Exception:
+        st.info("Map temporarily unavailable")
 
-        st.caption(layer_status)
 
+def render_expanded_detail_panel():
+    detail = st.session_state.get("expanded_detail")
+    if not detail:
+        return
+
+    st.markdown('<div class="detail-box">', unsafe_allow_html=True)
+    hdr_col, btn_col = st.columns([6, 1])
+    with hdr_col:
+        st.subheader(detail["title"])
+        if detail.get("subtitle"):
+            st.caption(detail["subtitle"])
+    with btn_col:
+        if st.button("Close View", key="close_expanded_detail_btn"):
+            st.session_state.pop("expanded_detail", None)
+            st.rerun()
+
+    chart_col, info_col = st.columns([3, 2])
+    with chart_col:
+        st.plotly_chart(detail["fig"], use_container_width=True, key="expanded_modal_plotly")
     with info_col:
-        st.subheader("📌 Pop-Up Place Inspector")
-        selected_dist = st.selectbox(
-            "Select or click a Kelantan district on the map",
-            options=list(DISTRICT_INFO.keys()),
-            index=list(DISTRICT_INFO.keys()).index(st.session_state["selected_zone_district"]),
-        )
-        st.session_state["selected_zone_district"] = selected_dist
+        for item in detail.get("metrics", []):
+            st.markdown(f"**{item['label']}:** {item['value']}")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        d_info = DISTRICT_INFO[selected_dist]
-        d_rows = df_students[df_students["District"] == selected_dist]
 
-        with st.container(border=True):
-            st.markdown(
-                f'<span class="module-badge" style="background:{d_info["badge_bg"]};">{d_info["zone"]}</span>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(f"### 📍 {selected_dist}")
-            st.write(d_info["place_summary"])
-            st.markdown(f"- **Coordinates:** `{d_info['lat']}, {d_info['lon']}`")
-            st.markdown(f"- **Students:** `{len(d_rows)}` | **Centres:** `{d_info['centres']}`")
-            st.markdown(
-                f"- **Diagnosis:** Mild `{int((d_rows['Diagnosis'] == 'Mild Autism').sum())}` • "
-                f"High-Function `{int((d_rows['Diagnosis'] == 'High-Function Autism').sum())}` • "
-                f"Severe `{int((d_rows['Diagnosis'] == 'Severe Autism').sum())}`"
-            )
-            st.markdown(f"- **Suitable Centre:** {d_info['recommended_centre']}")
-            st.markdown(f"- **Therapists:** {d_info['therapists']}")
+def main():
+    init_db()
+    apply_custom_theme()
 
-    st.divider()
-    st.subheader("📊 Visual Analytics")
-    g1, g2, g3 = st.columns(3)
-    with g1:
-        st.markdown("**Students per District**")
-        st.bar_chart(df_students.groupby("District").size().rename("Students"), height=250)
-    with g2:
-        st.markdown("**Diagnosis by District**")
-        st.bar_chart(pd.crosstab(df_students["District"], df_students["Diagnosis"]), height=250)
-    with g3:
-        st.markdown("**Required Services**")
-        st.bar_chart(df_students.groupby("Required Service").size().rename("Count"), height=250)
-
-# ==============================================================================
-# PAGE 2: STUDENT REGISTRY (EDIT & INSERT)
-# ==============================================================================
-elif page == "2. Student Registry (Edit & Insert)":
-    st.subheader("📋 Student Registry — Edit & Insert Records")
-
-    with st.expander("➕ Insert New Student Record", expanded=False):
-        with st.form("insert_student_form", clear_on_submit=True):
-            c1, c2, c3, c4 = st.columns(4)
-            new_id = c1.text_input("Record ID", value=f"KOD-{1000 + len(df_students)}")
-            new_ident = c2.text_input("Identifier", value=f"Child Record #{len(df_students) + 1} (Anonymized)")
-            new_age = c3.number_input("Age", min_value=1, max_value=21, value=6)
-            new_dist = c4.selectbox("District", list(DISTRICT_INFO.keys()))
-
-            c5, c6, c7, c8 = st.columns(4)
-            new_diag = c5.selectbox("Diagnosis", ["Mild Autism", "High-Function Autism", "Severe Autism"])
-            new_serv = c6.selectbox("Required Service", ["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"])
-            new_date = c7.text_input("Date (YYYY-MM-DD)", value="2026-11-23")
-            new_status = c8.selectbox("Status", ["Verified Active", "Pending Verification"])
-
-            if st.form_submit_button("✨ Add Record"):
-                new_row = pd.DataFrame([{
-                    "Record ID": new_id.strip(),
-                    "Identifier": new_ident.strip(),
-                    "Age": int(new_age),
-                    "District": new_dist,
-                    "Diagnosis": new_diag,
-                    "Required Service": new_serv,
-                    "Date": new_date.strip(),
-                    "Status": new_status,
-                }])
-                st.session_state["student_df"] = pd.concat([st.session_state["student_df"], new_row], ignore_index=True)
-                st.success(f"Added {new_id}!")
-                st.rerun()
-
-    edited_df = st.data_editor(
-        st.session_state["student_df"],
-        num_rows="dynamic",
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "District": st.column_config.SelectboxColumn("District", options=list(DISTRICT_INFO.keys()), required=True),
-            "Diagnosis": st.column_config.SelectboxColumn("Diagnosis", options=["Mild Autism", "High-Function Autism", "Severe Autism"], required=True),
-            "Required Service": st.column_config.SelectboxColumn("Required Service", options=["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"], required=True),
-            "Status": st.column_config.SelectboxColumn("Status", options=["Verified Active", "Pending Verification"], required=True),
-        },
+    st.sidebar.markdown("### Kelantan Healthcare GIS")
+    st.sidebar.markdown("**Autism Analytics Portal**")
+    page = st.sidebar.radio(
+        "Navigation",
+        ["Dashboard Overview", "District GIS Map", "Student & Centre Records"],
+        label_visibility="collapsed",
     )
 
-    b1, b2 = st.columns([2, 3])
-    if b1.button("💾 Save Table Edits", type="primary"):
-        st.session_state["student_df"] = edited_df.copy()
-        st.success("Saved changes to registry!")
+    data = load_dashboard_data()
+    summary_df = data["summary_df"]
+    centres_df = data["centres_df"]
+    students_df = data["students_df"]
 
-    b2.download_button(
-        label="⬇️ Download Updated CSV",
-        data=st.session_state["student_df"].to_csv(index=False).encode("utf-8"),
-        file_name="kelantan_student_registry_updated.csv",
-        mime="text/csv",
-    )
+    st.title("Kelantan Autism GIS Analytics Dashboard")
+    st.caption("District-level service accessibility, diagnosis profiles, and therapy demand")
 
-# ==============================================================================
-# PAGE 3: PARENTS — CHILD RECORD, AUTISM TYPE, SUITABLE CENTRE & THERAPISTS
-# ==============================================================================
-elif page == "3. Parents: Child & Centre Matcher":
-    st.subheader("🏥 Parents Portal — Child Profile, Suitable Centre & Therapists")
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("Total Registered Students", data["total_students"])
+    k2.metric("Verified Student Records", data["verified_students"])
+    k3.metric("Autism Centres", data["total_centres"])
+    k4.metric("Kelantan Districts Mapped", data["total_districts"])
 
-    f1, f2 = st.columns([2, 4])
-    dist_filter = f1.selectbox("Filter District", ["ALL"] + list(DISTRICT_INFO.keys()))
-    pool_df = df_students if dist_filter == "ALL" else df_students[df_students["District"] == dist_filter]
+    render_expanded_detail_panel()
 
-    selected_rec_id = f2.selectbox(
-        "Click / Choose Child Record",
-        options=pool_df["Record ID"].tolist(),
-        format_func=lambda rid: f"{rid} — {pool_df.loc[pool_df['Record ID'] == rid, 'Identifier'].values[0]} ({pool_df.loc[pool_df['Record ID'] == rid, 'District'].values[0]})",
-    )
+    if page == "Dashboard Overview":
+        col_left, col_right = st.columns(2)
 
-    child_row = df_students[df_students["Record ID"] == selected_rec_id].iloc[0]
-    c_dist = str(child_row["District"]).upper()
-    c_diag = str(child_row["Diagnosis"])
-    c_info = DISTRICT_INFO.get(c_dist, DISTRICT_INFO["KOTA BHARU"])
-
-    left, right = st.columns([5, 7], gap="large")
-    with left:
-        st.markdown("### 👶 Child Information")
-        with st.container(border=True):
-            st.markdown(f"**Record ID:** `{child_row['Record ID']}`")
-            st.markdown(f"**Identifier:** {child_row['Identifier']}")
-            st.markdown(f"**Age:** `{child_row['Age']}` years old")
-            st.markdown(f"**District:** `{c_dist}` (`{c_info['zone']}`)")
-            st.markdown(f"**Type of Autism:** `{c_diag}`")
-            st.markdown(f"**Required Service:** `{child_row['Required Service']}`")
-            st.markdown(f"**Date:** `{child_row['Date']}` | **Status:** `{child_row['Status']}`")
-
-    with right:
-        st.markdown("### 🌟 Suitable Centre & Therapists")
-        with st.container(border=True):
-            st.markdown(
-                f'<span class="module-badge" style="background:{c_info["badge_bg"]};">{c_info["zone"]}</span>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(f"#### ⭐ {c_info['recommended_centre']}")
-            st.markdown(f"**Why Suitable:** {c_info['why_suitable']}")
-            st.markdown(f"**Therapists Provided:** {c_info['therapists']}")
-            st.markdown(f"**Matched Required Service:** `{child_row['Required Service']}`")
-
-# ==============================================================================
-# PAGE 4: PARENTS — 4 COLORFUL INTERACTIVE FLIPBOOK MODULES
-# ==============================================================================
-else:
-    st.subheader("📚 4 Interactive Flipbook Modules (Illustrated & Downloadable)")
-    st.caption("Flip through pages right here in the dashboard, or download each module as an interactive HTML flipbook.")
-
-    cols = st.columns(2, gap="large")
-    for idx, mod in enumerate(MODULES_4):
-        p_key = f"flip_page_{mod['key']}"
-        cur_page = st.session_state[p_key]
-        total_pages = len(mod["pages"])
-        p_heading, p_summary, p_steps = mod["pages"][cur_page]
-
-        with cols[idx % 2]:
-            with st.container(border=True):
-                st.markdown(
-                    f'<span class="module-badge" style="background:{mod["color"]};">{mod["code"]} • {mod["domain"]}</span>',
-                    unsafe_allow_html=True,
+        with col_left:
+            st.markdown('<div class="section-card">', unsafe_allow_html=True)
+            st.subheader("Students by District")
+            if summary_df.empty or summary_df["Registered Students"].sum() == 0:
+                st.info("No data available")
+            else:
+                fig_dist = px.bar(
+                    summary_df,
+                    x="District",
+                    y="Registered Students",
+                    color="District",
+                    color_discrete_sequence=GRAPH_PALETTE,
+                    text="Registered Students",
                 )
-                st.markdown(f"### {mod['title']}")
-                st.markdown(module_svg(mod["key"], mod["color"], mod["soft_bg"]), unsafe_allow_html=True)
+                fig_dist.update_traces(textposition="outside", textfont_color="#111827")
+                style_plotly_fig(fig_dist, x_title="Kelantan District", y_title="Registered Students")
+                st.plotly_chart(fig_dist, use_container_width=True, key="chart_students_district")
 
-                st.markdown(
-                    f"""
-                    <div class="flip-card" style="background:{mod['soft_bg']};margin-top:12px;">
-                        <div style="font-weight:700;font-size:15px;margin-bottom:6px;">{p_heading}</div>
-                        <div style="font-size:13px;margin-bottom:10px;">{p_summary}</div>
-                        <div style="background:#FFFFFF;padding:10px 12px;border-radius:8px;font-size:12.5px;line-height:1.55;">
-                            {p_steps.replace(chr(10), "<br>")}
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
+                selected_dist = st.selectbox(
+                    "Inspect District Expanded View",
+                    options=summary_df["District"].tolist(),
+                    key="select_district_expand",
                 )
-
-                nav1, nav2, nav3 = st.columns([1, 1.4, 1])
-                if nav1.button("◀ Prev", key=f"prev_{mod['key']}", disabled=(cur_page == 0), use_container_width=True):
-                    st.session_state[p_key] = cur_page - 1
+                if st.button("Expand District Analytics", key="btn_expand_district"):
+                    row = summary_df[summary_df["District"] == selected_dist].iloc[0].to_dict()
+                    t_lines = [
+                        {"label": f"{t['service']} Demand", "value": f"{t['students']} students"}
+                        for t in row.get("Therapy Demand", [])
+                    ] or [{"label": "Therapy Demand", "value": "No data available"}]
+                    exp_fig = go.Figure(
+                        data=[
+                            go.Bar(
+                                name=selected_dist,
+                                x=["Registered Students", "Autism Centres"],
+                                y=[row["Registered Students"], row["Autism Centres"]],
+                                marker_color=["#17365D", "#0F8B8D"],
+                                text=[row["Registered Students"], row["Autism Centres"]],
+                                textposition="outside",
+                            )
+                        ]
+                    )
+                    style_plotly_fig(exp_fig, x_title="Indicator", y_title="Count")
+                    st.session_state["expanded_detail"] = {
+                        "title": f"{selected_dist} – Expanded District View",
+                        "subtitle": f"Accessibility Status: {row['Accessibility Status']}",
+                        "fig": exp_fig,
+                        "metrics": [
+                            {"label": "Total Registered Students", "value": row["Registered Students"]},
+                            {"label": "Number of Autism Centres", "value": row["Autism Centres"]},
+                            {"label": "Available Therapy Services", "value": row["Available Therapies"]},
+                            {"label": "Accessibility Status", "value": row["Accessibility Status"]},
+                            *t_lines,
+                        ],
+                    }
                     st.rerun()
-                nav2.markdown(
-                    f"<div style='text-align:center;padding-top:8px;font-weight:700;'>Page {cur_page + 1} / {total_pages}</div>",
-                    unsafe_allow_html=True,
-                )
-                if nav3.button("Next ▶", key=f"next_{mod['key']}", disabled=(cur_page == total_pages - 1), use_container_width=True):
-                    st.session_state[p_key] = cur_page + 1
-                    st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
 
-                flip_html = build_flipbook_html(mod)
-                st.download_button(
-                    label=f"📖 Download {mod['code']} Flipbook (.html)",
-                    data=flip_html.encode("utf-8"),
-                    file_name=f"{mod['code'].replace(' ', '_')}_Flipbook.html",
-                    mime="text/html",
-                    key=f"dl_flip_{mod['key']}",
-                    use_container_width=True,
+        with col_right:
+            st.markdown('<div class="section-card">', unsafe_allow_html=True)
+            st.subheader("Diagnosis Distribution")
+            if students_df.empty:
+                st.info("No data available")
+            else:
+                diag_df = (
+                    students_df.groupby("diagnosis")
+                    .size()
+                    .reset_index(name="Students")
+                    .sort_values("Students", ascending=False)
                 )
+                total_diag = diag_df["Students"].sum()
+                diag_df["Percentage"] = diag_df["Students"].apply(
+                    lambda v: f"{(v / total_diag * 100):.1f}%" if total_diag > 0 else "0.0%"
+                )
+
+                fig_diag = px.pie(
+                    diag_df,
+                    names="diagnosis",
+                    values="Students",
+                    hole=0.48,
+                    color_discrete_sequence=GRAPH_PALETTE,
+                )
+                fig_diag.update_traces(
+                    textinfo="label+value+percent",
+                    textfont_color="#111827",
+                )
+                style_plotly_fig(fig_diag, is_pie=True)
+                st.plotly_chart(fig_diag, use_container_width=True, key="chart_diagnosis_doughnut")
+
+                selected_diag = st.selectbox(
+                    "Inspect Diagnosis Category",
+                    options=diag_df["diagnosis"].tolist(),
+                    key="select_diagnosis_expand",
+                )
+                if st.button("Expand Diagnosis View", key="btn_expand_diagnosis"):
+                    d_row = diag_df[diag_df["diagnosis"] == selected_diag].iloc[0]
+                    exp_diag_fig = px.pie(
+                        diag_df,
+                        names="diagnosis",
+                        values="Students",
+                        hole=0.48,
+                        color_discrete_sequence=GRAPH_PALETTE,
+                    )
+                    exp_diag_fig.update_traces(textinfo="label+value+percent", textfont_color="#111827")
+                    style_plotly_fig(exp_diag_fig, is_pie=True)
+                    st.session_state["expanded_detail"] = {
+                        "title": f"Diagnosis Category: {selected_diag}",
+                        "subtitle": f"Exact student count and percentage across {total_diag} records",
+                        "fig": exp_diag_fig,
+                        "metrics": [
+                            {"label": "Diagnosis Category", "value": selected_diag},
+                            {"label": "Number of Students", "value": int(d_row["Students"])},
+                            {"label": "Percentage of Total", "value": d_row["Percentage"]},
+                        ],
+                    }
+                    st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        t_col, c_col = st.columns(2)
+
+        with t_col:
+            st.markdown('<div class="section-card">', unsafe_allow_html=True)
+            st.subheader("Therapy Service Demand")
+            if students_df.empty:
+                st.info("No data available")
+            else:
+                therapy_df = (
+                    students_df.groupby("therapy_required")
+                    .size()
+                    .reset_index(name="Students Requiring Service")
+                    .sort_values("Students Requiring Service", ascending=True)
+                )
+                total_th = therapy_df["Students Requiring Service"].sum()
+
+                fig_th = px.bar(
+                    therapy_df,
+                    x="Students Requiring Service",
+                    y="therapy_required",
+                    orientation="h",
+                    color="therapy_required",
+                    color_discrete_sequence=GRAPH_PALETTE,
+                    text="Students Requiring Service",
+                )
+                fig_th.update_traces(textposition="outside", textfont_color="#111827")
+                style_plotly_fig(fig_th, x_title="Students Requiring Service", y_title="Therapy Service")
+                st.plotly_chart(fig_th, use_container_width=True, key="chart_therapy_hbar")
+
+                selected_th = st.selectbox(
+                    "Inspect Therapy Service",
+                    options=therapy_df["therapy_required"].tolist(),
+                    key="select_therapy_expand",
+                )
+                if st.button("Expand Therapy View", key="btn_expand_therapy"):
+                    th_row = therapy_df[therapy_df["therapy_required"] == selected_th].iloc[0]
+                    cnt_val = int(th_row["Students Requiring Service"])
+                    pct_val = f"{(cnt_val / total_th * 100):.1f}%" if total_th > 0 else "0.0%"
+                    exp_th_fig = go.Figure(
+                        data=[
+                            go.Bar(
+                                x=[cnt_val],
+                                y=[selected_th],
+                                orientation="h",
+                                marker_color="#0F8B8D",
+                                text=[cnt_val],
+                                textposition="outside",
+                            )
+                        ]
+                    )
+                    style_plotly_fig(exp_th_fig, x_title="Students Requiring Service", y_title="Therapy Service")
+                    st.session_state["expanded_detail"] = {
+                        "title": f"Therapy Service: {selected_th}",
+                        "subtitle": "Demand breakdown from database records",
+                        "fig": exp_th_fig,
+                        "metrics": [
+                            {"label": "Therapy Service", "value": selected_th},
+                            {"label": "Students Requiring Service", "value": cnt_val},
+                            {"label": "Share of Therapy Requests", "value": pct_val},
+                        ],
+                    }
+                    st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        with c_col:
+            st.markdown('<div class="section-card">', unsafe_allow_html=True)
+            st.subheader("Autism Centre Distribution")
+            if summary_df.empty or summary_df["Autism Centres"].sum() == 0:
+                st.info("No data available")
+            else:
+                fig_cnt = px.bar(
+                    summary_df,
+                    x="District",
+                    y="Autism Centres",
+                    color="District",
+                    color_discrete_sequence=GRAPH_PALETTE,
+                    text="Autism Centres",
+                )
+                fig_cnt.update_traces(textposition="outside", textfont_color="#111827")
+                style_plotly_fig(fig_cnt, x_title="District", y_title="Number of Autism Centres")
+                st.plotly_chart(fig_cnt, use_container_width=True, key="chart_centres_dist")
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown('<div class="section-card">', unsafe_allow_html=True)
+        st.subheader("Kelantan District Accessibility Choropleth Map")
+        render_kelantan_map(summary_df, centres_df)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    elif page == "District GIS Map":
+        st.markdown('<div class="section-card">', unsafe_allow_html=True)
+        st.subheader("Kelantan District Accessibility Map")
+        render_kelantan_map(summary_df, centres_df)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown('<div class="section-card">', unsafe_allow_html=True)
+        st.subheader("District Accessibility Summary")
+        if summary_df.empty:
+            st.info("No data available")
+        else:
+            st.dataframe(
+                summary_df[["District", "Registered Students", "Autism Centres", "Accessibility Status", "Available Therapies"]],
+                use_container_width=True,
+                hide_index=True,
+            )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    elif page == "Student & Centre Records":
+        f1, f2 = st.columns(2)
+        district_names = summary_df["District"].tolist() if not summary_df.empty else ["Kota Bharu"]
+
+        with f1:
+            st.markdown('<div class="section-card">', unsafe_allow_html=True)
+            st.subheader("Add Student Record")
+            with st.form("add_student_form", clear_on_submit=True):
+                s_code = st.text_input("Student ID", placeholder="e.g. KLT-020")
+                s_name = st.text_input("Student Name", placeholder="Enter student name")
+                s_dist = st.selectbox("District", options=district_names)
+                s_diag = st.text_input("Diagnosis Category", placeholder="e.g. ASD Level 1")
+                s_th = st.text_input("Therapy Required", placeholder="e.g. Speech Therapy")
+                s_ver = st.checkbox("Verified Record", value=True)
+                submitted_s = st.form_submit_button("Save Student Record")
+
+            if submitted_s:
+                if not all([s_code.strip(), s_name.strip(), s_diag.strip(), s_th.strip()]):
+                    st.error("Please fill in all required student fields.")
+                else:
+                    try:
+                        add_student_record(s_code, s_name, s_dist, s_diag, s_th, s_ver)
+                        st.success("Student record saved and analytics updated.")
+                        st.rerun()
+                    except sqlite3.IntegrityError:
+                        st.error("Student ID already exists.")
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        with f2:
+            st.markdown('<div class="section-card">', unsafe_allow_html=True)
+            st.subheader("Add Autism Centre")
+            with st.form("add_centre_form", clear_on_submit=True):
+                c_name = st.text_input("Centre Name", placeholder="Enter autism centre name")
+                c_dist = st.selectbox("District", options=district_names, key="centre_dist_select")
+                c_lat = st.number_input("Latitude", value=6.1254, format="%.6f")
+                c_lng = st.number_input("Longitude", value=102.2381, format="%.6f")
+                c_th = st.text_input("Therapies Offered", placeholder="e.g. Speech Therapy, OT")
+                submitted_c = st.form_submit_button("Save Autism Centre")
+
+            if submitted_c:
+                if not all([c_name.strip(), c_th.strip()]):
+                    st.error("Please fill in centre name and therapies offered.")
+                else:
+                    add_centre_record(c_name, c_dist, c_lat, c_lng, c_th)
+                    st.success("Autism centre saved and map/analytics updated.")
+                    st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown('<div class="section-card">', unsafe_allow_html=True)
+        st.subheader("Registered Student Records")
+        if students_df.empty:
+            st.info("No data available")
+        else:
+            st.dataframe(students_df, use_container_width=True, hide_index=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
+if __name__ == "__main__":
+    main()
