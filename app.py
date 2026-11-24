@@ -1,7 +1,7 @@
+
 import json
 import os
 import sqlite3
-from urllib.parse import quote
 
 import folium
 import pandas as pd
@@ -262,72 +262,69 @@ def add_centre_record(name, district_name, lat, lng, therapies_offered):
 
 
 def apply_custom_theme():
-    font_svg = quote(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#172033" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'
-    )
     st.markdown(
-        f"""
+        """
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-            html, body, [class*="css"], .stApp {{
+            html, body, [class*="css"], .stApp {
                 font-family: 'Inter', 'Roboto', Arial, sans-serif;
                 color: #000000;
                 background-color: #F4F7FB;
-            }}
+            }
 
-            .stApp {{
+            .stApp {
                 background-color: #F4F7FB;
-            }}
+            }
 
-            [data-testid="stSidebar"] {{
+            [data-testid="stSidebar"] {
                 background-color: #FFFFFF;
                 border-right: 1px solid #CBD5E1;
-            }}
+            }
 
-            [data-testid="stSidebar"] * {{
+            [data-testid="stSidebar"] * {
                 color: #000000 !important;
-            }}
+            }
 
-            h1, h2, h3, h4, h5, h6 {{
+            h1, h2, h3, h4, h5, h6 {
                 color: #000000 !important;
                 font-weight: 700 !important;
-            }}
+            }
 
-            p, span, label, div, li {{
+            p, span, label, div, li {
                 color: #000000;
-            }}
+            }
 
             [data-testid="stMarkdownContainer"] *,
             [data-testid="stWidgetLabel"] *,
             [data-testid="stCaptionContainer"] *,
-            .caption-muted, small {{
+            .caption-muted, small {
                 color: #000000 !important;
-            }}
+            }
 
-            [data-testid="stMetric"] {{
+            [data-testid="stMetric"] {
                 background-color: #FFFFFF;
                 border: 1px solid #CBD5E1;
                 border-top: 4px solid #17365D;
                 border-radius: 10px;
                 padding: 0.85rem 1rem;
-            }}
+            }
 
             [data-testid="stMetricLabel"] *,
-            [data-testid="stMetricValue"] * {{
+            [data-testid="stMetricValue"] * {
                 color: #000000 !important;
                 font-weight: 700 !important;
-            }}
+            }
 
-            .section-card {{
+            .section-card {
                 background-color: #FFFFFF;
                 border: 1px solid #CBD5E1;
                 border-radius: 10px;
                 padding: 1.1rem 1.25rem;
                 margin-bottom: 1rem;
-            }}
+            }
 
-            .detail-box {{
+            .detail-box {
                 background-color: #FFFFFF;
                 border: 1px solid #0F8B8D;
                 border-left: 5px solid #17365D;
@@ -335,36 +332,43 @@ def apply_custom_theme():
                 padding: 1.1rem 1.3rem;
                 margin-top: 0.75rem;
                 margin-bottom: 1.25rem;
-            }}
+            }
 
-            .stButton > button {{
-                background-color: #17365D;
+            .stButton > button,
+            .stFormSubmitButton > button,
+            button[kind="primary"],
+            button[kind="secondary"] {
+                background-color: #17365D !important;
                 color: #FFFFFF !important;
-                border: none;
+                border: 1px solid #0F2440 !important;
                 border-radius: 6px;
                 font-weight: 600;
-            }}
+            }
 
-            .stButton > button * {{
+            .stButton > button *,
+            .stFormSubmitButton > button *,
+            button[kind="primary"] *,
+            button[kind="secondary"] * {
                 color: #FFFFFF !important;
-            }}
+            }
 
-            .stButton > button:hover {{
-                background-color: #1E3A5F;
-            }}
+            .stButton > button:hover,
+            .stFormSubmitButton > button:hover {
+                background-color: #1E3A5F !important;
+            }
 
-            input, textarea, select, [data-baseweb="select"] > div {{
+            input, textarea, select, [data-baseweb="select"] > div {
                 background-color: #FFFFFF !important;
                 color: #000000 !important;
                 border-color: #94A3B8 !important;
-            }}
+            }
 
-            [data-baseweb="select"] span, [data-baseweb="popover"] li {{
+            [data-baseweb="select"] span, [data-baseweb="popover"] li {
                 color: #000000 !important;
                 background-color: #FFFFFF !important;
-            }}
+            }
 
-            .map-legend {{
+            .map-legend {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 1.1rem;
@@ -372,9 +376,9 @@ def apply_custom_theme():
                 font-size: 0.9rem;
                 font-weight: 500;
                 color: #000000;
-            }}
+            }
 
-            .swatch {{
+            .swatch {
                 display: inline-block;
                 width: 14px;
                 height: 14px;
@@ -382,7 +386,11 @@ def apply_custom_theme():
                 margin-right: 6px;
                 vertical-align: middle;
                 border: 1px solid rgba(17, 24, 39, 0.25);
-            }}
+            }
+
+            .leaflet-control-attribution a[href*="carto"] {
+                display: none !important;
+            }
         </style>
         """,
         unsafe_allow_html=True,
