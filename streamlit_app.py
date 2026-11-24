@@ -22,6 +22,35 @@ st.markdown(
         font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
     }
 
+
+    /* Replace black top Streamlit header bar with colorful interlocking puzzle border */
+    header[data-testid="stHeader"],
+    [data-testid="stToolbar"] {
+        background-color: #FFFFFF !important;
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMzYiIGhlaWdodD0iNTYiIHZpZXdCb3g9IjAgMCAzMzYgNTYiPgogIDwhLS0gUm93IDEgYmFzZSBzcXVhcmVzICg3IGNvbG9ycyB4IDQ4cHggPSAzMzZweCkgLS0+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjI2IiBmaWxsPSIjRTExRDI0Ii8+CiAgPHJlY3QgeD0iNDgiIHk9IjAiIHdpZHRoPSI0OCIgaGVpZ2h0PSIyNiIgZmlsbD0iI0Y1ODIyMCIvPgogIDxyZWN0IHg9Ijk2IiB5PSIwIiB3aWR0aD0iNDgiIGhlaWdodD0iMjYiIGZpbGw9IiNGOUU0MjQiLz4KICA8cmVjdCB4PSIxNDQiIHk9IjAiIHdpZHRoPSI0OCIgaGVpZ2h0PSIyNiIgZmlsbD0iIzZCQjUzNiIvPgogIDxyZWN0IHg9IjE5MiIgeT0iMCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjI2IiBmaWxsPSIjNjhDM0U4Ii8+CiAgPHJlY3QgeD0iMjQwIiB5PSIwIiB3aWR0aD0iNDgiIGhlaWdodD0iMjYiIGZpbGw9IiMxQjQ5OUIiLz4KICA8cmVjdCB4PSIyODgiIHk9IjAiIHdpZHRoPSI0OCIgaGVpZ2h0PSIyNiIgZmlsbD0iIzlCNEQ5QiIvPgoKICA8IS0tIFJvdyAxIGhvcml6b250YWwgaW50ZXJsb2NraW5nIHRhYnMgLS0+CiAgPGNpcmNsZSBjeD0iNTEiIGN5PSIxMyIgcj0iNC41IiBmaWxsPSIjRTExRDI0Ii8+CiAgPGNpcmNsZSBjeD0iOTMiIGN5PSIxMyIgcj0iNC41IiBmaWxsPSIjRjlFNDI0Ii8+CiAgPGNpcmNsZSBjeD0iMTQ3IiBjeT0iMTMiIHI9IjQuNSIgZmlsbD0iI0Y5RTQyNCIvPgogIDxjaXJjbGUgY3g9IjE4OSIgY3k9IjEzIiByPSI0LjUiIGZpbGw9IiM2OEMzRTgiLz4KICA8Y2lyY2xlIGN4PSIyNDMiIGN5PSIxMyIgcj0iNC41IiBmaWxsPSIjNjhDM0U4Ii8+CiAgPGNpcmNsZSBjeD0iMjg1IiBjeT0iMTMiIHI9IjQuNSIgZmlsbD0iIzlCNEQ5QiIvPgogIDxjaXJjbGUgY3g9IjMzMyIgY3k9IjEzIiByPSI0LjUiIGZpbGw9IiNFMTFEMjQiLz4KCiAgPCEtLSBSb3cgMiBiYXNlIHNxdWFyZXMgKHNoaWZ0ZWQgY29sb3Igc2VxdWVuY2UgbWF0Y2hpbmcgc2NyZWVuc2hvdCkgLS0+CiAgPHJlY3QgeD0iMCIgeT0iMjYiIHdpZHRoPSI0OCIgaGVpZ2h0PSIyNiIgZmlsbD0iIzY4QzNFOCIvPgogIDxyZWN0IHg9IjQ4IiB5PSIyNiIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjI2IiBmaWxsPSIjMUI0OTlCIi8+CiAgPHJlY3QgeD0iOTYiIHk9IjI2IiB3aWR0aD0iNDgiIGhlaWdodD0iMjYiIGZpbGw9IiM5QjREOUIiLz4KICA8cmVjdCB4PSIxNDQiIHk9IjI2IiB3aWR0aD0iNDgiIGhlaWdodD0iMjYiIGZpbGw9IiNFMTFEMjQiLz4KICA8cmVjdCB4PSIxOTIiIHk9IjI2IiB3aWR0aD0iNDgiIGhlaWdodD0iMjYiIGZpbGw9IiNGNTgyMjAiLz4KICA8cmVjdCB4PSIyNDAiIHk9IjI2IiB3aWR0aD0iNDgiIGhlaWdodD0iMjYiIGZpbGw9IiNGOUU0MjQiLz4KICA8cmVjdCB4PSIyODgiIHk9IjI2IiB3aWR0aD0iNDgiIGhlaWdodD0iMjYiIGZpbGw9IiM2QkI1MzYiLz4KCiAgPCEtLSBSb3cgMiBob3Jpem9udGFsIGludGVybG9ja2luZyB0YWJzIC0tPgogIDxjaXJjbGUgY3g9IjQ1IiBjeT0iMzkiIHI9IjQuNSIgZmlsbD0iIzFCNDk5QiIvPgogIDxjaXJjbGUgY3g9Ijk5IiBjeT0iMzkiIHI9IjQuNSIgZmlsbD0iIzFCNDk5QiIvPgogIDxjaXJjbGUgY3g9IjE0MSIgY3k9IjM5IiByPSI0LjUiIGZpbGw9IiNFMTFEMjQiLz4KICA8Y2lyY2xlIGN4PSIxOTUiIGN5PSIzOSIgcj0iNC41IiBmaWxsPSIjRTExRDI0Ii8+CiAgPGNpcmNsZSBjeD0iMjM3IiBjeT0iMzkiIHI9IjQuNSIgZmlsbD0iI0Y5RTQyNCIvPgogIDxjaXJjbGUgY3g9IjI5MSIgY3k9IjM5IiByPSI0LjUiIGZpbGw9IiNGOUU0MjQiLz4KICA8Y2lyY2xlIGN4PSIzIiBjeT0iMzkiIHI9IjQuNSIgZmlsbD0iIzZCQjUzNiIvPgoKICA8IS0tIFZlcnRpY2FsIGludGVybG9ja2luZyB0YWJzIGJldHdlZW4gUm93IDEgYW5kIFJvdyAyIC0tPgogIDxjaXJjbGUgY3g9IjI0IiBjeT0iMjMiIHI9IjQuNSIgZmlsbD0iIzY4QzNFOCIvPgogIDxjaXJjbGUgY3g9IjcyIiBjeT0iMjkiIHI9IjQuNSIgZmlsbD0iI0Y1ODIyMCIvPgogIDxjaXJjbGUgY3g9IjEyMCIgY3k9IjIzIiByPSI0LjUiIGZpbGw9IiM5QjREOUIiLz4KICA8Y2lyY2xlIGN4PSIxNjgiIGN5PSIyOSIgcj0iNC41IiBmaWxsPSIjNkJCNTM2Ii8+CiAgPGNpcmNsZSBjeD0iMjE2IiBjeT0iMjMiIHI9IjQuNSIgZmlsbD0iI0Y1ODIyMCIvPgogIDxjaXJjbGUgY3g9IjI2NCIgY3k9IjI5IiByPSI0LjUiIGZpbGw9IiMxQjQ5OUIiLz4KICA8Y2lyY2xlIGN4PSIzMTIiIGN5PSIyMyIgcj0iNC41IiBmaWxsPSIjNkJCNTM2Ii8+CgogIDwhLS0gQm90dG9tIHByb3RydWRpbmcgcHV6emxlIHRhYnMgbWF0Y2hpbmcgc2NyZWVuc2hvdCAtLT4KICA8Y2lyY2xlIGN4PSIyNCIgY3k9IjUyIiByPSIzLjgiIGZpbGw9IiM2OEMzRTgiLz4KICA8Y2lyY2xlIGN4PSIxMjAiIGN5PSI1MiIgcj0iMy44IiBmaWxsPSIjOUI0RDlCIi8+CiAgPGNpcmNsZSBjeD0iMjE2IiBjeT0iNTIiIHI9IjMuOCIgZmlsbD0iI0Y1ODIyMCIvPgogIDxjaXJjbGUgY3g9IjMxMiIgY3k9IjUyIiByPSIzLjgiIGZpbGw9IiM2QkI1MzYiLz4KPC9zdmc+") !important;
+        background-repeat: repeat-x !important;
+        background-position: left top !important;
+        background-size: auto 56px !important;
+        height: 58px !important;
+        border-bottom: none !important;
+    }
+
+    /* Ensure top toolbar icons stay clearly readable against the colorful puzzle bar */
+    header[data-testid="stHeader"] button,
+    header[data-testid="stHeader"] a,
+    [data-testid="stToolbar"] button,
+    [data-testid="stToolbar"] svg {
+        background-color: rgba(255, 255, 255, 0.88) !important;
+        color: #0F172A !important;
+        fill: #0F172A !important;
+        border-radius: 8px !important;
+    }
+
+    /* Add clean top spacing so main content sits nicely below the 58px puzzle header */
+    [data-testid="stAppViewContainer"] .main .block-container {
+        padding-top: 4.3rem !important;
+    }
+
     .stApp {
         background: linear-gradient(135deg, #CCFBF1 0%, #EDE9FE 52%, #DBEAFE 100%) !important;
         color: #0F172A !important;
