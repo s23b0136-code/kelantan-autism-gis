@@ -5,7 +5,6 @@ import sqlite3
 from datetime import datetime
 
 import pandas as pd
-import plotly.express as px
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -901,37 +900,6 @@ def build_student_registration_trend(students_df: pd.DataFrame, years: list[int]
     return trend_df
 
 
-def style_white_black_fig(fig, height: int = 290):
-    fig.update_layout(
-        height=height,
-        paper_bgcolor="#FFFFFF",
-        plot_bgcolor="#FFFFFF",
-        font=dict(family="Inter, Segoe UI, Arial, sans-serif", size=12, color="#0F172A"),
-        margin=dict(l=12, r=12, t=24, b=12),
-        legend=dict(
-            font=dict(color="#0F172A"),
-            bgcolor="#FFFFFF",
-            bordercolor="#E2E8F0",
-            borderwidth=1,
-        ),
-    )
-    fig.update_xaxes(
-        color="#0F172A",
-        tickfont=dict(color="#0F172A"),
-        title_font=dict(color="#0F172A"),
-        linecolor="#CBD5E1",
-        showgrid=False,
-    )
-    fig.update_yaxes(
-        color="#0F172A",
-        tickfont=dict(color="#0F172A"),
-        title_font=dict(color="#0F172A"),
-        linecolor="#CBD5E1",
-        gridcolor="#E2E8F0",
-    )
-    return fig
-
-
 st.markdown(
     """
     <style>
@@ -1034,6 +1002,11 @@ st.markdown(
         border: 1px solid #0F294A !important;
         font-weight: 600 !important;
         opacity: 1 !important;
+    }
+    [data-testid="stMain"] [data-testid="stVegaLiteChart"],
+    [data-testid="stMain"] [data-testid="stVegaLiteChart"] > div {
+        background-color: #FFFFFF !important;
+        border-radius: 8px;
     }
     .gov-header-banner {
         background: #FFFFFF;
@@ -1623,15 +1596,8 @@ if active_page == "Admin Dashboard":
         with st.container(border=True):
             st.subheader("Students by District (10 Kelantan Districts)")
             st.caption("Accurate student distribution retrieved directly from registered student records.")
-            fig_dist = px.bar(
-                access_df,
-                x="district",
-                y="students",
-                labels={"district": "District", "students": "Registered Students"},
-                color_discrete_sequence=["#1E3A8A"],
-            )
-            style_white_black_fig(fig_dist, height=290)
-            st.plotly_chart(fig_dist, use_container_width=True, config={"displayModeBar": False})
+            dist_chart_df = access_df[["district", "students"]].set_index("district")
+            st.bar_chart(dist_chart_df, color="#1E3A8A", height=290)
 
     with c_right:
         with st.container(border=True):
@@ -1640,14 +1606,7 @@ if active_page == "Admin Dashboard":
             if not students_df.empty:
                 diag_counts = students_df["diagnosis"].value_counts().reset_index()
                 diag_counts.columns = ["Diagnosis Category", "Students"]
-                fig_diag = px.bar(
-                    diag_counts,
-                    x="Diagnosis Category",
-                    y="Students",
-                    color_discrete_sequence=["#0D9488"],
-                )
-                style_white_black_fig(fig_diag, height=290)
-                st.plotly_chart(fig_diag, use_container_width=True, config={"displayModeBar": False})
+                st.bar_chart(diag_counts.set_index("Diagnosis Category"), color="#0D9488", height=290)
 
     c_bot_l, c_bot_r = st.columns([1, 1.35], gap="medium")
     with c_bot_l:
@@ -1657,28 +1616,14 @@ if active_page == "Admin Dashboard":
             if not students_df.empty:
                 serv_counts = students_df["required_service"].value_counts().reset_index()
                 serv_counts.columns = ["Therapy Service", "Students"]
-                fig_serv = px.bar(
-                    serv_counts,
-                    x="Therapy Service",
-                    y="Students",
-                    color_discrete_sequence=["#0284C7"],
-                )
-                style_white_black_fig(fig_serv, height=280)
-                st.plotly_chart(fig_serv, use_container_width=True, config={"displayModeBar": False})
+                st.bar_chart(serv_counts.set_index("Therapy Service"), color="#0284C7", height=280)
 
     with c_bot_r:
         with st.container(border=True):
             st.subheader("Centre Distribution by District")
             st.caption("Number of registered autism service centres per Kelantan district.")
-            fig_c_dist = px.bar(
-                access_df,
-                x="district",
-                y="centres",
-                labels={"district": "District", "centres": "Centres"},
-                color_discrete_sequence=["#4338CA"],
-            )
-            style_white_black_fig(fig_c_dist, height=280)
-            st.plotly_chart(fig_c_dist, use_container_width=True, config={"displayModeBar": False})
+            centre_dist_df = access_df[["district", "centres"]].set_index("district")
+            st.bar_chart(centre_dist_df, color="#4338CA", height=280)
 
     st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
 
@@ -1686,37 +1631,24 @@ if active_page == "Admin Dashboard":
     with c_ext_l:
         with st.container(border=True):
             st.subheader("Therapy Demand by District")
-            st.caption("Click a district bar to inspect therapy demand and student records for that place.")
+            st.caption("Breakdown of required therapy services across all 10 Kelantan districts. Select a row below to inspect that place.")
             therapy_dist_df = build_therapy_demand_by_district(students_df)
-            therapy_long_df = therapy_dist_df.reset_index().melt(
-                id_vars="District", var_name="Therapy Service", value_name="Students"
-            )
-            fig_therapy = px.bar(
-                therapy_long_df,
-                x="District",
-                y="Students",
-                color="Therapy Service",
-                barmode="stack",
-                color_discrete_sequence=["#1E3A8A", "#0D9488", "#0284C7", "#14B8A6"],
-            )
-            style_white_black_fig(fig_therapy, height=290)
-            fig_therapy.update_layout(
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0)
-            )
-            therapy_event = st.plotly_chart(
-                fig_therapy,
-                key="therapy_district_chart",
+            st.bar_chart(therapy_dist_df, color=["#1E3A8A", "#0D9488", "#0284C7", "#14B8A6"], height=260)
+
+            district_picker_df = therapy_dist_df.reset_index()
+            dist_sel_event = st.dataframe(
+                district_picker_df,
+                key="therapy_district_picker",
                 on_select="rerun",
-                selection_mode="points",
+                selection_mode="single-row",
                 use_container_width=True,
-                config={"displayModeBar": False},
+                hide_index=True,
             )
-            pts_d = (therapy_event or {}).get("selection", {}).get("points", [])
-            selected_district_click = str(pts_d[0]["x"]).strip() if (pts_d and "x" in pts_d[0]) else None
-            if selected_district_click:
+            sel_d_rows = (dist_sel_event or {}).get("selection", {}).get("rows", [])
+            if sel_d_rows:
+                selected_district_click = str(district_picker_df.iloc[sel_d_rows[0]]["District"]).strip()
                 st.markdown(f"**Selected Place:** {html.escape(selected_district_click)}")
-                if selected_district_click in therapy_dist_df.index:
-                    st.dataframe(therapy_dist_df.loc[[selected_district_click]], use_container_width=True)
+                st.dataframe(therapy_dist_df.loc[[selected_district_click]], use_container_width=True)
                 matched_students = students_df[students_df["district"] == selected_district_click]
                 st.dataframe(
                     matched_students[["record_id", "student_name", "diagnosis", "required_service", "registered_date", "status"]],
@@ -1727,31 +1659,24 @@ if active_page == "Admin Dashboard":
     with c_ext_r:
         with st.container(border=True):
             st.subheader("Registered Students Trend (2021–2026)")
-            st.caption("Click a year point on the line to inspect registrations for that year.")
+            st.caption("Annual student registrations from registered_date. Select a year row below to inspect that year.")
             trend_df = build_student_registration_trend(students_df, [2021, 2022, 2023, 2024, 2025, 2026])
-            trend_plot_df = trend_df.reset_index()
-            fig_trend = px.line(
-                trend_plot_df,
-                x="Year",
-                y="Registered Students",
-                markers=True,
-                color_discrete_sequence=["#0F294A"],
-            )
-            style_white_black_fig(fig_trend, height=290)
-            fig_trend.update_traces(marker=dict(size=9, color="#0D9488"))
-            fig_trend.update_yaxes(rangemode="tozero")
-            trend_event = st.plotly_chart(
-                fig_trend,
-                key="student_year_chart",
+            st.line_chart(trend_df, color="#0F294A", height=260)
+
+            year_picker_df = trend_df.reset_index()
+            yr_sel_event = st.dataframe(
+                year_picker_df,
+                key="student_year_picker",
                 on_select="rerun",
-                selection_mode="points",
+                selection_mode="single-row",
                 use_container_width=True,
-                config={"displayModeBar": False},
+                hide_index=True,
             )
-            pts_y = (trend_event or {}).get("selection", {}).get("points", [])
-            selected_year_click = str(pts_y[0]["x"]).strip() if (pts_y and "x" in pts_y[0]) else None
-            if selected_year_click:
-                yr_count = int(trend_df.loc[selected_year_click, "Registered Students"]) if selected_year_click in trend_df.index else 0
+            sel_y_rows = (yr_sel_event or {}).get("selection", {}).get("rows", [])
+            if sel_y_rows:
+                picked_row = year_picker_df.iloc[sel_y_rows[0]]
+                selected_year_click = str(picked_row["Year"]).strip()
+                yr_count = int(picked_row["Registered Students"])
                 st.markdown(f"**Selected Year:** {html.escape(selected_year_click)} — **Registered Students:** {yr_count}")
                 if selected_year_click.isdigit() and not students_df.empty and "registered_date" in students_df.columns:
                     parsed_yr = pd.to_datetime(students_df["registered_date"], errors="coerce").dt.year.astype("Int64")
