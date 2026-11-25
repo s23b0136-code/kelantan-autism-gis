@@ -2,6 +2,69 @@ import pandas as pd
 import streamlit as st
 from shared_data import DISTRICT_INFO, init_state
 
+st.markdown(
+    """
+    <style>
+        :root, .stApp {
+            --text-color: #000000 !important;
+            color: #000000 !important;
+        }
+
+        h1, h2, h3, h4, h5, h6,
+        [data-testid="stWidgetLabel"],
+        [data-testid="stWidgetLabel"] *,
+        [data-testid="stCaptionContainer"],
+        [data-testid="stCaptionContainer"] *,
+        [data-testid="stExpander"] summary,
+        [data-testid="stExpander"] summary *,
+        [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMarkdownContainer"] span,
+        [data-testid="stMarkdownContainer"] label {
+            color: #000000 !important;
+            opacity: 1 !important;
+        }
+
+        [data-testid="stMarkdownContainer"] [style*="color: #fff"],
+        [data-testid="stMarkdownContainer"] [style*="color: #ffffff"],
+        [data-testid="stMarkdownContainer"] [style*="color: white"],
+        [data-testid="stMarkdownContainer"] [style*="color:#fff"],
+        [data-testid="stMarkdownContainer"] [style*="color:#ffffff"],
+        [data-testid="stMarkdownContainer"] [style*="color:white"],
+        [data-testid="stMarkdownContainer"] [style*="color: rgba(255"],
+        [data-testid="stMarkdownContainer"] [style*="color:rgba(255"] {
+            color: #000000 !important;
+        }
+
+        .stButton > button,
+        .stButton > button *,
+        .stFormSubmitButton > button,
+        .stFormSubmitButton > button *,
+        [data-testid="stDownloadButton"] > button,
+        [data-testid="stDownloadButton"] > button * {
+            background-color: #17365D !important;
+            color: #FFFFFF !important;
+            border-color: #0F2440 !important;
+            opacity: 1 !important;
+        }
+
+        [data-testid="stTextInput"] input,
+        [data-testid="stNumberInput"] input,
+        [data-baseweb="select"] > div,
+        [data-baseweb="select"] > div * {
+            color: #FFFFFF !important;
+            opacity: 1 !important;
+        }
+
+        [data-baseweb="popover"] li,
+        [data-baseweb="popover"] li * {
+            color: #000000 !important;
+            background-color: #FFFFFF !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 df_students = init_state()
 
 st.title("Admin — Student Registry (Edit & Insert Records)")
