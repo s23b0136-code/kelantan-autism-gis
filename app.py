@@ -364,7 +364,7 @@ def apply_custom_theme():
                 background-color: #1E3A5F !important;
             }
 
-            /* Keep text inside selectboxes and inputs crisp white/readable */
+            /* Keep text inside selectboxes and inputs readable */
             [data-baseweb="select"] div,
             [data-baseweb="select"] span {
                 color: #FFFFFF !important;
