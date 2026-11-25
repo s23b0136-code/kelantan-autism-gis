@@ -1,4 +1,3 @@
-
 import json
 import os
 import sqlite3
@@ -267,18 +266,15 @@ def apply_custom_theme():
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-            html, body, [class*="css"], .stApp {
+            :root, .stApp {
+                --text-color: #000000 !important;
                 font-family: 'Inter', 'Roboto', Arial, sans-serif;
-                color: #000000;
-                background-color: #F4F7FB;
-            }
-
-            .stApp {
-                background-color: #F4F7FB;
+                color: #000000 !important;
+                background-color: #F4F7FB !important;
             }
 
             [data-testid="stSidebar"] {
-                background-color: #FFFFFF;
+                background-color: #FFFFFF !important;
                 border-right: 1px solid #CBD5E1;
             }
 
@@ -286,34 +282,31 @@ def apply_custom_theme():
                 color: #000000 !important;
             }
 
-            h1, h2, h3, h4, h5, h6 {
-                color: #000000 !important;
-                font-weight: 700 !important;
-            }
-
-            p, span, label, div, li {
-                color: #000000;
-            }
-
+            h1, h2, h3, h4, h5, h6,
+            p, span, label, div, li,
             [data-testid="stMarkdownContainer"] *,
             [data-testid="stWidgetLabel"] *,
             [data-testid="stCaptionContainer"] *,
+            [data-testid="stMetricLabel"] *,
+            [data-testid="stMetricValue"] *,
+            [data-testid="stMetricDelta"] *,
+            button[data-baseweb="tab"],
+            button[data-baseweb="tab"] *,
             .caption-muted, small {
                 color: #000000 !important;
+                opacity: 1 !important;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-weight: 700 !important;
             }
 
             [data-testid="stMetric"] {
-                background-color: #FFFFFF;
+                background-color: #FFFFFF !important;
                 border: 1px solid #CBD5E1;
                 border-top: 4px solid #17365D;
                 border-radius: 10px;
                 padding: 0.85rem 1rem;
-            }
-
-            [data-testid="stMetricLabel"] *,
-            [data-testid="stMetricValue"] * {
-                color: #000000 !important;
-                font-weight: 700 !important;
             }
 
             .section-card {
@@ -350,6 +343,7 @@ def apply_custom_theme():
             button[kind="primary"] *,
             button[kind="secondary"] * {
                 color: #FFFFFF !important;
+                opacity: 1 !important;
             }
 
             .stButton > button:hover,
