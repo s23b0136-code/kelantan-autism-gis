@@ -1,8 +1,6 @@
-
 import html
 import json
 import math
-import os
 import sqlite3
 from datetime import datetime
 
@@ -11,17 +9,14 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="Kelantan Autism GIS — Healthcare Service Management Platform",
-    page_icon="🏥",
+    page_title="Kelantan Autism GIS Healthcare Service Management Platform",
+    page_icon="🗺️",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 DB_PATH = "kelantan_autism_gis.db"
 
-# ==============================================================================
-# 1. KELANTAN 10-DISTRICT GEOJSON BOUNDARIES (STRICTLY KELANTAN STATE, MALAYSIA)
-# ==============================================================================
 KELANTAN_DISTRICTS = [
     "Kota Bharu",
     "Bachok",
@@ -48,7 +43,6 @@ DISTRICT_CENTROIDS = {
     "Gua Musang": (4.8843, 101.9644),
 }
 
-# Authentic contiguous 10-district Kelantan state polygon topology (lon, lat)
 KELANTAN_GEOJSON = {
     "type": "FeatureCollection",
     "features": [
@@ -60,8 +54,8 @@ KELANTAN_GEOJSON = {
                 "coordinates": [[
                     [102.08, 6.24], [102.23, 6.22], [102.22, 6.13],
                     [102.14, 6.12], [102.08, 6.16], [102.08, 6.24]
-                ]]
-            }
+                ]],
+            },
         },
         {
             "type": "Feature",
@@ -71,8 +65,8 @@ KELANTAN_GEOJSON = {
                 "coordinates": [[
                     [102.23, 6.22], [102.35, 6.17], [102.33, 5.95],
                     [102.21, 5.94], [102.20, 6.04], [102.22, 6.13], [102.23, 6.22]
-                ]]
-            }
+                ]],
+            },
         },
         {
             "type": "Feature",
@@ -82,8 +76,8 @@ KELANTAN_GEOJSON = {
                 "coordinates": [[
                     [102.35, 6.17], [102.44, 6.08], [102.47, 5.94],
                     [102.33, 5.95], [102.35, 6.17]
-                ]]
-            }
+                ]],
+            },
         },
         {
             "type": "Feature",
@@ -94,8 +88,8 @@ KELANTAN_GEOJSON = {
                     [101.96, 6.06], [102.08, 6.16], [102.14, 6.12],
                     [102.22, 6.13], [102.20, 6.04], [102.21, 5.94],
                     [102.06, 5.92], [101.96, 5.97], [101.96, 6.06]
-                ]]
-            }
+                ]],
+            },
         },
         {
             "type": "Feature",
@@ -105,8 +99,8 @@ KELANTAN_GEOJSON = {
                 "coordinates": [[
                     [102.33, 5.95], [102.47, 5.94], [102.52, 5.78],
                     [102.36, 5.74], [102.31, 5.83], [102.33, 5.95]
-                ]]
-            }
+                ]],
+            },
         },
         {
             "type": "Feature",
@@ -117,8 +111,8 @@ KELANTAN_GEOJSON = {
                     [102.21, 5.94], [102.33, 5.95], [102.31, 5.83],
                     [102.36, 5.74], [102.24, 5.68], [102.18, 5.76],
                     [102.18, 5.86], [102.21, 5.94]
-                ]]
-            }
+                ]],
+            },
         },
         {
             "type": "Feature",
@@ -129,8 +123,8 @@ KELANTAN_GEOJSON = {
                     [101.96, 5.97], [102.06, 5.92], [102.21, 5.94],
                     [102.18, 5.86], [102.18, 5.76], [102.04, 5.68],
                     [101.94, 5.77], [101.96, 5.97]
-                ]]
-            }
+                ]],
+            },
         },
         {
             "type": "Feature",
@@ -141,8 +135,8 @@ KELANTAN_GEOJSON = {
                     [101.70, 5.86], [101.96, 5.97], [101.94, 5.77],
                     [102.04, 5.68], [101.96, 5.48], [101.73, 5.52],
                     [101.66, 5.68], [101.70, 5.86]
-                ]]
-            }
+                ]],
+            },
         },
         {
             "type": "Feature",
@@ -153,8 +147,8 @@ KELANTAN_GEOJSON = {
                     [102.04, 5.68], [102.18, 5.76], [102.24, 5.68],
                     [102.36, 5.74], [102.42, 5.45], [102.28, 5.24],
                     [102.06, 5.26], [101.96, 5.48], [102.04, 5.68]
-                ]]
-            }
+                ]],
+            },
         },
         {
             "type": "Feature",
@@ -166,15 +160,12 @@ KELANTAN_GEOJSON = {
                     [102.28, 5.24], [102.38, 4.92], [102.26, 4.62],
                     [101.88, 4.56], [101.56, 4.74], [101.52, 5.14],
                     [101.66, 5.42], [101.73, 5.52]
-                ]]
-            }
+                ]],
+            },
         },
     ],
 }
 
-# ==============================================================================
-# 2. INITIAL REALISTIC KELANTAN AUTISM CENTRES & PRESERVED 104 STUDENT RECORDS
-# ==============================================================================
 INITIAL_CENTRES = [
     {
         "centre_name": "NASOM Malaysia - Kota Bharu",
@@ -185,7 +176,7 @@ INITIAL_CENTRES = [
         "lon": 102.2542,
         "contact": "+609-748 5120",
         "services": "Speech Therapy, ABA Therapy, Occupational Sensory, Early Intervention",
-        "hours": "Sun–Thu: 8:00 AM – 5:00 PM",
+        "hours": "Sun-Thu: 8:00 AM - 5:00 PM",
         "capacity": 45,
     },
     {
@@ -197,7 +188,7 @@ INITIAL_CENTRES = [
         "lon": 102.2456,
         "contact": "+609-745 2000",
         "services": "Speech Therapy, Occupational Sensory, Early Intervention",
-        "hours": "Sun–Thu: 8:00 AM – 4:30 PM",
+        "hours": "Sun-Thu: 8:00 AM - 4:30 PM",
         "capacity": 60,
     },
     {
@@ -209,7 +200,7 @@ INITIAL_CENTRES = [
         "lon": 102.2835,
         "contact": "+609-767 3000",
         "services": "Speech Therapy, ABA Therapy, Occupational Sensory, Early Intervention",
-        "hours": "Sun–Thu: 8:00 AM – 5:00 PM",
+        "hours": "Sun-Thu: 8:00 AM - 5:00 PM",
         "capacity": 55,
     },
     {
@@ -221,7 +212,7 @@ INITIAL_CENTRES = [
         "lon": 102.2891,
         "contact": "+609-773 4118",
         "services": "Early Intervention, Occupational Sensory",
-        "hours": "Sun–Thu: 8:30 AM – 3:30 PM",
+        "hours": "Sun-Thu: 8:30 AM - 3:30 PM",
         "capacity": 30,
     },
     {
@@ -233,7 +224,7 @@ INITIAL_CENTRES = [
         "lon": 102.4012,
         "contact": "+609-778 8240",
         "services": "Early Intervention, Speech Therapy, Occupational Sensory",
-        "hours": "Sun–Thu: 8:30 AM – 4:00 PM",
+        "hours": "Sun-Thu: 8:30 AM - 4:00 PM",
         "capacity": 28,
     },
     {
@@ -245,7 +236,7 @@ INITIAL_CENTRES = [
         "lon": 102.4235,
         "contact": "+609-778 9055",
         "services": "Early Intervention, ABA Therapy",
-        "hours": "Sun–Thu: 8:30 AM – 3:30 PM",
+        "hours": "Sun-Thu: 8:30 AM - 3:30 PM",
         "capacity": 22,
     },
     {
@@ -257,7 +248,7 @@ INITIAL_CENTRES = [
         "lon": 102.1428,
         "contact": "+609-790 9333",
         "services": "Speech Therapy, Early Intervention, Occupational Sensory",
-        "hours": "Sun–Thu: 8:00 AM – 4:30 PM",
+        "hours": "Sun-Thu: 8:00 AM - 4:30 PM",
         "capacity": 32,
     },
     {
@@ -269,7 +260,7 @@ INITIAL_CENTRES = [
         "lon": 101.9820,
         "contact": "+609-795 0412",
         "services": "Early Intervention, ABA Therapy",
-        "hours": "Sun–Thu: 8:30 AM – 4:00 PM",
+        "hours": "Sun-Thu: 8:30 AM - 4:00 PM",
         "capacity": 24,
     },
     {
@@ -281,7 +272,7 @@ INITIAL_CENTRES = [
         "lon": 102.1665,
         "contact": "+609-725 7333",
         "services": "Speech Therapy, Early Intervention",
-        "hours": "Sun–Thu: 8:00 AM – 4:30 PM",
+        "hours": "Sun-Thu: 8:00 AM - 4:30 PM",
         "capacity": 25,
     },
     {
@@ -293,7 +284,7 @@ INITIAL_CENTRES = [
         "lon": 102.1984,
         "contact": "+609-719 6420",
         "services": "Occupational Sensory, ABA Therapy, Speech Therapy",
-        "hours": "Sun–Thu: 9:00 AM – 5:30 PM",
+        "hours": "Sun-Thu: 9:00 AM - 5:30 PM",
         "capacity": 26,
     },
     {
@@ -305,7 +296,7 @@ INITIAL_CENTRES = [
         "lon": 102.4021,
         "contact": "+609-786 6210",
         "services": "Early Intervention, Occupational Sensory",
-        "hours": "Sun–Thu: 8:30 AM – 4:00 PM",
+        "hours": "Sun-Thu: 8:30 AM - 4:00 PM",
         "capacity": 24,
     },
     {
@@ -317,7 +308,7 @@ INITIAL_CENTRES = [
         "lon": 102.2210,
         "contact": "+609-975 2533",
         "services": "Speech Therapy, Occupational Sensory, Early Intervention",
-        "hours": "Sun–Thu: 8:00 AM – 4:30 PM",
+        "hours": "Sun-Thu: 8:00 AM - 4:30 PM",
         "capacity": 26,
     },
     {
@@ -329,7 +320,7 @@ INITIAL_CENTRES = [
         "lon": 102.1512,
         "contact": "+609-955 7333",
         "services": "Speech Therapy, Early Intervention, ABA Therapy",
-        "hours": "Sun–Thu: 8:00 AM – 4:30 PM",
+        "hours": "Sun-Thu: 8:00 AM - 4:30 PM",
         "capacity": 28,
     },
     {
@@ -341,7 +332,7 @@ INITIAL_CENTRES = [
         "lon": 102.2035,
         "contact": "+609-966 6333",
         "services": "Speech Therapy, Occupational Sensory, Early Intervention",
-        "hours": "Sun–Thu: 8:00 AM – 4:30 PM",
+        "hours": "Sun-Thu: 8:00 AM - 4:30 PM",
         "capacity": 30,
     },
     {
@@ -353,7 +344,7 @@ INITIAL_CENTRES = [
         "lon": 101.8450,
         "contact": "+609-944 0288",
         "services": "Early Intervention",
-        "hours": "Sun–Thu: 8:30 AM – 3:30 PM",
+        "hours": "Sun-Thu: 8:30 AM - 3:30 PM",
         "capacity": 16,
     },
     {
@@ -365,16 +356,15 @@ INITIAL_CENTRES = [
         "lon": 101.9660,
         "contact": "+609-912 1133",
         "services": "Speech Therapy, Early Intervention",
-        "hours": "Sun–Thu: 8:00 AM – 4:30 PM",
+        "hours": "Sun-Thu: 8:00 AM - 4:30 PM",
         "capacity": 20,
     },
 ]
 
-# 4 Interactive Flipbook Modules (Preserved & Enhanced with Dedicated Cover Page + Page-Turning Animation)
 MODULES_4 = [
     {
         "key": "AG",
-        "code": "Module 01 • AG",
+        "code": "Module 01 - AG",
         "title": "Toilet Training & Daily Hygiene",
         "domain": "Self-Care & Independence",
         "color": "#0F294A",
@@ -383,30 +373,30 @@ MODULES_4 = [
         "cover_desc": "A structured visual guide to help parents establish calm, predictable bathroom and handwashing routines at home.",
         "pages": [
             (
-                "Step 1 • Recognizing Readiness & Visual Cues",
+                "Step 1. Recognizing Readiness & Visual Cues",
                 "Introduce clear picture cues before each scheduled bathroom visit.",
-                "• Use a laminated toilet visual card at eye level.\n• Keep verbal prompts short and consistent: 'Time for toilet.'\n• Visit at predictable intervals (after meals and before outings).",
+                "- Use a laminated toilet visual card at eye level.\n- Keep verbal prompts short and consistent: 'Time for toilet.'\n- Visit at predictable intervals (after meals and before outings).",
             ),
             (
-                "Step 2 • Calm Bathroom Transition",
+                "Step 2. Calm Bathroom Transition",
                 "Ensure the bathroom environment feels safe, warm, and sensory-friendly.",
-                "• Use a non-slip footstool so feet are supported.\n• Avoid loud flushing while the child is still seated if sensitive to sound.\n• Praise calm sitting immediately.",
+                "- Use a non-slip footstool so feet are supported.\n- Avoid loud flushing while the child is still seated if sensitive to sound.\n- Praise calm sitting immediately.",
             ),
             (
-                "Step 3 • 4-Step Handwashing Sequence",
+                "Step 3. 4-Step Handwashing Sequence",
                 "Break handwashing into four repeatable steps: Wet, Soap, Scrub (10s), Rinse & Dry.",
-                "• Count slowly to 10 together while rubbing soap.\n• Keep towel and soap within easy reach.\n• Model the sequence side-by-side.",
+                "- Count slowly to 10 together while rubbing soap.\n- Keep towel and soap within easy reach.\n- Model the sequence side-by-side.",
             ),
             (
-                "Step 4 • Positive Reinforcement & Tracking",
+                "Step 4. Positive Reinforcement & Tracking",
                 "Track daily successes gently and respond neutrally to accidents.",
-                "• Reward effort immediately with praise or a visual token.\n• Keep a simple daily log to share progress with therapists.",
+                "- Reward effort immediately with praise or a visual token.\n- Keep a simple daily log to share progress with therapists.",
             ),
         ],
     },
     {
         "key": "AH",
-        "code": "Module 02 • AH",
+        "code": "Module 02 - AH",
         "title": "Morning & Classroom Transition Routine",
         "domain": "Home & School Transitions",
         "color": "#0D9488",
@@ -415,30 +405,30 @@ MODULES_4 = [
         "cover_desc": "Practical strategies using countdowns and First/Then boards to reduce anxiety during morning departures and centre arrivals.",
         "pages": [
             (
-                "Step 1 • Advance Countdown Cues",
+                "Step 1. Advance Countdown Cues",
                 "Prepare your child 5 minutes and 2 minutes before any activity change.",
-                "• Use a visual sand timer or phone countdown.\n• Say clearly: 'In 2 minutes, shoes on.'\n• Allow time to finish the current action.",
+                "- Use a visual sand timer or phone countdown.\n- Say clearly: 'In 2 minutes, shoes on.'\n- Allow time to finish the current action.",
             ),
             (
-                "Step 2 • Using a 'First / Then' Visual Board",
+                "Step 2. Using a 'First / Then' Visual Board",
                 "Pair a required routine step with a comforting or motivating activity.",
-                "• Example: FIRST pack school bag → THEN hold favourite sensory toy in car.\n• Point to each picture as you speak.",
+                "- Example: FIRST pack school bag -> THEN hold favourite sensory toy in car.\n- Point to each picture as you speak.",
             ),
             (
-                "Step 3 • Smooth Centre / School Drop-Off",
+                "Step 3. Smooth Centre / School Drop-Off",
                 "Establish a brief, predictable goodbye ritual at the centre entrance.",
-                "• Greet the therapist or teacher together.\n• Keep goodbye warm, confident, and brief.\n• Hand over the child's daily communication card.",
+                "- Greet the therapist or teacher together.\n- Keep goodbye warm, confident, and brief.\n- Hand over the child's daily communication card.",
             ),
             (
-                "Step 4 • Settling-In Buffer Time",
-                "Allow 3–5 minutes of quiet regulation upon arriving in a new room.",
-                "• Let your child check their visual schedule before starting table tasks.",
+                "Step 4. Settling-In Buffer Time",
+                "Allow 3-5 minutes of quiet regulation upon arriving in a new room.",
+                "- Let your child check their visual schedule before starting table tasks.",
             ),
         ],
     },
     {
         "key": "AI",
-        "code": "Module 03 • AI",
+        "code": "Module 03 - AI",
         "title": "Morning Walk & Sensory Regulation",
         "domain": "Sensory & Motor Wellness",
         "color": "#1E3A8A",
@@ -447,30 +437,30 @@ MODULES_4 = [
         "cover_desc": "Gentle outdoor movement and sensory environment checks to support emotional regulation and focus before therapy.",
         "pages": [
             (
-                "Step 1 • Predictable Morning Movement",
+                "Step 1. Predictable Morning Movement",
                 "Start the day with a calm 10-minute walk along a familiar path.",
-                "• Walk at your child's natural pace.\n• Use rhythmic, reassuring encouragement.\n• Heavy-work movement helps organize the nervous system.",
+                "- Walk at your child's natural pace.\n- Use rhythmic, reassuring encouragement.\n- Heavy-work movement helps organize the nervous system.",
             ),
             (
-                "Step 2 • Early Sensory Load Check",
+                "Step 2. Early Sensory Load Check",
                 "Notice environmental triggers such as bright sunlight, traffic noise, or crowds.",
-                "• Offer noise-reducing headphones or a cap before distress escalates.\n• Watch for early signs like covering ears or pacing.",
+                "- Offer noise-reducing headphones or a cap before distress escalates.\n- Watch for early signs like covering ears or pacing.",
             ),
             (
-                "Step 3 • Deep Breathing & Grounding Reset",
+                "Step 3. Deep Breathing & Grounding Reset",
                 "Practice a simple 'Smell the flower, blow the candle' breathing exercise.",
-                "• Inhale slowly for 3 seconds, exhale gently for 4 seconds.\n• Repeat 3 times together in a quiet corner.",
+                "- Inhale slowly for 3 seconds, exhale gently for 4 seconds.\n- Repeat 3 times together in a quiet corner.",
             ),
             (
-                "Step 4 • Transitioning to Focused Learning",
+                "Step 4. Transitioning to Focused Learning",
                 "Follow movement with a sip of water and a calm seated activity.",
-                "• A regulated body improves attention during speech and occupational therapy.",
+                "- A regulated body improves attention during speech and occupational therapy.",
             ),
         ],
     },
     {
         "key": "SK",
-        "code": "Module 04 • SK",
+        "code": "Module 04 - SK",
         "title": "Speech & Picture Exchange (PECS)",
         "domain": "Communication & Language",
         "color": "#0F294A",
@@ -479,32 +469,30 @@ MODULES_4 = [
         "cover_desc": "Build functional everyday communication using picture exchange cards, clear single-word models, and responsive reinforcement.",
         "pages": [
             (
-                "Step 1 • Selecting High-Motivation Cards",
-                "Begin with 3–4 items your child genuinely wants (water, snack, break, toy).",
-                "• Place clear picture cards on a Velcro strip within easy reach.\n• Ensure the child can see and reach the cards independently.",
+                "Step 1. Selecting High-Motivation Cards",
+                "Begin with 3-4 items your child genuinely wants (water, snack, break, toy).",
+                "- Place clear picture cards on a Velcro strip within easy reach.\n- Ensure the child can see and reach the cards independently.",
             ),
             (
-                "Step 2 • The Picture Exchange Action",
+                "Step 2. The Picture Exchange Action",
                 "Prompt your child to hand the picture card directly into your open hand.",
-                "• Immediately honor the request when the card is exchanged.\n• Immediate response teaches that communication works.",
+                "- Immediately honor the request when the card is exchanged.\n- Immediate response teaches that communication works.",
             ),
             (
-                "Step 3 • Pairing Clear Spoken Models",
+                "Step 3. Pairing Clear Spoken Models",
                 "Speak the target word clearly at the exact moment you receive the card.",
-                "• Say 'Water' or 'More snack' clearly.\n• Do not withhold the item if the child cannot yet repeat the word.",
+                "- Say 'Water' or 'More snack' clearly.\n- Do not withhold the item if the child cannot yet repeat the word.",
             ),
             (
-                "Step 4 • Expanding Across Daily Routines",
+                "Step 4. Expanding Across Daily Routines",
                 "Use picture cards during meals, playtime, and therapy sessions.",
-                "• Gradually introduce 'Help' and 'Break' cards to reduce frustration.",
+                "- Gradually introduce 'Help' and 'Break' cards to reduce frustration.",
             ),
         ],
     },
 ]
 
-# ==============================================================================
-# 3. SQLITE DATABASE INITIALIZATION & SYNCHRONIZATION
-# ==============================================================================
+
 def get_conn():
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
@@ -517,26 +505,24 @@ def map_legacy_district(raw_dist: str, idx: int) -> str:
         return "Tumpat"
     if d == "Rantau Panjang":
         return "Pasir Mas"
+    extra_map = {
+        15: "Machang",
+        22: "Tanah Merah",
+        29: "Kuala Krai",
+        36: "Jeli",
+        43: "Gua Musang",
+        50: "Machang",
+        57: "Tanah Merah",
+        64: "Kuala Krai",
+        71: "Gua Musang",
+        78: "Machang",
+        85: "Tanah Merah",
+        92: "Kuala Krai",
+        99: "Jeli",
+    }
+    if idx in extra_map:
+        return extra_map[idx]
     if d in KELANTAN_DISTRICTS:
-        # Distribute a realistic share into Machang, Tanah Merah, Kuala Krai, Jeli, Gua Musang
-        # while keeping Kota Bharu highest and preserving exact 104 total count
-        extra_map = {
-            15: "Machang",
-            22: "Tanah Merah",
-            29: "Kuala Krai",
-            36: "Jeli",
-            43: "Gua Musang",
-            50: "Machang",
-            57: "Tanah Merah",
-            64: "Kuala Krai",
-            71: "Gua Musang",
-            78: "Machang",
-            85: "Tanah Merah",
-            92: "Kuala Krai",
-            99: "Jeli",
-        }
-        if idx in extra_map:
-            return extra_map[idx]
         return d
     return KELANTAN_DISTRICTS[idx % len(KELANTAN_DISTRICTS)]
 
@@ -545,7 +531,8 @@ def init_database():
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("""
+    cur.execute(
+        """
         CREATE TABLE IF NOT EXISTS students (
             record_id TEXT PRIMARY KEY,
             student_name TEXT NOT NULL,
@@ -556,9 +543,11 @@ def init_database():
             registered_date TEXT NOT NULL,
             status TEXT NOT NULL
         )
-    """)
+        """
+    )
 
-    cur.execute("""
+    cur.execute(
+        """
         CREATE TABLE IF NOT EXISTS autism_centres (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             centre_name TEXT NOT NULL,
@@ -572,9 +561,11 @@ def init_database():
             hours TEXT NOT NULL,
             capacity INTEGER NOT NULL
         )
-    """)
+        """
+    )
 
-    cur.execute("""
+    cur.execute(
+        """
         CREATE TABLE IF NOT EXISTS parent_registrations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             reg_code TEXT NOT NULL,
@@ -593,34 +584,39 @@ def init_database():
             status TEXT NOT NULL DEFAULT 'Pending',
             submitted_at TEXT NOT NULL
         )
-    """)
+        """
+    )
     conn.commit()
 
-    # Seed Autism Centres if empty
     cur.execute("SELECT COUNT(*) FROM autism_centres")
     if cur.fetchone()[0] == 0:
         for c in INITIAL_CENTRES:
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO autism_centres
                 (centre_name, category, address, district, lat, lon, contact, services, hours, capacity)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                c["centre_name"], c["category"], c["address"], c["district"],
-                c["lat"], c["lon"], c["contact"], c["services"], c["hours"], c["capacity"]
-            ))
+                """,
+                (
+                    c["centre_name"], c["category"], c["address"], c["district"],
+                    c["lat"], c["lon"], c["contact"], c["services"], c["hours"], c["capacity"],
+                ),
+            )
         conn.commit()
 
-    # Seed Preserved 104 Student Records if empty
     cur.execute("SELECT COUNT(*) FROM students")
     if cur.fetchone()[0] == 0:
-        legacy_districts = ["KOTA BHARU", "BACHOK", "PASIR MAS", "PASIR PUTEH", "WAKAF BHARU", "TUMPAT", "RANTAU PANJANG"]
+        legacy_districts = [
+            "KOTA BHARU", "BACHOK", "PASIR MAS", "PASIR PUTEH",
+            "WAKAF BHARU", "TUMPAT", "RANTAU PANJANG",
+        ]
         diags = ["Mild Autism", "High-Function Autism", "Severe Autism"]
         servs = ["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"]
         dates = ["2026-01-15", "2026-02-15", "2026-03-15", "2026-04-15", "2026-05-15", "2026-06-15"]
         sample_names = [
             "Aisyah Humaira", "Muhammad Adam", "Nurul Izzah", "Ahmad Danial", "Siti Khadijah",
             "Wan Amirul", "Nik Sofea", "Che Muhammad Hakim", "Tengku Zara", "Muhammad Rayyan",
-            "Nur Qistina", "Ahmad Harith", "Putri Damia", "Muhammad Iman", "Nur Aleesya"
+            "Nur Qistina", "Ahmad Harith", "Putri Damia", "Muhammad Iman", "Nur Aleesya",
         ]
         for i in range(104):
             rec_id = f"KOD-{1000 + i}"
@@ -631,14 +627,16 @@ def init_database():
             serv = servs[i % len(servs)]
             dt = dates[i % len(dates)]
             status = "Pending Verification" if (i % 5 == 0) else "Verified Active"
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO students
                 (record_id, student_name, age, district, diagnosis, required_service, registered_date, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (rec_id, s_name, age, dist, diag, serv, dt, status))
+                """,
+                (rec_id, s_name, age, dist, diag, serv, dt, status),
+            )
         conn.commit()
 
-    # Seed 2 sample parent registration records if empty so Admin & Parents can see realistic initial records
     cur.execute("SELECT COUNT(*) FROM parent_registrations")
     if cur.fetchone()[0] == 0:
         sample_recs = [
@@ -676,16 +674,21 @@ def init_database():
             },
         ]
         for sr in sample_recs:
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO parent_registrations
                 (reg_code, child_name, age, diagnosis, residential_address, district, home_lat, home_lon,
-                 required_services, parent_name, parent_contact, recommended_centres_json, selected_centre, status, submitted_at)
+                 required_services, parent_name, parent_contact, recommended_centres_json,
+                 selected_centre, status, submitted_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                sr["reg_code"], sr["child_name"], sr["age"], sr["diagnosis"], sr["residential_address"],
-                sr["district"], sr["home_lat"], sr["home_lon"], sr["required_services"], sr["parent_name"],
-                sr["parent_contact"], "[]", sr["selected_centre"], sr["status"], sr["submitted_at"]
-            ))
+                """,
+                (
+                    sr["reg_code"], sr["child_name"], sr["age"], sr["diagnosis"], sr["residential_address"],
+                    sr["district"], sr["home_lat"], sr["home_lon"], sr["required_services"],
+                    sr["parent_name"], sr["parent_contact"], "[]", sr["selected_centre"],
+                    sr["status"], sr["submitted_at"],
+                ),
+            )
         conn.commit()
 
     conn.close()
@@ -693,9 +696,7 @@ def init_database():
 
 init_database()
 
-# ==============================================================================
-# 4. DATA QUERY & SPATIAL RECOMMENDATION ENGINE (HAVERSINE + SUITABILITY SCORE)
-# ==============================================================================
+
 def load_students_df() -> pd.DataFrame:
     conn = get_conn()
     df = pd.read_sql_query("SELECT * FROM students ORDER BY record_id ASC", conn)
@@ -727,10 +728,8 @@ def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 
 def estimate_home_coordinates(district: str, address_text: str) -> tuple[float, float]:
-    """Derives realistic residential coordinates strictly inside the chosen Kelantan district."""
     base_lat, base_lon = DISTRICT_CENTROIDS.get(district, (6.1254, 102.2381))
     addr_lower = address_text.lower()
-    # Known local landmarks/townships within Kelantan districts for accurate sub-district placement
     local_anchors = {
         "kubang kerian": (6.0980, 102.2795),
         "pengkalan chepa": (6.1560, 102.2880),
@@ -748,8 +747,6 @@ def estimate_home_coordinates(district: str, address_text: str) -> tuple[float, 
     for kw, coords in local_anchors.items():
         if kw in addr_lower:
             return coords
-
-    # Deterministic small offset within ~2.2 km of district centroid based on address string
     seed = sum(ord(ch) for ch in address_text.strip()) if address_text.strip() else 42
     d_lat = ((seed % 19) - 9) * 0.0022
     d_lon = (((seed * 7) % 19) - 9) * 0.0022
@@ -759,44 +756,30 @@ def estimate_home_coordinates(district: str, address_text: str) -> tuple[float, 
 def compute_top_3_centres(home_lat: float, home_lon: float, required_services: list[str], centres_df: pd.DataFrame) -> list[dict]:
     if centres_df.empty:
         return []
-
     req_set = {s.strip() for s in required_services if s.strip()}
     scored = []
     for _, row in centres_df.iterrows():
         c_lat = float(row["lat"])
         c_lon = float(row["lon"])
         dist_km = haversine_km(home_lat, home_lon, c_lat, c_lon)
-
         avail_list = [s.strip() for s in str(row["services"]).split(",") if s.strip()]
         avail_set = set(avail_list)
-
         if req_set:
             matched_services = sorted(req_set.intersection(avail_set))
             service_ratio = len(matched_services) / len(req_set)
         else:
             matched_services = avail_list
             service_ratio = 1.0
-
-        # Distance score (closer centres score higher; 0 km -> 1.0, 50+ km -> lower)
         dist_score = max(0.15, 1.0 - (dist_km / 65.0))
-        # Capacity / availability score
         cap = max(1, int(row["capacity"]))
         cap_score = min(1.0, cap / 45.0)
-
-        # Weighted suitability score (55% therapy match, 35% proximity, 10% capacity)
         raw_score = (0.55 * service_ratio + 0.35 * dist_score + 0.10 * cap_score) * 100.0
         suitability_pct = min(99, max(45, int(round(raw_score))))
-
-        if matched_services:
-            match_txt = f"Matches {', '.join(matched_services)}"
-        else:
-            match_txt = "General developmental & referral support"
-
+        match_txt = f"Matches {', '.join(matched_services)}" if matched_services else "General developmental & referral support"
         reason = (
             f"{suitability_pct}% suitability score (system-generated): {match_txt}; "
             f"located {dist_km:.1f} km from child's residence with {cap}-slot centre capacity."
         )
-
         scored.append({
             "id": int(row["id"]),
             "centre_name": str(row["centre_name"]),
@@ -814,8 +797,6 @@ def compute_top_3_centres(home_lat: float, home_lon: float, required_services: l
             "matched_services": matched_services,
             "reason": reason,
         })
-
-    # Rank primarily by suitability score descending, then shortest distance ascending
     scored.sort(key=lambda x: (-x["suitability_pct"], x["distance_km"]))
     top3 = scored[:3]
     for idx, item in enumerate(top3, start=1):
@@ -826,13 +807,18 @@ def compute_top_3_centres(home_lat: float, home_lon: float, required_services: l
 def compute_district_accessibility(students_df: pd.DataFrame, centres_df: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for dist in KELANTAN_DISTRICTS:
-        s_cnt = int((students_df["District"] == dist).sum()) if "District" in students_df.columns else int((students_df["district"] == dist).sum())
-        c_sub = centres_df[centres_df["district"] == dist]
+        if students_df.empty:
+            s_cnt = 0
+        elif "District" in students_df.columns:
+            s_cnt = int((students_df["District"] == dist).sum())
+        else:
+            s_cnt = int((students_df["district"] == dist).sum())
+
+        c_sub = centres_df[centres_df["district"] == dist] if not centres_df.empty else pd.DataFrame()
         c_cnt = int(len(c_sub))
         cap_sum = int(c_sub["capacity"].sum()) if c_cnt > 0 else 0
         ratio = round(s_cnt / c_cnt, 1) if c_cnt > 0 else float(s_cnt)
 
-        # Accessibility classification: Green (Good), Yellow (Moderate), Red (Poor / Critical Shortage)
         if c_cnt >= 3 or (c_cnt >= 2 and ratio <= 7.5):
             level = "Green"
             status_label = "Good Accessibility"
@@ -846,7 +832,7 @@ def compute_district_accessibility(students_df: pd.DataFrame, centres_df: pd.Dat
         else:
             level = "Red"
             status_label = "Poor Accessibility (Critical Shortage)"
-            gap_status = "Critical Shortage — Priority Expansion"
+            gap_status = "Critical Shortage - Priority Expansion"
             fill_hex = "#DC2626"
 
         lat, lon = DISTRICT_CENTROIDS[dist]
@@ -866,193 +852,164 @@ def compute_district_accessibility(students_df: pd.DataFrame, centres_df: pd.Dat
     return pd.DataFrame(rows)
 
 
-# ==============================================================================
-# 5. PROFESSIONAL GOVERNMENT HEALTHCARE GIS STYLING (NAVY, WHITE, TEAL, LIGHT BLUE)
-# ==============================================================================
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    html, body, [class*="css"] {
-        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    }
+        :root, .stApp {
+            --text-color: #000000 !important;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            background-color: #F1F5F9 !important;
+            color: #000000 !important;
+        }
 
-    /* Clean professional top header bar */
-    header[data-testid="stHeader"] {
-        background-color: #FFFFFF !important;
-        border-bottom: 1px solid #CBD5E1 !important;
-    }
+        header[data-testid="stHeader"] {
+            background-color: #FFFFFF !important;
+            border-bottom: 1px solid #CBD5E1 !important;
+        }
 
-    .stApp {
-        background-color: #F1F5F9 !important;
-        color: #0F294A !important;
-    }
+        [data-testid="stSidebar"] {
+            background-color: #0F294A !important;
+            border-right: 1px solid #1E3A5F !important;
+        }
 
-    /* Fixed vertical left sidebar in deep government healthcare navy */
-    [data-testid="stSidebar"] {
-        background-color: #0F294A !important;
-        border-right: 1px solid #1E3A5F !important;
-    }
+        [data-testid="stSidebar"] * {
+            color: #F8FAFC !important;
+            opacity: 1 !important;
+        }
 
-    [data-testid="stSidebar"] * {
-        color: #F8FAFC !important;
-    }
+        .sidebar-brand {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            padding: 14px 12px;
+            margin-bottom: 14px;
+        }
 
-    .sidebar-brand {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 12px;
-        padding: 14px 12px;
-        margin-bottom: 14px;
-    }
+        .sidebar-section-label {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #5EEAD4 !important;
+            margin: 14px 0 6px 4px;
+        }
 
-    .sidebar-section-label {
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        color: #5EEAD4 !important;
-        margin: 14px 0 6px 4px;
-    }
+        [data-testid="stSidebar"] .stButton > button,
+        [data-testid="stSidebar"] .stButton > button * {
+            width: 100% !important;
+            text-align: left !important;
+            justify-content: flex-start !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            color: #FFFFFF !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            border-radius: 9px !important;
+            font-size: 13.5px !important;
+            font-weight: 600 !important;
+        }
 
-    /* Sidebar navigation buttons */
-    [data-testid="stSidebar"] .stButton > button {
-        width: 100% !important;
-        text-align: left !important;
-        justify-content: flex-start !important;
-        background-color: transparent !important;
-        color: #E2E8F0 !important;
-        border: 1px solid transparent !important;
-        border-radius: 9px !important;
-        padding: 9px 12px !important;
-        font-size: 13.5px !important;
-        font-weight: 500 !important;
-        transition: all 0.18s ease !important;
-        margin-bottom: 2px !important;
-    }
+        [data-testid="stSidebar"] .stButton > button[kind="primary"],
+        [data-testid="stSidebar"] .stButton > button[kind="primary"] * {
+            background-color: #0D9488 !important;
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+            border: 1px solid #14B8A6 !important;
+        }
 
-    [data-testid="stSidebar"] .stButton > button:hover {
-        background-color: rgba(13, 148, 136, 0.22) !important;
-        border-color: rgba(94, 234, 212, 0.35) !important;
-        color: #FFFFFF !important;
-        transform: translateX(2px);
-    }
+        [data-testid="stMain"] h1,
+        [data-testid="stMain"] h2,
+        [data-testid="stMain"] h3,
+        [data-testid="stMain"] h4,
+        [data-testid="stMain"] [data-testid="stWidgetLabel"],
+        [data-testid="stMain"] [data-testid="stWidgetLabel"] *,
+        [data-testid="stMain"] [data-testid="stMetricLabel"],
+        [data-testid="stMain"] [data-testid="stMetricLabel"] *,
+        [data-testid="stMain"] [data-testid="stMetricValue"],
+        [data-testid="stMain"] [data-testid="stMetricValue"] *,
+        [data-testid="stMain"] [data-testid="stCaptionContainer"],
+        [data-testid="stMain"] [data-testid="stCaptionContainer"] *,
+        [data-testid="stMain"] button[data-baseweb="tab"],
+        [data-testid="stMain"] button[data-baseweb="tab"] * {
+            color: #000000 !important;
+            opacity: 1 !important;
+        }
 
-    /* Active nav button highlight */
-    [data-testid="stSidebar"] .stButton > button[kind="primary"] {
-        background-color: #0D9488 !important;
-        color: #FFFFFF !important;
-        font-weight: 700 !important;
-        border: 1px solid #14B8A6 !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22) !important;
-    }
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] span,
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] strong,
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] div {
+            color: #000000 !important;
+        }
 
-    /* Main content cards */
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: #FFFFFF !important;
-        border-radius: 12px !important;
-        border: 1px solid #CBD5E1 !important;
-        box-shadow: 0 2px 10px rgba(15, 41, 74, 0.05) !important;
-        padding: 6px 8px;
-    }
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] div[style*="linear-gradient"],
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] div[style*="linear-gradient"] * {
+            color: #FFFFFF !important;
+        }
 
-    .gov-header-banner {
-        background: #FFFFFF;
-        border-left: 6px solid #0F294A;
-        border-top: 1px solid #CBD5E1;
-        border-right: 1px solid #CBD5E1;
-        border-bottom: 1px solid #CBD5E1;
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin-bottom: 14px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 12px;
-        box-shadow: 0 2px 8px rgba(15, 41, 74, 0.04);
-    }
+        [data-testid="stMain"] .stButton > button[kind="primary"],
+        [data-testid="stMain"] .stButton > button[kind="primary"] *,
+        [data-testid="stMain"] .stFormSubmitButton > button,
+        [data-testid="stMain"] .stFormSubmitButton > button *,
+        [data-testid="stMain"] [data-testid="stDownloadButton"] > button,
+        [data-testid="stMain"] [data-testid="stDownloadButton"] > button * {
+            background-color: #0F294A !important;
+            color: #FFFFFF !important;
+            border: 1px solid #0F294A !important;
+            opacity: 1 !important;
+        }
 
-    .kpi-card {
-        background: #FFFFFF;
-        border: 1px solid #CBD5E1;
-        border-top: 4px solid #0F294A;
-        border-radius: 12px;
-        padding: 16px 18px;
-        box-shadow: 0 2px 8px rgba(15, 41, 74, 0.04);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
-    }
+        [data-testid="stMain"] [data-baseweb="select"] > div,
+        [data-testid="stMain"] [data-baseweb="select"] > div * {
+            color: #FFFFFF !important;
+            opacity: 1 !important;
+        }
 
-    .kpi-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(15, 41, 74, 0.08);
-    }
+        [data-testid="stMain"] [data-baseweb="popover"] li,
+        [data-testid="stMain"] [data-baseweb="popover"] li * {
+            color: #000000 !important;
+            background-color: #FFFFFF !important;
+        }
 
-    .kpi-card.teal {
-        border-top-color: #0D9488;
-    }
+        .gov-header-banner {
+            background: #FFFFFF;
+            border-left: 6px solid #0F294A;
+            border-top: 1px solid #CBD5E1;
+            border-right: 1px solid #CBD5E1;
+            border-bottom: 1px solid #CBD5E1;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
 
-    .kpi-card.lblue {
-        border-top-color: #0284C7;
-    }
+        .kpi-card {
+            background: #FFFFFF;
+            border: 1px solid #CBD5E1;
+            border-top: 4px solid #0F294A;
+            border-radius: 12px;
+            padding: 16px 18px;
+        }
 
-    .kpi-title {
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-        color: #475569;
-        margin-bottom: 6px;
-    }
+        .kpi-card.teal { border-top-color: #0D9488; }
+        .kpi-card.lblue { border-top-color: #0284C7; }
+        .kpi-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #000000; margin-bottom: 6px; }
+        .kpi-num { font-size: 30px; font-weight: 800; color: #000000; line-height: 1.1; }
+        .kpi-sub { font-size: 12px; color: #000000; font-weight: 600; margin-top: 5px; }
 
-    .kpi-num {
-        font-size: 30px;
-        font-weight: 800;
-        color: #0F294A;
-        line-height: 1.1;
-    }
-
-    .kpi-sub {
-        font-size: 12px;
-        color: #0D9488;
-        font-weight: 600;
-        margin-top: 5px;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 3px 10px;
-        border-radius: 999px;
-        font-size: 11.5px;
-        font-weight: 700;
-    }
-
-    .badge-approved { background: #CCFBF1; color: #0F766E; border: 1px solid #99F6E4; }
-    .badge-pending { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
-    .badge-rejected { background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; }
-
-    /* Main primary buttons */
-    [data-testid="stMain"] .stButton > button[kind="primary"] {
-        background-color: #0F294A !important;
-        color: #FFFFFF !important;
-        border: 1px solid #0F294A !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-    }
-
-    [data-testid="stMain"] .stButton > button[kind="primary"]:hover {
-        background-color: #0D9488 !important;
-        border-color: #0D9488 !important;
-    }
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+        .badge-approved { background: #CCFBF1; color: #000000; border: 1px solid #0D9488; }
+        .badge-pending { background: #FEF3C7; color: #000000; border: 1px solid #D97706; }
+        .badge-rejected { background: #FEE2E2; color: #000000; border: 1px solid #DC2626; }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# ==============================================================================
-# 6. SESSION STATE & NAVIGATION MANAGEMENT
-# ==============================================================================
 ALL_PAGES = [
     "Admin Dashboard",
     "Student Registry",
@@ -1070,15 +1027,11 @@ ALL_PAGES = [
 
 if "active_page" not in st.session_state:
     st.session_state["active_page"] = "Admin Dashboard"
-
 if "user_role" not in st.session_state:
     st.session_state["user_role"] = "Administrator"
-
 if "logged_out" not in st.session_state:
     st.session_state["logged_out"] = False
-
 if "latest_recommendation_context" not in st.session_state:
-    # Default active context using real database records so Find Suitable Centres works immediately too
     init_centres = load_centres_df()
     def_lat, def_lon = 6.1180, 102.2480
     def_top3 = compute_top_3_centres(def_lat, def_lon, ["Speech Therapy", "Occupational Sensory"], init_centres)
@@ -1095,14 +1048,12 @@ if "latest_recommendation_context" not in st.session_state:
         "parent_name": "Noraini binti Ismail",
         "parent_contact": "012-987 6543",
         "top3": def_top3,
-        "focused_rank": 0,  # 0 = overview of home + 3 centres; 1,2,3 = zoomed to specific centre
+        "focused_rank": 0,
         "selected_centre": def_top3[0]["centre_name"] if def_top3 else "",
         "just_submitted": False,
     }
-
 if "open_flipbook_key" not in st.session_state:
     st.session_state["open_flipbook_key"] = None
-
 for m in MODULES_4:
     pk = f"fb_page_{m['key']}"
     if pk not in st.session_state:
@@ -1116,24 +1067,14 @@ def navigate_to(page_name: str, role_hint: str | None = None):
         st.session_state["user_role"] = role_hint
 
 
-# ==============================================================================
-# 7. FIXED VERTICAL LEFT SIDEBAR NAVIGATION
-# ==============================================================================
 with st.sidebar:
     st.markdown(
         f"""
         <div class="sidebar-brand">
-            <div style="display:flex;align-items:center;gap:10px;">
-                <div style="width:38px;height:38px;border-radius:9px;background:#0D9488;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;color:#FFFFFF;">
-                    🏥
-                </div>
-                <div>
-                    <div style="font-size:14.5px;font-weight:800;line-height:1.2;color:#FFFFFF;">Kelantan Autism GIS</div>
-                    <div style="font-size:11px;color:#99F6E4;font-weight:600;">Healthcare Service Portal</div>
-                </div>
-            </div>
-            <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.12);font-size:11.5px;color:#CBD5E1;">
-                Active Role: <strong style="color:#FFFFFF;">{html.escape(st.session_state['user_role'])}</strong>
+            <div style="font-size:15px;font-weight:800;line-height:1.25;color:#FFFFFF;">Kelantan Autism GIS Portal</div>
+            <div style="font-size:11.5px;color:#99F6E4;font-weight:600;margin-top:2px;">Healthcare Service Management</div>
+            <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.14);font-size:11.5px;color:#FFFFFF;">
+                Active Role: <strong>{html.escape(st.session_state['user_role'])}</strong>
             </div>
         </div>
         """,
@@ -1142,53 +1083,50 @@ with st.sidebar:
 
     st.markdown('<div class="sidebar-section-label">ADMIN PORTAL</div>', unsafe_allow_html=True)
     admin_nav = [
-        ("📊", "Admin Dashboard"),
-        ("🎓", "Student Registry"),
-        ("📋", "Student Registration Records"),
-        ("🗺️", "GIS Accessibility Map"),
-        ("🏥", "Autism Centre Management"),
-        ("📈", "Accessibility Analytics"),
+        ("Admin Dashboard", "Admin Dashboard"),
+        ("Student Registry", "Student Registry"),
+        ("Student Registration Records", "Student Registration Records"),
+        ("GIS Accessibility Map", "GIS Accessibility Map"),
+        ("Autism Centre Management", "Autism Centre Management"),
+        ("Accessibility Analytics", "Accessibility Analytics"),
     ]
-    for icon, label in admin_nav:
-        is_active = (st.session_state["active_page"] == label) and not st.session_state["logged_out"]
-        if st.button(f"{icon}  {label}", key=f"nav_{label}", type="primary" if is_active else "secondary"):
-            navigate_to(label, "Administrator")
+    for btn_txt, page_target in admin_nav:
+        is_active = (st.session_state["active_page"] == page_target) and not st.session_state["logged_out"]
+        if st.button(btn_txt, key=f"nav_{page_target}", type="primary" if is_active else "secondary"):
+            navigate_to(page_target, "Administrator")
             st.rerun()
 
     st.markdown('<div class="sidebar-section-label">PARENTS PORTAL</div>', unsafe_allow_html=True)
     parent_nav = [
-        ("🏠", "Parents Dashboard"),
-        ("📝", "Child Registration"),
-        ("📍", "Find Suitable Centres"),
-        ("📖", "Learning Modules"),
-        ("🕒", "Registration History"),
+        ("Parents Dashboard", "Parents Dashboard"),
+        ("Child Registration", "Child Registration"),
+        ("Find Suitable Centres", "Find Suitable Centres"),
+        ("Learning Modules", "Learning Modules"),
+        ("Registration History", "Registration History"),
     ]
-    for icon, label in parent_nav:
-        is_active = (st.session_state["active_page"] == label) and not st.session_state["logged_out"]
-        if st.button(f"{icon}  {label}", key=f"nav_{label}", type="primary" if is_active else "secondary"):
-            navigate_to(label, "Parent / Guardian")
+    for btn_txt, page_target in parent_nav:
+        is_active = (st.session_state["active_page"] == page_target) and not st.session_state["logged_out"]
+        if st.button(btn_txt, key=f"nav_{page_target}", type="primary" if is_active else "secondary"):
+            navigate_to(page_target, "Parent / Guardian")
             st.rerun()
 
     st.markdown("<hr style='border-color:rgba(255,255,255,0.15);margin:14px 0 10px 0;'>", unsafe_allow_html=True)
     is_settings = (st.session_state["active_page"] == "Settings") and not st.session_state["logged_out"]
-    if st.button("⚙️  Settings", key="nav_Settings", type="primary" if is_settings else "secondary"):
+    if st.button("Settings", key="nav_Settings", type="primary" if is_settings else "secondary"):
         navigate_to("Settings")
         st.rerun()
-
-    if st.button("🚪  Logout", key="nav_Logout", type="secondary"):
+    if st.button("Logout", key="nav_Logout", type="secondary"):
         st.session_state["logged_out"] = True
         st.rerun()
 
-# ==============================================================================
-# 8. LOGOUT / PORTAL ACCESS GATEWAY SCREEN
-# ==============================================================================
+
 if st.session_state["logged_out"]:
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:20px;font-weight:800;color:#0F294A;">Kelantan Autism GIS — Session Signed Out</div>
-                <div style="font-size:13px;color:#475569;">Select a portal role below to sign back into the Kelantan Healthcare GIS Management System.</div>
+                <div style="font-size:20px;font-weight:800;color:#000000;">Kelantan Autism GIS Session Signed Out</div>
+                <div style="font-size:13px;color:#000000;">Select a portal role below to sign back into the Kelantan Healthcare GIS Management System.</div>
             </div>
         </div>
         """,
@@ -1197,23 +1135,21 @@ if st.session_state["logged_out"]:
     c1, c2 = st.columns(2, gap="large")
     with c1:
         with st.container(border=True):
-            st.subheader("🛡️ Administrator Portal Sign-In")
+            st.subheader("Administrator Portal Sign-In")
             st.write("Manage student registries, verify parent registration submissions, update autism centres, and analyze district accessibility gaps.")
             if st.button("Sign In as Administrator", type="primary", use_container_width=True):
                 navigate_to("Admin Dashboard", "Administrator")
                 st.rerun()
     with c2:
         with st.container(border=True):
-            st.subheader("👨‍👩‍👧 Parents & Guardian Portal Sign-In")
+            st.subheader("Parents & Guardian Portal Sign-In")
             st.write("Register your child, automatically locate the 3 most suitable autism centres on the Kelantan GIS map, and access interactive flipbook guides.")
             if st.button("Sign In as Parent / Guardian", type="primary", use_container_width=True):
                 navigate_to("Parents Dashboard", "Parent / Guardian")
                 st.rerun()
     st.stop()
 
-# ==============================================================================
-# 9. REUSABLE INTERACTIVE LEAFLET COMPONENTS (STRICTLY KELANTAN STATE)
-# ==============================================================================
+
 def render_kelantan_choropleth_map(
     access_df: pd.DataFrame,
     centres_df: pd.DataFrame,
@@ -1223,7 +1159,7 @@ def render_kelantan_choropleth_map(
     geojson_str = json.dumps(KELANTAN_GEOJSON)
     access_map = {row["district"]: row.to_dict() for _, row in access_df.iterrows()}
     access_json = json.dumps(access_map)
-    centres_json = json.dumps(centres_df.to_dict(orient="records"))
+    centres_json = json.dumps(centres_df.to_dict(orient="records") if not centres_df.empty else [])
     sel_dist_json = json.dumps(selected_district)
 
     html_code = f"""<!DOCTYPE html>
@@ -1233,134 +1169,127 @@ def render_kelantan_choropleth_map(
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-  html, body {{
+html, body {{
     margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    background: #FFFFFF; color: #0F294A;
-  }}
-  #map {{
+    background: #FFFFFF; color: #000000;
+}}
+#map {{
     width: 100%; height: {map_height - 56}px; border-radius: 10px;
-    border: 1px solid #CBD5E1; background: #E0F2FE;
-  }}
-  .legend-bar {{
+    border: 1px solid #CBD5E1; background: #E2E8F0;
+}}
+.legend-bar {{
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 10px; padding: 10px 4px 2px 4px;
-    font-size: 12px; font-weight: 600; color: #0F294A;
-  }}
-  .legend-items {{ display: flex; gap: 14px; flex-wrap: wrap; }}
-  .lg-item {{ display: flex; align-items: center; gap: 6px; }}
-  .lg-swatch {{ width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(15,41,74,0.3); }}
-  .dist-label {{
-    background: rgba(255,255,255,0.88); border: 1px solid #94A3B8;
+    font-size: 12px; font-weight: 600; color: #000000;
+}}
+.legend-items {{ display: flex; gap: 14px; flex-wrap: wrap; }}
+.lg-item {{ display: flex; align-items: center; gap: 6px; color: #000000; }}
+.lg-swatch {{ width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.3); }}
+.dist-label {{
+    background: rgba(255,255,255,0.92); border: 1px solid #64748B;
     border-radius: 5px; padding: 1px 5px; font-size: 10px; font-weight: 700;
-    color: #0F294A; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-  }}
+    color: #000000; white-space: nowrap;
+}}
 </style>
 </head>
 <body>
-  <div id="map"></div>
-  <div class="legend-bar">
+<div id="map"></div>
+<div class="legend-bar">
     <div class="legend-items">
-      <div class="lg-item"><span class="lg-swatch" style="background:#0D9488;"></span>Green: Good Accessibility / Sufficient Services</div>
-      <div class="lg-item"><span class="lg-swatch" style="background:#EAB308;"></span>Yellow: Moderate Accessibility / Limited Services</div>
-      <div class="lg-item"><span class="lg-swatch" style="background:#DC2626;"></span>Red: Poor Accessibility / Critical Shortage</div>
-      <div class="lg-item"><span class="lg-swatch" style="background:#0F294A;border-radius:999px;"></span>Autism Service Centre Marker</div>
+        <div class="lg-item"><span class="lg-swatch" style="background:#0D9488;"></span>Green: Good Accessibility</div>
+        <div class="lg-item"><span class="lg-swatch" style="background:#EAB308;"></span>Yellow: Moderate Accessibility</div>
+        <div class="lg-item"><span class="lg-swatch" style="background:#DC2626;"></span>Red: Poor Accessibility</div>
+        <div class="lg-item"><span class="lg-swatch" style="background:#0F294A;border-radius:999px;"></span>Autism Centre</div>
     </div>
-    <div style="color:#475569;">Scope: Kelantan State Only (10 Districts)</div>
-  </div>
+    <div style="color:#000000;">Scope: Kelantan State (10 Districts)</div>
+</div>
 <script>
-  const kelantanGeo = {geojson_str};
-  const accessData = {access_json};
-  const centres = {centres_json};
-  const selectedDist = {sel_dist_json};
+const kelantanGeo = {geojson_str};
+const accessData = {access_json};
+const centres = {centres_json};
+const selectedDist = {sel_dist_json};
 
-  // Strict Kelantan state bounding box so map stays focused exclusively on Kelantan
-  const kelantanBounds = L.latLngBounds([4.50, 101.40], [6.32, 102.62]);
-
-  const map = L.map('map', {{
+const kelantanBounds = L.latLngBounds([4.50, 101.40], [6.32, 102.62]);
+const map = L.map('map', {{
     maxBounds: kelantanBounds,
     maxBoundsViscosity: 0.9,
     minZoom: 8,
     maxZoom: 16
-  }});
+}});
 
-  L.tileLayer('https://{{s}}.basemaps.cartocdn.com/light_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
-    attribution: '&copy; OpenStreetMap &copy; CARTO | Kelantan GIS'
-  }}).addTo(map);
+L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+    attribution: '&copy; OpenStreetMap contributors'
+}}).addTo(map);
 
-  let targetLayer = null;
-
-  const geoLayer = L.geoJSON(kelantanGeo, {{
+let targetLayer = null;
+const geoLayer = L.geoJSON(kelantanGeo, {{
     style: function(feature) {{
-      const dName = feature.properties.district;
-      const info = accessData[dName] || {{ fill_hex: "#94A3B8" }};
-      const isSelected = (selectedDist !== "All Districts" && dName === selectedDist);
-      return {{
-        fillColor: info.fill_hex,
-        weight: isSelected ? 3.5 : 1.8,
-        opacity: 1,
-        color: isSelected ? "#0F294A" : "#FFFFFF",
-        fillOpacity: isSelected ? 0.62 : 0.45
-      }};
+        const dName = feature.properties.district;
+        const info = accessData[dName] || {{ fill_hex: "#94A3B8" }};
+        const isSelected = (selectedDist !== "All Districts" && dName === selectedDist);
+        return {{
+            fillColor: info.fill_hex,
+            weight: isSelected ? 3.5 : 1.8,
+            opacity: 1,
+            color: isSelected ? "#0F294A" : "#FFFFFF",
+            fillOpacity: isSelected ? 0.62 : 0.45
+        }};
     }},
     onEachFeature: function(feature, layer) {{
-      const dName = feature.properties.district;
-      const info = accessData[dName] || {{}};
-      if (selectedDist !== "All Districts" && dName === selectedDist) {{
-        targetLayer = layer;
-      }}
-      layer.bindPopup(`
-        <div style="font-family:Inter,sans-serif;min-width:210px;line-height:1.45;">
-          <div style="font-size:14px;font-weight:800;color:#0F294A;border-bottom:1px solid #E2E8F0;padding-bottom:4px;margin-bottom:6px;">
-            ${{dName}} District
-          </div>
-          <div><strong>Accessibility:</strong> <span style="color:${{info.fill_hex}};font-weight:700;">${{info.status_label}}</span></div>
-          <div><strong>Registered Students:</strong> ${{info.students}}</div>
-          <div><strong>Available Centres:</strong> ${{info.centres}}</div>
-          <div><strong>Total Slot Capacity:</strong> ${{info.total_capacity}}</div>
-          <div><strong>Student-to-Centre Ratio:</strong> ${{info.student_per_centre}} : 1</div>
-        </div>
-      `);
-
-      const center = layer.getBounds().getCenter();
-      L.marker(center, {{
-        interactive: false,
-        icon: L.divIcon({{
-          className: '',
-          html: `<div class="dist-label">${{dName}} (${{info.students}}s / ${{info.centres}}c)</div>`,
-          iconSize: [110, 20],
-          iconAnchor: [55, 10]
-        }})
-      }}).addTo(map);
+        const dName = feature.properties.district;
+        const info = accessData[dName] || {{}};
+        if (selectedDist !== "All Districts" && dName === selectedDist) {{
+            targetLayer = layer;
+        }}
+        layer.bindPopup(
+            `<div style="font-family:Inter,sans-serif;min-width:210px;line-height:1.45;color:#000000;">` +
+            `<div style="font-size:14px;font-weight:800;color:#000000;border-bottom:1px solid #CBD5E1;padding-bottom:4px;margin-bottom:6px;">${{dName}} District</div>` +
+            `<div><strong>Accessibility:</strong> ${{info.status_label || ''}}</div>` +
+            `<div><strong>Registered Students:</strong> ${{info.students ?? 0}}</div>` +
+            `<div><strong>Available Centres:</strong> ${{info.centres ?? 0}}</div>` +
+            `<div><strong>Total Slot Capacity:</strong> ${{info.total_capacity ?? 0}}</div>` +
+            `<div><strong>Student-to-Centre Ratio:</strong> ${{info.student_per_centre ?? 0}}:1</div>` +
+            `</div>`
+        );
+        const center = layer.getBounds().getCenter();
+        L.marker(center, {{
+            interactive: false,
+            icon: L.divIcon({{
+                className: "",
+                html: `<div class="dist-label">${{dName}} (${{info.students ?? 0}}s / ${{info.centres ?? 0}}c)</div>`,
+                iconSize: [120, 20],
+                iconAnchor: [60, 10]
+            }})
+        }}).addTo(map);
     }}
-  }}).addTo(map);
+}}).addTo(map);
 
-  if (targetLayer) {{
+if (targetLayer) {{
     map.fitBounds(targetLayer.getBounds(), {{ padding: [35, 35] }});
-  }} else {{
+}} else {{
     map.fitBounds(geoLayer.getBounds(), {{ padding: [15, 15] }});
-  }}
+}}
 
-  // Add Autism Centre Markers
-  centres.forEach(c => {{
+centres.forEach(c => {{
     if (selectedDist !== "All Districts" && c.district !== selectedDist) return;
     const markerIcon = L.divIcon({{
-      className: '',
-      html: `<div style="width:26px;height:26px;border-radius:999px;background:#0F294A;border:2.5px solid #FFFFFF;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,0.35);">🏥</div>`,
-      iconSize: [26, 26],
-      iconAnchor: [13, 13]
+        className: "",
+        html: `<div style="width:24px;height:24px;border-radius:999px;background:#0F294A;border:2.5px solid #FFFFFF;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">C</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
     }});
     const m = L.marker([c.lat, c.lon], {{ icon: markerIcon }}).addTo(map);
-    m.bindPopup(`
-      <div style="font-family:Inter,sans-serif;min-width:230px;line-height:1.45;">
-        <div style="font-size:13.5px;font-weight:800;color:#0F294A;margin-bottom:4px;">${{c.centre_name}}</div>
-        <div style="font-size:11.5px;color:#0D9488;font-weight:700;margin-bottom:6px;">${{c.category}} • ${{c.district}}</div>
-        <div style="font-size:12px;"><strong>Address:</strong> ${{c.address}}</div>
-        <div style="font-size:12px;"><strong>Services:</strong> ${{c.services}}</div>
-        <div style="font-size:12px;"><strong>Hours:</strong> ${{c.hours}}</div>
-        <div style="font-size:12px;"><strong>Contact:</strong> ${{c.contact}} • <strong>Capacity:</strong> ${{c.capacity}}</div>
-      </div>
-    `);
-  }});
+    m.bindPopup(
+        `<div style="font-family:Inter,sans-serif;min-width:230px;line-height:1.45;color:#000000;">` +
+        `<div style="font-size:13.5px;font-weight:800;color:#000000;margin-bottom:4px;">${{c.centre_name}}</div>` +
+        `<div style="font-size:11.5px;font-weight:700;margin-bottom:6px;">${{c.category}} - ${{c.district}}</div>` +
+        `<div style="font-size:12px;"><strong>Address:</strong> ${{c.address}}</div>` +
+        `<div style="font-size:12px;"><strong>Services:</strong> ${{c.services}}</div>` +
+        `<div style="font-size:12px;"><strong>Hours:</strong> ${{c.hours}}</div>` +
+        `<div style="font-size:12px;"><strong>Contact:</strong> ${{c.contact}} | <strong>Capacity:</strong> ${{c.capacity}}</div>` +
+        `</div>`
+    );
+}});
 </script>
 </body>
 </html>
@@ -1373,14 +1302,6 @@ def render_recommendation_gis_map(
     rec_ctx: dict,
     map_height: int = 500,
 ):
-    """
-    Renders the interactive Kelantan GIS Recommendation Map with:
-    - Step 1: Automatic zoom into the child's residential location on the Kelantan map
-    - Step 2: House icon for child's residential location
-    - Step 5: Three animated numbered markers (1, 2, 3)
-    - Step 6: Animated connecting lines between home and the 3 centres
-    - Step 8: Smooth flyTo zoom + marker highlight + info popup + distance when Recommendation 1, 2, or 3 is clicked
-    """
     geojson_str = json.dumps(KELANTAN_GEOJSON)
     access_map = {row["district"]: row.to_dict() for _, row in access_df.iterrows()}
     access_json = json.dumps(access_map)
@@ -1393,186 +1314,168 @@ def render_recommendation_gis_map(
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-  html, body {{
+html, body {{
     margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    background: #FFFFFF; color: #0F294A;
-  }}
-  #recMap {{
+    background: #FFFFFF; color: #000000;
+}}
+#recMap {{
     width: 100%; height: {map_height - 54}px; border-radius: 10px;
-    border: 1px solid #CBD5E1; background: #E0F2FE;
-  }}
-  @keyframes pulseRing {{
-    0% {{ transform: scale(0.95); box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.75); }}
-    70% {{ transform: scale(1.06); box-shadow: 0 0 0 14px rgba(13, 148, 136, 0); }}
-    100% {{ transform: scale(0.95); box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }}
-  }}
-  @keyframes dashFlow {{
+    border: 1px solid #CBD5E1; background: #E2E8F0;
+}}
+@keyframes dashFlow {{
     to {{ stroke-dashoffset: -36; }}
-  }}
-  .house-pin {{
-    width: 38px; height: 38px; border-radius: 999px;
+}}
+.house-pin {{
+    width: 34px; height: 34px; border-radius: 999px;
     background: #0F294A; border: 3px solid #FFFFFF;
-    color: #FFFFFF; font-size: 18px;
+    color: #FFFFFF; font-size: 13px; font-weight: 800;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 12px rgba(15, 41, 74, 0.45);
-    animation: pulseRing 2.2s infinite;
-  }}
-  .num-pin {{
+}}
+.num-pin {{
     width: 34px; height: 34px; border-radius: 999px;
     border: 3px solid #FFFFFF; color: #FFFFFF;
     font-size: 15px; font-weight: 800;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-    animation: pulseRing 2s infinite;
-  }}
-  .num-pin.active-focus {{
-    transform: scale(1.24);
+}}
+.num-pin.active-focus {{
+    transform: scale(1.22);
     border: 3.5px solid #FACC15;
-  }}
-  .animated-route {{
+}}
+.animated-route {{
     animation: dashFlow 1.2s linear infinite;
-  }}
-  .legend-strip {{
+}}
+.legend-strip {{
     display: flex; justify-content: space-between; align-items: center;
     flex-wrap: wrap; gap: 10px; padding: 9px 4px 2px 4px;
-    font-size: 12px; font-weight: 600; color: #0F294A;
-  }}
+    font-size: 12px; font-weight: 600; color: #000000;
+}}
 </style>
 </head>
 <body>
-  <div id="recMap"></div>
-  <div class="legend-strip">
-    <div style="display:flex;gap:14px;flex-wrap:wrap;">
-      <span>🏠 <strong>Child's Home Location</strong></span>
-      <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0D9488;vertical-align:middle;"></span> <strong>#1 Best Match</strong></span>
-      <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0284C7;vertical-align:middle;"></span> <strong>#2 Second Match</strong></span>
-      <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0F294A;vertical-align:middle;"></span> <strong>#3 Third Match</strong></span>
+<div id="recMap"></div>
+<div class="legend-strip">
+    <div style="display:flex;gap:14px;flex-wrap:wrap;color:#000000;">
+        <span><strong>H = Child's Home</strong></span>
+        <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0D9488;vertical-align:middle;"></span> <strong>#1 Best Match</strong></span>
+        <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0284C7;vertical-align:middle;"></span> <strong>#2 Second Match</strong></span>
+        <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0F294A;vertical-align:middle;"></span> <strong>#3 Third Match</strong></span>
     </div>
-    <div style="color:#0D9488;">Kelantan State GIS Spatial Matcher</div>
-  </div>
+    <div style="color:#000000;">Kelantan GIS Spatial Matcher</div>
+</div>
 <script>
-  const kelantanGeo = {geojson_str};
-  const accessData = {access_json};
-  const ctx = {ctx_json};
+const kelantanGeo = {geojson_str};
+const accessData = {access_json};
+const ctx = {ctx_json};
 
-  const kelantanBounds = L.latLngBounds([4.50, 101.40], [6.32, 102.62]);
-  const map = L.map('recMap', {{
+const kelantanBounds = L.latLngBounds([4.50, 101.40], [6.32, 102.62]);
+const map = L.map('recMap', {{
     maxBounds: kelantanBounds,
     maxBoundsViscosity: 0.9,
     minZoom: 8,
     maxZoom: 16
-  }});
+}});
 
-  L.tileLayer('https://{{s}}.basemaps.cartocdn.com/light_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
-    attribution: '&copy; OpenStreetMap &copy; CARTO | Kelantan GIS'
-  }}).addTo(map);
+L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+    attribution: '&copy; OpenStreetMap contributors'
+}}).addTo(map);
 
-  // District Choropleth Context Layer
-  L.geoJSON(kelantanGeo, {{
+L.geoJSON(kelantanGeo, {{
     style: function(feature) {{
-      const dName = feature.properties.district;
-      const info = accessData[dName] || {{ fill_hex: "#94A3B8" }};
-      const isHomeDist = (dName === ctx.district);
-      return {{
-        fillColor: info.fill_hex,
-        weight: isHomeDist ? 2.5 : 1.2,
-        opacity: 1,
-        color: isHomeDist ? "#0F294A" : "#FFFFFF",
-        fillOpacity: isHomeDist ? 0.28 : 0.14
-      }};
+        const dName = feature.properties.district;
+        const info = accessData[dName] || {{ fill_hex: "#94A3B8" }};
+        const isHomeDist = (dName === ctx.district);
+        return {{
+            fillColor: info.fill_hex,
+            weight: isHomeDist ? 2.5 : 1.2,
+            opacity: 1,
+            color: isHomeDist ? "#0F294A" : "#FFFFFF",
+            fillOpacity: isHomeDist ? 0.28 : 0.14
+        }};
     }}
-  }}).addTo(map);
+}}).addTo(map);
 
-  // Step 2: Child's Residential Location with HOUSE ICON
-  const homeLatLng = [ctx.home_lat, ctx.home_lon];
-  const houseIcon = L.divIcon({{
-    className: '',
-    html: `<div class="house-pin" title="Child's Residential Location">🏠</div>`,
-    iconSize: [38, 38],
-    iconAnchor: [19, 19]
-  }});
+const homeLatLng = [ctx.home_lat, ctx.home_lon];
+const houseIcon = L.divIcon({{
+    className: "",
+    html: `<div class="house-pin" title="Child Residential Location">H</div>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17]
+}});
+const homeMarker = L.marker(homeLatLng, {{ icon: houseIcon, zIndexOffset: 1000 }}).addTo(map);
+homeMarker.bindPopup(
+    `<div style="font-family:Inter,sans-serif;min-width:210px;line-height:1.45;color:#000000;">` +
+    `<div style="font-size:13.5px;font-weight:800;color:#000000;">Child's Residential Location</div>` +
+    `<div style="font-size:12.5px;font-weight:700;margin:3px 0;">${{ctx.child_name}} (Age ${{ctx.age}})</div>` +
+    `<div style="font-size:12px;"><strong>District:</strong> ${{ctx.district}}</div>` +
+    `<div style="font-size:12px;"><strong>Address:</strong> ${{ctx.residential_address}}</div>` +
+    `<div style="font-size:12px;"><strong>Required:</strong> ${{(ctx.required_services || []).join(", ")}}</div>` +
+    `</div>`
+);
 
-  const homeMarker = L.marker(homeLatLng, {{ icon: houseIcon, zIndexOffset: 1000 }}).addTo(map);
-  homeMarker.bindPopup(`
-    <div style="font-family:Inter,sans-serif;min-width:210px;line-height:1.45;">
-      <div style="font-size:13.5px;font-weight:800;color:#0F294A;">🏠 Child's Residential Location</div>
-      <div style="font-size:12.5px;font-weight:700;color:#0D9488;margin:3px 0;">${{ctx.child_name}} (Age ${{ctx.age}})</div>
-      <div style="font-size:12px;"><strong>District:</strong> ${{ctx.district}}</div>
-      <div style="font-size:12px;"><strong>Address:</strong> ${{ctx.residential_address}}</div>
-      <div style="font-size:12px;"><strong>Required:</strong> ${{ctx.required_services.join(", ")}}</div>
-    </div>
-  `);
+const rankColors = {{ 1: "#0D9488", 2: "#0284C7", 3: "#0F294A" }};
+const allPoints = [homeLatLng];
+const centreMarkers = {{}};
 
-  const rankColors = {{ 1: "#0D9488", 2: "#0284C7", 3: "#0F294A" }};
-  const allPoints = [homeLatLng];
-  const centreMarkers = {{}};
-
-  (ctx.top3 || []).forEach(c => {{
+(ctx.top3 || []).forEach(c => {{
     const cLatLng = [c.lat, c.lon];
     allPoints.push(cLatLng);
     const col = rankColors[c.rank] || "#0D9488";
     const isFocused = (ctx.focused_rank === c.rank);
 
-    // Step 6: Animated connecting line between child's home and recommended centre
     L.polyline([homeLatLng, cLatLng], {{
-      color: col,
-      weight: isFocused ? 4.5 : 3,
-      opacity: isFocused ? 0.95 : 0.78,
-      dashArray: "10, 8",
-      className: "animated-route"
+        color: col,
+        weight: isFocused ? 4.5 : 3,
+        opacity: isFocused ? 0.95 : 0.78,
+        dashArray: "10, 8",
+        className: "animated-route"
     }}).addTo(map);
 
-    // Distance midpoint pill
     const midLat = (homeLatLng[0] + cLatLng[0]) / 2;
     const midLon = (homeLatLng[1] + cLatLng[1]) / 2;
     L.marker([midLat, midLon], {{
-      interactive: false,
-      icon: L.divIcon({{
-        className: '',
-        html: `<div style="background:#FFFFFF;border:1.5px solid ${{col}};color:#0F294A;border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:800;white-space:nowrap;box-shadow:0 2px 5px rgba(0,0,0,0.15);">#${{c.rank}}: ${{c.distance_km}} km</div>`,
-        iconSize: [74, 20],
-        iconAnchor: [37, 10]
-      }})
+        interactive: false,
+        icon: L.divIcon({{
+            className: "",
+            html: `<div style="background:#FFFFFF;border:1.5px solid ${{col}};color:#000000;border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:800;white-space:nowrap;">#${{c.rank}}: ${{c.distance_km}} km</div>`,
+            iconSize: [76, 20],
+            iconAnchor: [38, 10]
+        }})
     }}).addTo(map);
 
-    // Step 5: Animated numbered marker (1, 2, 3)
+    const focusClass = isFocused ? "active-focus" : "";
     const numIcon = L.divIcon({{
-      className: '',
-      html: `<div class="num-pin ${{isFocused ? 'active-focus' : ''}}" style="background:${{col}};">${{c.rank}}</div>`,
-      iconSize: [34, 34],
-      iconAnchor: [17, 17]
+        className: "",
+        html: `<div class="num-pin ${{focusClass}}" style="background:${{col}};">${{c.rank}}</div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 17]
     }});
-
     const m = L.marker(cLatLng, {{ icon: numIcon, zIndexOffset: 900 - c.rank }}).addTo(map);
-    m.bindPopup(`
-      <div style="font-family:Inter,sans-serif;min-width:240px;line-height:1.45;">
-        <div style="display:inline-block;background:${{col}};color:#FFFFFF;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-bottom:4px;">
-          Recommendation #${{c.rank}} • ${{c.suitability_pct}}% Suitability
-        </div>
-        <div style="font-size:14px;font-weight:800;color:#0F294A;">${{c.centre_name}}</div>
-        <div style="font-size:12px;color:#0D9488;font-weight:700;margin:3px 0;">Distance from Home: ${{c.distance_km}} km</div>
-        <div style="font-size:12px;"><strong>Address:</strong> ${{c.address}}</div>
-        <div style="font-size:12px;"><strong>Services:</strong> ${{c.services}}</div>
-        <div style="font-size:12px;"><strong>Operating Hours:</strong> ${{c.hours}}</div>
-        <div style="font-size:12px;"><strong>Contact:</strong> ${{c.contact}}</div>
-      </div>
-    `);
+    m.bindPopup(
+        `<div style="font-family:Inter,sans-serif;min-width:240px;line-height:1.45;color:#000000;">` +
+        `<div style="display:inline-block;background:${{col}};color:#FFFFFF;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-bottom:4px;">Recommendation #${{c.rank}} - ${{c.suitability_pct}}% Suitability</div>` +
+        `<div style="font-size:14px;font-weight:800;color:#000000;">${{c.centre_name}}</div>` +
+        `<div style="font-size:12px;font-weight:700;margin:3px 0;">Distance from Home: ${{c.distance_km}} km</div>` +
+        `<div style="font-size:12px;"><strong>Address:</strong> ${{c.address}}</div>` +
+        `<div style="font-size:12px;"><strong>Services:</strong> ${{c.services}}</div>` +
+        `<div style="font-size:12px;"><strong>Operating Hours:</strong> ${{c.hours}}</div>` +
+        `<div style="font-size:12px;"><strong>Contact:</strong> ${{c.contact}}</div>` +
+        `</div>`
+    );
     centreMarkers[c.rank] = m;
-  }});
+}});
 
-  // Step 1 & Step 8: Automatic zoom to child's residential location or smooth flyTo focused centre
-  if (ctx.focused_rank && centreMarkers[ctx.focused_rank]) {{
+if (ctx.focused_rank && centreMarkers[ctx.focused_rank]) {{
     const targetC = ctx.top3.find(x => x.rank === ctx.focused_rank);
     map.setView(homeLatLng, 11);
     setTimeout(() => {{
-      map.flyTo([targetC.lat, targetC.lon], 14, {{ animate: true, duration: 1.2 }});
-      setTimeout(() => {{ centreMarkers[ctx.focused_rank].openPopup(); }}, 1250);
+        map.flyTo([targetC.lat, targetC.lon], 14, {{ animate: true, duration: 1.2 }});
+        setTimeout(() => {{ centreMarkers[ctx.focused_rank].openPopup(); }}, 1250);
     }}, 350);
-  }} else {{
+}} else {{
     const groupBounds = L.latLngBounds(allPoints);
     map.fitBounds(groupBounds, {{ padding: [48, 48], maxZoom: 13 }});
     setTimeout(() => {{ homeMarker.openPopup(); }}, 450);
-  }}
+}}
 </script>
 </body>
 </html>
@@ -1580,33 +1483,26 @@ def render_recommendation_gis_map(
     components.html(html_code, height=map_height, scrolling=False)
 
 
-# ==============================================================================
-# 10. LOAD LIVE DATABASE STATE FOR ALL PORTAL PAGES
-# ==============================================================================
 students_df = load_students_df()
 centres_df = load_centres_df()
 regs_df = load_registrations_df()
 access_df = compute_district_accessibility(students_df, centres_df)
-
 active_page = st.session_state["active_page"]
 
-# ==============================================================================
-# PAGE A: ADMIN DASHBOARD
-# ==============================================================================
 if active_page == "Admin Dashboard":
     total_students = len(students_df)
-    verified_students = int((students_df["status"] == "Verified Active").sum())
+    verified_students = int((students_df["status"] == "Verified Active").sum()) if not students_df.empty else 0
     total_centres = len(centres_df)
-    districts_covered = int((access_df["centres"] > 0).sum())
+    districts_covered = int((access_df["centres"] > 0).sum()) if not access_df.empty else 0
 
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">📊 Executive Healthcare GIS Analytics Dashboard</div>
-                <div style="font-size:13px;color:#475569;">State of Kelantan, Malaysia • Real-Time Student Registry & Autism Service Centre Intelligence</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">Executive Healthcare GIS Analytics Dashboard</div>
+                <div style="font-size:13px;color:#000000;">State of Kelantan, Malaysia Real-Time Student Registry &amp; Autism Service Centre Intelligence</div>
             </div>
-            <div style="background:#E0F2FE;color:#0F294A;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid #BAE6FD;">
+            <div style="background:#E0F2FE;color:#000000;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid #0284C7;">
                 10 Kelantan Districts Monitored
             </div>
         </div>
@@ -1614,7 +1510,6 @@ if active_page == "Admin Dashboard":
         unsafe_allow_html=True,
     )
 
-    # 4 Required KPI Cards
     k1, k2, k3, k4 = st.columns(4, gap="medium")
     with k1:
         st.markdown(
@@ -1627,8 +1522,9 @@ if active_page == "Admin Dashboard":
             unsafe_allow_html=True,
         )
     with k3:
+        cap_total = int(centres_df["capacity"].sum()) if not centres_df.empty else 0
         st.markdown(
-            f'<div class="kpi-card lblue"><div class="kpi-title">Total Autism Centres</div><div class="kpi-num">{total_centres}</div><div class="kpi-sub">Total Capacity: {int(centres_df["capacity"].sum())} Slots</div></div>',
+            f'<div class="kpi-card lblue"><div class="kpi-title">Total Autism Centres</div><div class="kpi-num">{total_centres}</div><div class="kpi-sub">Total Capacity: {cap_total} Slots</div></div>',
             unsafe_allow_html=True,
         )
     with k4:
@@ -1639,7 +1535,6 @@ if active_page == "Admin Dashboard":
 
     st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
 
-    # Interactive Charts directly computed from database records
     c_left, c_right = st.columns([1.35, 1], gap="medium")
     with c_left:
         with st.container(border=True):
@@ -1652,18 +1547,20 @@ if active_page == "Admin Dashboard":
         with st.container(border=True):
             st.subheader("Autism Diagnosis Distribution")
             st.caption("Exact breakdown across registered diagnosis categories.")
-            diag_counts = students_df["diagnosis"].value_counts().reset_index()
-            diag_counts.columns = ["Diagnosis Category", "Students"]
-            st.bar_chart(diag_counts.set_index("Diagnosis Category"), color="#0D9488", height=290)
+            if not students_df.empty:
+                diag_counts = students_df["diagnosis"].value_counts().reset_index()
+                diag_counts.columns = ["Diagnosis Category", "Students"]
+                st.bar_chart(diag_counts.set_index("Diagnosis Category"), color="#0D9488", height=290)
 
     c_bot_l, c_bot_r = st.columns([1, 1.35], gap="medium")
     with c_bot_l:
         with st.container(border=True):
             st.subheader("Required Therapy Services")
             st.caption("Demand across registered student therapy requirements.")
-            serv_counts = students_df["required_service"].value_counts().reset_index()
-            serv_counts.columns = ["Therapy Service", "Students"]
-            st.bar_chart(serv_counts.set_index("Therapy Service"), color="#0284C7", height=280)
+            if not students_df.empty:
+                serv_counts = students_df["required_service"].value_counts().reset_index()
+                serv_counts.columns = ["Therapy Service", "Students"]
+                st.bar_chart(serv_counts.set_index("Therapy Service"), color="#0284C7", height=280)
 
     with c_bot_r:
         with st.container(border=True):
@@ -1672,16 +1569,13 @@ if active_page == "Admin Dashboard":
             centre_dist_df = access_df[["district", "centres"]].set_index("district")
             st.bar_chart(centre_dist_df, color="#0D9488", height=280)
 
-# ==============================================================================
-# PAGE B: STUDENT REGISTRY (SEARCH, FILTER, ADD, EDIT, DELETE WITH CONFIRMATION)
-# ==============================================================================
 elif active_page == "Student Registry":
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">🎓 Student Registry Management</div>
-                <div style="font-size:13px;color:#475569;">Search, filter, inspect, add, edit, and delete registered autism student records.</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">Student Registry Management</div>
+                <div style="font-size:13px;color:#000000;">Search, filter, inspect, add, edit, and delete registered autism student records.</div>
             </div>
         </div>
         """,
@@ -1690,7 +1584,7 @@ elif active_page == "Student Registry":
 
     with st.container(border=True):
         f1, f2, f3 = st.columns([2, 1.2, 1.2])
-        search_q = f1.text_input("🔍 Search Student by Name or Record ID", placeholder="Type name or KOD-1000...")
+        search_q = f1.text_input("Search Student by Name or Record ID", placeholder="Type name or KOD-1000...")
         dist_filter = f2.selectbox("Filter by District", ["All Districts"] + KELANTAN_DISTRICTS)
         diag_filter = f3.selectbox("Filter by Diagnosis Category", ["All Categories", "Mild Autism", "High-Function Autism", "Severe Autism"])
 
@@ -1698,8 +1592,8 @@ elif active_page == "Student Registry":
         if search_q.strip():
             q = search_q.strip().lower()
             filtered_df = filtered_df[
-                filtered_df["student_name"].str.lower().str.contains(q)
-                | filtered_df["record_id"].str.lower().str.contains(q)
+                filtered_df["student_name"].str.lower().str.contains(q, na=False)
+                | filtered_df["record_id"].str.lower().str.contains(q, na=False)
             ]
         if dist_filter != "All Districts":
             filtered_df = filtered_df[filtered_df["district"] == dist_filter]
@@ -1723,10 +1617,10 @@ elif active_page == "Student Registry":
         )
 
     tab_view, tab_add, tab_edit, tab_del = st.tabs([
-        "👤 View Individual Student Profile",
-        "➕ Add New Student Record",
-        "✏️ Edit Existing Record",
-        "🗑️ Delete Record (With Confirmation)",
+        "View Individual Student Profile",
+        "Add New Student Record",
+        "Edit Existing Record",
+        "Delete Record (With Confirmation)",
     ])
 
     with tab_view:
@@ -1735,16 +1629,16 @@ elif active_page == "Student Registry":
                 sel_rec_id = st.selectbox(
                     "Select Student Record to Inspect",
                     options=filtered_df["record_id"].tolist(),
-                    format_func=lambda rid: f"{rid} — {filtered_df[filtered_df['record_id'] == rid]['student_name'].values[0]}",
+                    format_func=lambda rid: f"{rid} - {filtered_df[filtered_df['record_id'] == rid]['student_name'].values[0]}",
                 )
                 s_row = filtered_df[filtered_df["record_id"] == sel_rec_id].iloc[0]
                 v1, v2, v3 = st.columns(3)
                 v1.metric("Student Name", s_row["student_name"])
-                v2.metric("District & Age", f"{s_row['district']} • Age {s_row['age']}")
+                v2.metric("District & Age", f"{s_row['district']} - Age {s_row['age']}")
                 v3.metric("Verification Status", s_row["status"])
                 st.info(
-                    f"**Diagnosis Category:** {s_row['diagnosis']}  |  "
-                    f"**Registered Therapy Requirement:** {s_row['required_service']}  |  "
+                    f"**Diagnosis Category:** {s_row['diagnosis']} | "
+                    f"**Registered Therapy Requirement:** {s_row['required_service']} | "
                     f"**Date Registered:** {s_row['registered_date']}"
                 )
             else:
@@ -1772,11 +1666,14 @@ elif active_page == "Student Registry":
                     else:
                         conn = get_conn()
                         try:
-                            conn.execute("""
+                            conn.execute(
+                                """
                                 INSERT INTO students
                                 (record_id, student_name, age, district, diagnosis, required_service, registered_date, status)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                            """, (new_rid.strip(), new_sname.strip(), int(new_sage), new_sdist, new_sdiag, new_sserv, new_sdate.strip(), new_sstat))
+                                """,
+                                (new_rid.strip(), new_sname.strip(), int(new_sage), new_sdist, new_sdiag, new_sserv, new_sdate.strip(), new_sstat),
+                            )
                             conn.commit()
                             st.success(f"Student record {new_rid.strip()} added to database!")
                             st.rerun()
@@ -1791,7 +1688,7 @@ elif active_page == "Student Registry":
                 edit_rid = st.selectbox(
                     "Choose Record to Edit",
                     options=students_df["record_id"].tolist(),
-                    format_func=lambda rid: f"{rid} — {students_df[students_df['record_id'] == rid]['student_name'].values[0]}",
+                    format_func=lambda rid: f"{rid} - {students_df[students_df['record_id'] == rid]['student_name'].values[0]}",
                     key="edit_student_select",
                 )
                 cur_s = students_df[students_df["record_id"] == edit_rid].iloc[0]
@@ -1799,23 +1696,42 @@ elif active_page == "Student Registry":
                     e1, e2, e3 = st.columns(3)
                     ed_name = e1.text_input("Student Name", value=cur_s["student_name"])
                     ed_age = e2.number_input("Age", min_value=1, max_value=21, value=int(cur_s["age"]))
-                    ed_dist = e3.selectbox("District", KELANTAN_DISTRICTS, index=KELANTAN_DISTRICTS.index(cur_s["district"]) if cur_s["district"] in KELANTAN_DISTRICTS else 0)
+                    ed_dist = e3.selectbox(
+                        "District",
+                        KELANTAN_DISTRICTS,
+                        index=KELANTAN_DISTRICTS.index(cur_s["district"]) if cur_s["district"] in KELANTAN_DISTRICTS else 0,
+                    )
 
                     e4, e5, e6 = st.columns(3)
                     diag_opts = ["Mild Autism", "High-Function Autism", "Severe Autism"]
                     serv_opts = ["Speech Therapy", "ABA Therapy", "Occupational Sensory", "Early Intervention"]
                     stat_opts = ["Verified Active", "Pending Verification"]
-                    ed_diag = e4.selectbox("Diagnosis Category", diag_opts, index=diag_opts.index(cur_s["diagnosis"]) if cur_s["diagnosis"] in diag_opts else 0)
-                    ed_serv = e5.selectbox("Required Therapy", serv_opts, index=serv_opts.index(cur_s["required_service"]) if cur_s["required_service"] in serv_opts else 0)
-                    ed_stat = e6.selectbox("Status", stat_opts, index=stat_opts.index(cur_s["status"]) if cur_s["status"] in stat_opts else 0)
+                    ed_diag = e4.selectbox(
+                        "Diagnosis Category",
+                        diag_opts,
+                        index=diag_opts.index(cur_s["diagnosis"]) if cur_s["diagnosis"] in diag_opts else 0,
+                    )
+                    ed_serv = e5.selectbox(
+                        "Required Therapy",
+                        serv_opts,
+                        index=serv_opts.index(cur_s["required_service"]) if cur_s["required_service"] in serv_opts else 0,
+                    )
+                    ed_stat = e6.selectbox(
+                        "Status",
+                        stat_opts,
+                        index=stat_opts.index(cur_s["status"]) if cur_s["status"] in stat_opts else 0,
+                    )
 
                     if st.form_submit_button("Update Student Record", type="primary"):
                         conn = get_conn()
-                        conn.execute("""
+                        conn.execute(
+                            """
                             UPDATE students
                             SET student_name=?, age=?, district=?, diagnosis=?, required_service=?, status=?
                             WHERE record_id=?
-                        """, (ed_name.strip(), int(ed_age), ed_dist, ed_diag, ed_serv, ed_stat, edit_rid))
+                            """,
+                            (ed_name.strip(), int(ed_age), ed_dist, ed_diag, ed_serv, ed_stat, edit_rid),
+                        )
                         conn.commit()
                         conn.close()
                         st.success(f"Updated record {edit_rid}!")
@@ -1827,7 +1743,7 @@ elif active_page == "Student Registry":
                 del_rid = st.selectbox(
                     "Select Student Record to Delete",
                     options=students_df["record_id"].tolist(),
-                    format_func=lambda rid: f"{rid} — {students_df[students_df['record_id'] == rid]['student_name'].values[0]}",
+                    format_func=lambda rid: f"{rid} - {students_df[students_df['record_id'] == rid]['student_name'].values[0]}",
                     key="del_student_select",
                 )
                 confirm_del = st.checkbox(f"I confirm that I want to permanently delete student record {del_rid}.")
@@ -1839,16 +1755,13 @@ elif active_page == "Student Registry":
                     st.success(f"Deleted record {del_rid}.")
                     st.rerun()
 
-# ==============================================================================
-# PAGE C: STUDENT REGISTRATION RECORDS (ADMIN REVIEW, APPROVE / REJECT)
-# ==============================================================================
 elif active_page == "Student Registration Records":
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">📋 Parent Registration Submissions & Verification</div>
-                <div style="font-size:13px;color:#475569;">Review parent-submitted child profiles, contact details, therapy requirements, and approve or reject placements.</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">Parent Registration Submissions &amp; Verification</div>
+                <div style="font-size:13px;color:#000000;">Review parent-submitted child profiles, contact details, therapy requirements, and approve or reject placements.</div>
             </div>
         </div>
         """,
@@ -1861,7 +1774,6 @@ elif active_page == "Student Registration Records":
         with st.container(border=True):
             status_f = st.selectbox("Filter by Registration Status", ["All", "Pending", "Approved", "Rejected"])
             view_regs = regs_df if status_f == "All" else regs_df[regs_df["status"] == status_f]
-
             st.dataframe(
                 view_regs[[
                     "reg_code", "child_name", "age", "diagnosis", "district",
@@ -1890,20 +1802,18 @@ elif active_page == "Student Registration Records":
                 h1, h2 = st.columns([3, 1])
                 with h1:
                     st.markdown(
-                        f"**{r['reg_code']} — {r['child_name']}** (Age {r['age']} • {r['diagnosis']})  "
+                        f"**{r['reg_code']} - {r['child_name']}** (Age {r['age']} - {r['diagnosis']}) "
                         f"<span class='status-badge {badge_cls}'>{r['status']}</span>",
                         unsafe_allow_html=True,
                     )
                     st.write(
-                        f"**Parent:** {r['parent_name']} ({r['parent_contact']})  |  "
-                        f"**District:** {r['district']}  |  **Address:** {r['residential_address']}"
+                        f"**Parent:** {r['parent_name']} ({r['parent_contact']}) | "
+                        f"**District:** {r['district']} | **Address:** {r['residential_address']}"
                     )
                     st.write(
-                        f"**Required Therapy:** {r['required_services']}  |  "
+                        f"**Required Therapy:** {r['required_services']} | "
                         f"**Selected Preferred Centre:** {r['selected_centre'] or 'Not yet selected'}"
                     )
-
-                    # Show top recommended centres stored or dynamically evaluated
                     rec_list = []
                     try:
                         rec_list = json.loads(r["recommended_centres_json"]) if r["recommended_centres_json"] else []
@@ -1912,33 +1822,35 @@ elif active_page == "Student Registration Records":
                     if not rec_list:
                         req_s = [x.strip() for x in str(r["required_services"]).split(",") if x.strip()]
                         rec_list = compute_top_3_centres(float(r["home_lat"]), float(r["home_lon"]), req_s, centres_df)
-                    rec_summary = " • ".join([f"#{x['rank']} {x['centre_name']} ({x['distance_km']} km, {x['suitability_pct']}%)" for x in rec_list])
+                    rec_summary = " | ".join([f"#{x['rank']} {x['centre_name']} ({x['distance_km']} km, {x['suitability_pct']}%)" for x in rec_list])
                     st.caption(f"System Recommended Centres: {rec_summary}")
 
                 with h2:
-                    if st.button("✅ Approve", key=f"app_{r['id']}", type="primary", use_container_width=True):
+                    if st.button("Approve", key=f"app_{r['id']}", type="primary", use_container_width=True):
                         conn = get_conn()
                         conn.execute("UPDATE parent_registrations SET status='Approved' WHERE id=?", (int(r["id"]),))
-                        # Also ensure approved child is added to verified Student Registry if not already present
                         rec_student_id = f"REG-{r['id']}"
                         cur = conn.cursor()
                         cur.execute("SELECT COUNT(*) FROM students WHERE record_id=?", (rec_student_id,))
                         if cur.fetchone()[0] == 0:
                             primary_serv = str(r["required_services"]).split(",")[0].strip() or "Early Intervention"
-                            conn.execute("""
+                            conn.execute(
+                                """
                                 INSERT INTO students
                                 (record_id, student_name, age, district, diagnosis, required_service, registered_date, status)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                            """, (
-                                rec_student_id, r["child_name"], int(r["age"]), r["district"],
-                                r["diagnosis"], primary_serv, datetime.now().strftime("%Y-%m-%d"), "Verified Active"
-                            ))
+                                """,
+                                (
+                                    rec_student_id, r["child_name"], int(r["age"]), r["district"],
+                                    r["diagnosis"], primary_serv, datetime.now().strftime("%Y-%m-%d"), "Verified Active",
+                                ),
+                            )
                         conn.commit()
                         conn.close()
                         st.success(f"{r['reg_code']} approved and synced to Student Registry!")
                         st.rerun()
 
-                    if st.button("❌ Reject", key=f"rej_{r['id']}", use_container_width=True):
+                    if st.button("Reject", key=f"rej_{r['id']}", use_container_width=True):
                         conn = get_conn()
                         conn.execute("UPDATE parent_registrations SET status='Rejected' WHERE id=?", (int(r["id"]),))
                         conn.commit()
@@ -1946,16 +1858,13 @@ elif active_page == "Student Registration Records":
                         st.warning(f"{r['reg_code']} marked as Rejected.")
                         st.rerun()
 
-# ==============================================================================
-# PAGE D: KELANTAN GIS ACCESSIBILITY MAP (10 DISTRICTS CHOROPLETH + MARKERS)
-# ==============================================================================
 elif active_page == "GIS Accessibility Map":
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">🗺️ Kelantan District GIS Accessibility Choropleth Map</div>
-                <div style="font-size:13px;color:#475569;">District-level boundary choropleth across all 10 Kelantan districts with live autism service centre markers.</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">Kelantan District GIS Accessibility Choropleth Map</div>
+                <div style="font-size:13px;color:#000000;">District-level boundary choropleth across all 10 Kelantan districts with live autism service centre markers.</div>
             </div>
         </div>
         """,
@@ -1969,17 +1878,14 @@ elif active_page == "GIS Accessibility Map":
         with m2:
             st.caption(
                 "Click any district boundary polygon to view registered students, available centres, slot capacity, and accessibility status. "
-                "Click any 🏥 marker to inspect centre operating hours, services, and contact details."
+                "Click any marker to inspect centre operating hours, services, and contact details."
             )
-
         render_kelantan_choropleth_map(access_df, centres_df, selected_district=sel_map_dist, map_height=530)
 
     with st.container(border=True):
         st.subheader("District-by-District Spatial Summary (All 10 Kelantan Districts)")
         st.dataframe(
-            access_df[[
-                "district", "students", "centres", "total_capacity", "student_per_centre", "status_label"
-            ]].rename(columns={
+            access_df[["district", "students", "centres", "total_capacity", "student_per_centre", "status_label"]].rename(columns={
                 "district": "District",
                 "students": "Registered Students",
                 "centres": "Available Centres",
@@ -1991,16 +1897,13 @@ elif active_page == "GIS Accessibility Map":
             hide_index=True,
         )
 
-# ==============================================================================
-# PAGE E: AUTISM CENTRE MANAGEMENT (ADD, EDIT, DELETE -> UPDATES GIS MAP)
-# ==============================================================================
 elif active_page == "Autism Centre Management":
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">🏥 Autism Service Centre Management</div>
-                <div style="font-size:13px;color:#475569;">Add, edit, and remove autism therapy centres. All updates immediately reflect on the Kelantan GIS Map and recommendation engine.</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">Autism Service Centre Management</div>
+                <div style="font-size:13px;color:#000000;">Add, edit, and remove autism therapy centres. All updates immediately reflect on the Kelantan GIS Map and recommendation engine.</div>
             </div>
         </div>
         """,
@@ -2010,9 +1913,7 @@ elif active_page == "Autism Centre Management":
     with st.container(border=True):
         st.subheader(f"Registered Autism Centres in Kelantan ({len(centres_df)} Centres)")
         st.dataframe(
-            centres_df[[
-                "id", "centre_name", "category", "district", "address", "lat", "lon", "contact", "services", "hours", "capacity"
-            ]].rename(columns={
+            centres_df[["id", "centre_name", "category", "district", "address", "lat", "lon", "contact", "services", "hours", "capacity"]].rename(columns={
                 "id": "ID",
                 "centre_name": "Centre Name",
                 "category": "Category",
@@ -2029,7 +1930,7 @@ elif active_page == "Autism Centre Management":
             hide_index=True,
         )
 
-    c_tab1, c_tab2, c_tab3 = st.tabs(["➕ Add New Autism Centre", "✏️ Edit Centre Details", "🗑️ Delete Centre"])
+    c_tab1, c_tab2, c_tab3 = st.tabs(["Add New Autism Centre", "Edit Centre Details", "Delete Centre"])
 
     with c_tab1:
         with st.container(border=True):
@@ -2049,8 +1950,8 @@ elif active_page == "Autism Centre Management":
 
                 r2a, r2b, r2c = st.columns([2, 1, 1])
                 caddr = r2a.text_input("Full Address", placeholder="Street, Postcode, District, Kelantan")
-                clat = r2b.number_input("Latitude (Kelantan: 4.55 – 6.25)", min_value=4.50, max_value=6.30, value=6.1200, format="%.5f")
-                clon = r2c.number_input("Longitude (Kelantan: 101.45 – 102.55)", min_value=101.40, max_value=102.60, value=102.2400, format="%.5f")
+                clat = r2b.number_input("Latitude (Kelantan: 4.55 - 6.25)", min_value=4.50, max_value=6.30, value=6.1200, format="%.5f")
+                clon = r2c.number_input("Longitude (Kelantan: 101.45 - 102.55)", min_value=101.40, max_value=102.60, value=102.2400, format="%.5f")
 
                 r3a, r3b, r3c = st.columns([1.2, 1.8, 1])
                 ccontact = r3a.text_input("Contact Number", placeholder="+609-744 0000")
@@ -2060,21 +1961,24 @@ elif active_page == "Autism Centre Management":
                     default=["Speech Therapy", "Early Intervention"],
                 )
                 ccap = r3c.number_input("Centre Capacity (Slots)", min_value=1, max_value=500, value=25)
-                chours = st.text_input("Operating Hours", value="Sun–Thu: 8:30 AM – 4:30 PM")
+                chours = st.text_input("Operating Hours", value="Sun-Thu: 8:30 AM - 4:30 PM")
 
                 if st.form_submit_button("Add Centre to GIS Database", type="primary"):
                     if not cname.strip() or not caddr.strip() or not cservs:
                         st.error("Please fill in Centre Name, Address, and at least one therapy service.")
                     else:
                         conn = get_conn()
-                        conn.execute("""
+                        conn.execute(
+                            """
                             INSERT INTO autism_centres
                             (centre_name, category, address, district, lat, lon, contact, services, hours, capacity)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        """, (
-                            cname.strip(), ccat, caddr.strip(), cdist, float(clat), float(clon),
-                            ccontact.strip() or "+609-000 0000", ", ".join(cservs), chours.strip(), int(ccap)
-                        ))
+                            """,
+                            (
+                                cname.strip(), ccat, caddr.strip(), cdist, float(clat), float(clon),
+                                ccontact.strip() or "+609-000 0000", ", ".join(cservs), chours.strip(), int(ccap),
+                            ),
+                        )
                         conn.commit()
                         conn.close()
                         st.success(f"Added {cname.strip()}! It now appears on the Kelantan GIS Map.")
@@ -2086,14 +1990,18 @@ elif active_page == "Autism Centre Management":
                 sel_cid = st.selectbox(
                     "Select Centre to Edit",
                     options=centres_df["id"].tolist(),
-                    format_func=lambda cid: f"#{cid} — {centres_df[centres_df['id'] == cid]['centre_name'].values[0]}",
+                    format_func=lambda cid: f"#{cid} - {centres_df[centres_df['id'] == cid]['centre_name'].values[0]}",
                 )
                 crow = centres_df[centres_df["id"] == sel_cid].iloc[0]
                 with st.form("edit_centre_form"):
                     ec1, ec2, ec3 = st.columns(3)
                     e_cname = ec1.text_input("Centre Name", value=crow["centre_name"])
                     e_ccat = ec2.text_input("Category", value=crow["category"])
-                    e_cdist = ec3.selectbox("District", KELANTAN_DISTRICTS, index=KELANTAN_DISTRICTS.index(crow["district"]) if crow["district"] in KELANTAN_DISTRICTS else 0)
+                    e_cdist = ec3.selectbox(
+                        "District",
+                        KELANTAN_DISTRICTS,
+                        index=KELANTAN_DISTRICTS.index(crow["district"]) if crow["district"] in KELANTAN_DISTRICTS else 0,
+                    )
 
                     ec4, ec5, ec6 = st.columns([2, 1, 1])
                     e_caddr = ec4.text_input("Full Address", value=crow["address"])
@@ -2113,15 +2021,18 @@ elif active_page == "Autism Centre Management":
 
                     if st.form_submit_button("Save Centre Changes", type="primary"):
                         conn = get_conn()
-                        conn.execute("""
+                        conn.execute(
+                            """
                             UPDATE autism_centres
                             SET centre_name=?, category=?, address=?, district=?, lat=?, lon=?, contact=?, services=?, hours=?, capacity=?
                             WHERE id=?
-                        """, (
-                            e_cname.strip(), e_ccat.strip(), e_caddr.strip(), e_cdist,
-                            float(e_clat), float(e_clon), e_ccontact.strip(),
-                            ", ".join(e_cservs), e_chours.strip(), int(e_ccap), int(sel_cid)
-                        ))
+                            """,
+                            (
+                                e_cname.strip(), e_ccat.strip(), e_caddr.strip(), e_cdist,
+                                float(e_clat), float(e_clon), e_ccontact.strip(),
+                                ", ".join(e_cservs), e_chours.strip(), int(e_ccap), int(sel_cid),
+                            ),
+                        )
                         conn.commit()
                         conn.close()
                         st.success("Centre updated on map and database!")
@@ -2133,7 +2044,7 @@ elif active_page == "Autism Centre Management":
                 del_cid = st.selectbox(
                     "Select Centre to Delete",
                     options=centres_df["id"].tolist(),
-                    format_func=lambda cid: f"#{cid} — {centres_df[centres_df['id'] == cid]['centre_name'].values[0]}",
+                    format_func=lambda cid: f"#{cid} - {centres_df[centres_df['id'] == cid]['centre_name'].values[0]}",
                     key="del_centre_sel",
                 )
                 confirm_cdel = st.checkbox(f"Confirm permanent deletion of Centre #{del_cid}")
@@ -2145,16 +2056,13 @@ elif active_page == "Autism Centre Management":
                     st.success("Autism centre removed from database and GIS map.")
                     st.rerun()
 
-# ==============================================================================
-# PAGE F: ACCESSIBILITY GAP ANALYTICS
-# ==============================================================================
 elif active_page == "Accessibility Analytics":
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">📈 District Accessibility Gap & Service Deficit Analysis</div>
-                <div style="font-size:13px;color:#475569;">Identifies Kelantan districts with high registered student demand but insufficient autism service centres.</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">District Accessibility Gap &amp; Service Deficit Analysis</div>
+                <div style="font-size:13px;color:#000000;">Identifies Kelantan districts with high registered student demand but insufficient autism service centres.</div>
             </div>
         </div>
         """,
@@ -2168,12 +2076,12 @@ elif active_page == "Accessibility Analytics":
     g1, g2, g3 = st.columns(3, gap="medium")
     with g1:
         st.markdown(
-            f'<div class="kpi-card" style="border-top-color:#DC2626;"><div class="kpi-title">Critical Shortage Districts (Red)</div><div class="kpi-num">{len(critical_df)}</div><div class="kpi-sub" style="color:#DC2626;">High Student-to-Centre Deficit</div></div>',
+            f'<div class="kpi-card" style="border-top-color:#DC2626;"><div class="kpi-title">Critical Shortage Districts (Red)</div><div class="kpi-num">{len(critical_df)}</div><div class="kpi-sub">High Student-to-Centre Deficit</div></div>',
             unsafe_allow_html=True,
         )
     with g2:
         st.markdown(
-            f'<div class="kpi-card" style="border-top-color:#EAB308;"><div class="kpi-title">Moderate Coverage Districts (Yellow)</div><div class="kpi-num">{len(moderate_df)}</div><div class="kpi-sub" style="color:#B45309;">Limited Specialist Bandwidth</div></div>',
+            f'<div class="kpi-card" style="border-top-color:#EAB308;"><div class="kpi-title">Moderate Coverage Districts (Yellow)</div><div class="kpi-num">{len(moderate_df)}</div><div class="kpi-sub">Limited Specialist Bandwidth</div></div>',
             unsafe_allow_html=True,
         )
     with g3:
@@ -2196,9 +2104,7 @@ elif active_page == "Accessibility Analytics":
         st.subheader("Priority Gap Action Table (Sorted by Highest Student-to-Centre Ratio)")
         sorted_gap = access_df.sort_values(by=["student_per_centre", "students"], ascending=False)
         st.dataframe(
-            sorted_gap[[
-                "district", "students", "centres", "total_capacity", "student_per_centre", "gap_status"
-            ]].rename(columns={
+            sorted_gap[["district", "students", "centres", "total_capacity", "student_per_centre", "gap_status"]].rename(columns={
                 "district": "District",
                 "students": "Registered Students",
                 "centres": "Autism Centres",
@@ -2210,16 +2116,13 @@ elif active_page == "Accessibility Analytics":
             hide_index=True,
         )
 
-# ==============================================================================
-# PAGE G: PARENTS DASHBOARD
-# ==============================================================================
 elif active_page == "Parents Dashboard":
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">🏠 Parents & Guardian Support Portal</div>
-                <div style="font-size:13px;color:#475569;">Register your child, locate the 3 most suitable autism centres in Kelantan, track application status, and explore home learning modules.</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">Parents &amp; Guardian Support Portal</div>
+                <div style="font-size:13px;color:#000000;">Register your child, locate the 3 most suitable autism centres in Kelantan, track application status, and explore home learning modules.</div>
             </div>
         </div>
         """,
@@ -2229,23 +2132,21 @@ elif active_page == "Parents Dashboard":
     p1, p2, p3 = st.columns(3, gap="medium")
     with p1:
         with st.container(border=True):
-            st.subheader("📝 1. Child Registration")
+            st.subheader("1. Child Registration")
             st.write("Submit your child's age, diagnosis, residential address, and therapy needs to find the closest suitable centres.")
             if st.button("Open Child Registration Form", type="primary", use_container_width=True):
                 navigate_to("Child Registration", "Parent / Guardian")
                 st.rerun()
-
     with p2:
         with st.container(border=True):
-            st.subheader("📍 2. Find Suitable Centres")
+            st.subheader("2. Find Suitable Centres")
             st.write("View your home marker, animated routes, km distances, and the top 3 matched centres on the Kelantan GIS map.")
             if st.button("Open GIS Centre Matcher", type="primary", use_container_width=True):
                 navigate_to("Find Suitable Centres", "Parent / Guardian")
                 st.rerun()
-
     with p3:
         with st.container(border=True):
-            st.subheader("📖 3. Learning Modules")
+            st.subheader("3. Learning Modules")
             st.write("Read 4 interactive page-turning flipbooks covering hygiene, classroom arrival, sensory walk, and PECS communication.")
             if st.button("Explore 4 Flipbook Modules", type="primary", use_container_width=True):
                 navigate_to("Learning Modules", "Parent / Guardian")
@@ -2257,9 +2158,7 @@ elif active_page == "Parents Dashboard":
             st.info("No registrations submitted yet. Click 'Open Child Registration Form' above to begin.")
         else:
             st.dataframe(
-                regs_df[[
-                    "reg_code", "child_name", "district", "required_services", "selected_centre", "status", "submitted_at"
-                ]].rename(columns={
+                regs_df[["reg_code", "child_name", "district", "required_services", "selected_centre", "status", "submitted_at"]].rename(columns={
                     "reg_code": "Registration ID",
                     "child_name": "Child Name",
                     "district": "District",
@@ -2272,16 +2171,13 @@ elif active_page == "Parents Dashboard":
                 hide_index=True,
             )
 
-# ==============================================================================
-# PAGE H: PARENTS PORTAL – CHILD REGISTRATION (VALIDATES & AUTO-NAVIGATES TO GIS MAP)
-# ==============================================================================
 elif active_page == "Child Registration":
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">📝 Child Registration & Automatic GIS Centre Matching</div>
-                <div style="font-size:13px;color:#475569;">Complete your child's registration below. Upon submission, the system will save your record and automatically zoom to your home on the Kelantan GIS map with your top 3 recommended centres.</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">Child Registration &amp; Automatic GIS Centre Matching</div>
+                <div style="font-size:13px;color:#000000;">Complete your child's registration below. Upon submission, the system will save your record and zoom to your home on the Kelantan GIS map with your top 3 recommended centres.</div>
             </div>
         </div>
         """,
@@ -2293,16 +2189,10 @@ elif active_page == "Child Registration":
             c1, c2, c3 = st.columns([1.6, 0.8, 1.2])
             child_name = c1.text_input("Child's Full Name *", placeholder="e.g., Aisyah Humaira binti Ahmad")
             child_age = c2.number_input("Child's Age *", min_value=1, max_value=21, value=6)
-            diagnosis_cat = c3.selectbox(
-                "Diagnosis Category *",
-                ["Mild Autism", "High-Function Autism", "Severe Autism"],
-            )
+            diagnosis_cat = c3.selectbox("Diagnosis Category *", ["Mild Autism", "High-Function Autism", "Severe Autism"])
 
             c4, c5 = st.columns([2, 1])
-            res_address = c4.text_input(
-                "Residential Address in Kelantan *",
-                placeholder="e.g., Lot 45, Jalan Kubang Kerian, 16150 Kota Bharu, Kelantan",
-            )
+            res_address = c4.text_input("Residential Address in Kelantan *", placeholder="e.g., Lot 45, Jalan Kubang Kerian, 16150 Kota Bharu, Kelantan")
             district_in = c5.selectbox("District in Kelantan *", KELANTAN_DISTRICTS)
 
             req_services = st.multiselect(
@@ -2346,27 +2236,21 @@ elif active_page == "Child Registration":
                     reg_code = f"REG-2026-{next_reg_num:03d}"
                     now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-                    cur.execute("""
+                    cur.execute(
+                        """
                         INSERT INTO parent_registrations
                         (reg_code, child_name, age, diagnosis, residential_address, district, home_lat, home_lon,
-                         required_services, parent_name, parent_contact, recommended_centres_json, selected_centre, status, submitted_at)
+                         required_services, parent_name, parent_contact, recommended_centres_json,
+                         selected_centre, status, submitted_at)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', ?)
-                    """, (
-                        reg_code,
-                        child_name.strip(),
-                        int(child_age),
-                        diagnosis_cat,
-                        res_address.strip(),
-                        district_in,
-                        home_lat,
-                        home_lon,
-                        ", ".join(req_services),
-                        parent_name.strip(),
-                        parent_contact.strip(),
-                        json.dumps(top3),
-                        top3[0]["centre_name"] if top3 else "",
-                        now_str,
-                    ))
+                        """,
+                        (
+                            reg_code, child_name.strip(), int(child_age), diagnosis_cat,
+                            res_address.strip(), district_in, home_lat, home_lon,
+                            ", ".join(req_services), parent_name.strip(), parent_contact.strip(),
+                            json.dumps(top3), top3[0]["centre_name"] if top3 else "", now_str,
+                        ),
+                    )
                     conn.commit()
                     conn.close()
 
@@ -2387,16 +2271,11 @@ elif active_page == "Child Registration":
                         "selected_centre": top3[0]["centre_name"] if top3 else "",
                         "just_submitted": True,
                     }
-                    # Step 9: Automatically navigate to the Kelantan GIS Map & Centre Recommendation view
                     navigate_to("Find Suitable Centres", "Parent / Guardian")
                     st.rerun()
 
-# ==============================================================================
-# PAGE I: AUTOMATIC GIS MAP ZOOM & TOP 3 CENTRE RECOMMENDATIONS
-# ==============================================================================
 elif active_page == "Find Suitable Centres":
     rec_ctx = st.session_state["latest_recommendation_context"]
-    # Refresh top3 dynamically from live centres_df so any newly added/edited centres are always used
     live_top3 = compute_top_3_centres(
         rec_ctx["home_lat"],
         rec_ctx["home_lon"],
@@ -2409,12 +2288,13 @@ elif active_page == "Find Suitable Centres":
         f"""
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">📍 Kelantan GIS Spatial Centre Recommendation</div>
-                <div style="font-size:13px;color:#475569;">
-                    Showing residential location (🏠) and Top 3 matched autism centres for <strong>{html.escape(rec_ctx['child_name'])}</strong> ({html.escape(rec_ctx['district'])})
+                <div style="font-size:21px;font-weight:800;color:#000000;">Kelantan GIS Spatial Centre Recommendation</div>
+                <div style="font-size:13px;color:#000000;">
+                    Showing residential location and Top 3 matched autism centres for
+                    <strong>{html.escape(rec_ctx['child_name'])}</strong> ({html.escape(rec_ctx['district'])})
                 </div>
             </div>
-            <div style="background:#CCFBF1;color:#0F766E;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid #99F6E4;">
+            <div style="background:#CCFBF1;color:#000000;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid #0D9488;">
                 Registration ID: {html.escape(rec_ctx['reg_code'])}
             </div>
         </div>
@@ -2424,8 +2304,8 @@ elif active_page == "Find Suitable Centres":
 
     if rec_ctx.get("just_submitted"):
         st.success(
-            f"Registration **{rec_ctx['reg_code']}** saved! The Kelantan GIS map has zoomed to **{rec_ctx['child_name']}'s** residential location (🏠) "
-            f"and calculated distances and suitability scores for the 3 best-matched autism centres."
+            f"Registration **{rec_ctx['reg_code']}** saved! The Kelantan GIS map has zoomed to "
+            f"**{rec_ctx['child_name']}'s** residential location and calculated distances and suitability scores for the 3 best-matched autism centres."
         )
         rec_ctx["just_submitted"] = False
 
@@ -2433,27 +2313,24 @@ elif active_page == "Find Suitable Centres":
         st.warning("Insufficient autism centre data exists in the database to generate recommendations. Please contact an administrator.")
     else:
         map_col, cards_col = st.columns([1.35, 1], gap="medium")
-
         with map_col:
             with st.container(border=True):
                 top_bar_l, top_bar_r = st.columns([3, 1.3], vertical_alignment="center")
                 with top_bar_l:
                     st.subheader("Interactive Kelantan GIS Route & Centre Map")
                 with top_bar_r:
-                    if st.button("🏠 Reset Overview", use_container_width=True):
+                    if st.button("Reset Overview", use_container_width=True):
                         rec_ctx["focused_rank"] = 0
                         st.rerun()
-
                 render_recommendation_gis_map(access_df, rec_ctx, map_height=540)
                 st.caption(
                     "Note: The suitability percentage is a system-generated spatial and service matching score based on therapy availability, "
-                    "distance from home, and centre slot capacity—not a clinical or medical assessment."
+                    "distance from home, and centre slot capacity - not a clinical or medical assessment."
                 )
 
         with cards_col:
             st.subheader("Top 3 Recommended Centres")
             rank_badge_colors = {1: "#0D9488", 2: "#0284C7", 3: "#0F294A"}
-
             for c in live_top3:
                 b_col = rank_badge_colors.get(c["rank"], "#0D9488")
                 is_selected = (rec_ctx.get("selected_centre") == c["centre_name"])
@@ -2462,29 +2339,30 @@ elif active_page == "Find Suitable Centres":
                         f"""
                         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;">
                             <span style="background:{b_col};color:#FFFFFF;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;">
-                                Recommendation #{c['rank']} • {c['suitability_pct']}% Suitability
+                                Recommendation #{c['rank']} - {c['suitability_pct']}% Suitability
                             </span>
-                            <span style="font-size:12.5px;font-weight:800;color:#0F294A;">📏 {c['distance_km']} km</span>
+                            <span style="font-size:12.5px;font-weight:800;color:#000000;">
+                                {c['distance_km']} km
+                            </span>
                         </div>
-                        <div style="font-size:15.5px;font-weight:800;color:#0F294A;margin-bottom:4px;">{html.escape(c['centre_name'])}</div>
-                        <div style="font-size:12px;color:#334155;line-height:1.45;">
+                        <div style="font-size:15.5px;font-weight:800;color:#000000;margin-bottom:4px;">{html.escape(c['centre_name'])}</div>
+                        <div style="font-size:12px;color:#000000;line-height:1.45;">
                             <strong>Address:</strong> {html.escape(c['address'])}<br>
                             <strong>Available Services:</strong> {html.escape(c['services'])}<br>
-                            <strong>Contact:</strong> {html.escape(c['contact'])} &nbsp;|&nbsp; <strong>Hours:</strong> {html.escape(c['hours'])}
+                            <strong>Contact:</strong> {html.escape(c['contact'])} &nbsp;|&nbsp;
+                            <strong>Hours:</strong> {html.escape(c['hours'])}
                         </div>
-                        <div style="margin-top:6px;background:#F0F9FF;border-left:3px solid {b_col};padding:6px 9px;border-radius:6px;font-size:11.8px;color:#0F294A;">
+                        <div style="margin-top:6px;background:#F0F9FF;border-left:3px solid {b_col};padding:6px 9px;border-radius:6px;font-size:11.8px;color:#000000;">
                             {html.escape(c['reason'])}
                         </div>
                         """,
                         unsafe_allow_html=True,
                     )
-
                     btn1, btn2 = st.columns(2)
-                    if btn1.button(f"🗺️ View #{c['rank']} on Map", key=f"view_map_{c['rank']}", use_container_width=True):
+                    if btn1.button(f"View #{c['rank']} on Map", key=f"view_map_{c['rank']}", use_container_width=True):
                         rec_ctx["focused_rank"] = c["rank"]
                         st.rerun()
-
-                    sel_label = "✅ Preferred Centre Saved" if is_selected else f"Select Centre #{c['rank']}"
+                    sel_label = "Preferred Centre Saved" if is_selected else f"Select Centre #{c['rank']}"
                     if btn2.button(
                         sel_label,
                         key=f"select_centre_{c['rank']}",
@@ -2502,16 +2380,13 @@ elif active_page == "Find Suitable Centres":
                         st.success(f"Saved **{c['centre_name']}** as your preferred centre for {rec_ctx['reg_code']}!")
                         st.rerun()
 
-# ==============================================================================
-# PAGE J: PARENTS LEARNING MODULES (4 INTERACTIVE FLIPBOOKS WITH COVER & PAGE-TURN)
-# ==============================================================================
 elif active_page == "Learning Modules":
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">📖 Parents Learning Modules — Interactive Flipbooks</div>
-                <div style="font-size:13px;color:#475569;">Click any module cover to open its interactive page-turning flipbook guide for home routine support.</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">Parents Learning Interactive Flipbooks</div>
+                <div style="font-size:13px;color:#000000;">Click any module cover to open its interactive page-turning flipbook guide for home routine support.</div>
             </div>
         </div>
         """,
@@ -2519,131 +2394,120 @@ elif active_page == "Learning Modules":
     )
 
     open_key = st.session_state["open_flipbook_key"]
-
     if open_key is None:
-        # Display the 4 Module Cover Pages
         cols = st.columns(2, gap="large")
         for idx, mod in enumerate(MODULES_4):
             with cols[idx % 2]:
                 with st.container(border=True):
                     st.markdown(
                         f"""
-                        <div style="background:linear-gradient(135deg, {mod['color']} 0%, {mod['accent']} 100%);
-                                    color:#FFFFFF;border-radius:10px;padding:22px 20px;margin-bottom:12px;">
-                            <div style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;opacity:0.9;">
-                                {html.escape(mod['code'])} • {html.escape(mod['domain'])}
+                        <div style="background:linear-gradient(135deg, {mod['color']} 0%, {mod['accent']} 100%);color:#FFFFFF;border-radius:10px;padding:22px 20px;margin-bottom:12px;">
+                            <div style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#FFFFFF;">
+                                {html.escape(mod['code'])} - {html.escape(mod['domain'])}
                             </div>
-                            <div style="font-size:20px;font-weight:800;margin:8px 0 6px 0;line-height:1.25;">
+                            <div style="font-size:20px;font-weight:800;margin:8px 0 6px 0;line-height:1.25;color:#FFFFFF;">
                                 {html.escape(mod['title'])}
                             </div>
-                            <div style="font-size:12.5px;opacity:0.95;line-height:1.45;">
+                            <div style="font-size:12.5px;color:#FFFFFF;line-height:1.45;">
                                 {html.escape(mod['cover_desc'])}
                             </div>
-                            <div style="margin-top:14px;font-size:11.5px;font-weight:700;background:rgba(255,255,255,0.16);
-                                        display:inline-block;padding:4px 10px;border-radius:999px;">
-                                4 Interactive Pages • Cover + Step-by-Step Guide
+                            <div style="margin-top:14px;font-size:11.5px;font-weight:700;background:rgba(255,255,255,0.2);color:#FFFFFF;display:inline-block;padding:4px 10px;border-radius:999px;">
+                                4 Interactive Pages: Cover + Step-by-Step Guide
                             </div>
                         </div>
                         """,
                         unsafe_allow_html=True,
                     )
-                    if st.button(f"📖 Open {mod['title']}", key=f"open_mod_{mod['key']}", type="primary", use_container_width=True):
+                    if st.button(f"Open {mod['title']}", key=f"open_mod_{mod['key']}", type="primary", use_container_width=True):
                         st.session_state["open_flipbook_key"] = mod["key"]
                         st.session_state[f"fb_page_{mod['key']}"] = 0
                         st.rerun()
     else:
         mod = next(m for m in MODULES_4 if m["key"] == open_key)
         p_key = f"fb_page_{mod['key']}"
-        cur_p = st.session_state[p_key]  # 0 = Cover Page, 1..4 = Content Pages
+        cur_p = st.session_state[p_key]
         total_p = len(mod["pages"]) + 1
 
-        if st.button("← Back to All 4 Module Covers"):
+        if st.button("Back to All 4 Module Covers"):
             st.session_state["open_flipbook_key"] = None
             st.rerun()
 
         with st.container(border=True):
             if cur_p == 0:
-                page_title = f"Cover Page — {mod['title']}"
+                page_title = f"Cover Page - {mod['title']}"
                 page_sub = mod["domain"]
                 page_body = mod["cover_desc"]
-                page_bullets = "• Click 'Next Page ▶' below to turn to Step 1.\n• Designed for daily home practice alongside therapist guidance."
+                page_bullets = "- Click 'Next Page' below to turn to Step 1.\n- Designed for daily home practice alongside therapist guidance."
             else:
                 heading, summary, steps = mod["pages"][cur_p - 1]
                 page_title = heading
-                page_sub = f"{mod['code']} • {mod['title']}"
+                page_sub = f"{mod['code']} - {mod['title']}"
                 page_body = summary
                 page_bullets = steps
 
-            # Smooth CSS 3D page-turn animation container
             bullets_html = "<br>".join(html.escape(line) for line in page_bullets.split("\n"))
             flipbook_visual = f"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8" />
 <style>
-  body {{ margin:0; padding:4px; font-family:'Inter','Segoe UI',Arial,sans-serif; background:transparent; }}
-  @keyframes pageTurnIn {{
+body {{ margin:0; padding:4px; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background:transparent; }}
+@keyframes pageTurnIn {{
     0% {{ opacity: 0; transform: perspective(1000px) rotateY(-14deg) translateX(16px); }}
     100% {{ opacity: 1; transform: perspective(1000px) rotateY(0deg) translateX(0); }}
-  }}
-  .book-page {{
+}}
+.book-page {{
     animation: pageTurnIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     background: #FFFFFF;
     border: 1px solid #CBD5E1;
     border-left: 8px solid {mod['color']};
     border-radius: 12px;
     padding: 24px 26px;
-    box-shadow: 0 8px 22px rgba(15, 41, 74, 0.08);
-  }}
-  .badge {{
-    display: inline-block; background: {mod['soft_bg']}; color: {mod['color']};
+}}
+.badge {{
+    display: inline-block; background: {mod['soft_bg']}; color: #000000;
     font-size: 11.5px; font-weight: 800; padding: 4px 12px; border-radius: 999px;
     margin-bottom: 10px;
-  }}
-  .p-title {{ font-size: 21px; font-weight: 800; color: #0F294A; margin: 0 0 8px 0; }}
-  .p-summary {{ font-size: 14.5px; color: #334155; line-height: 1.55; margin-bottom: 14px; }}
-  .p-box {{
+}}
+.p-title {{ font-size: 21px; font-weight: 800; color: #000000; margin: 0 0 8px 0; }}
+.p-summary {{ font-size: 14.5px; color: #000000; line-height: 1.55; margin-bottom: 14px; }}
+.p-box {{
     background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px;
-    padding: 14px 16px; font-size: 13.5px; color: #0F294A; line-height: 1.7;
-  }}
+    padding: 14px 16px; font-size: 13.5px; color: #000000; line-height: 1.7;
+}}
 </style>
 </head>
 <body>
-  <div class="book-page">
-    <div class="badge">{html.escape(page_sub)} • Page {cur_p + 1} of {total_p}</div>
+<div class="book-page">
+    <div class="badge">{html.escape(page_sub)} - Page {cur_p + 1} of {total_p}</div>
     <div class="p-title">{html.escape(page_title)}</div>
     <div class="p-summary">{html.escape(page_body)}</div>
     <div class="p-box">{bullets_html}</div>
-  </div>
+</div>
 </body>
 </html>
 """
             components.html(flipbook_visual, height=295, scrolling=False)
 
             nav_l, nav_m, nav_r = st.columns([1, 1.5, 1])
-            if nav_l.button("◀ Previous Page", disabled=(cur_p == 0), use_container_width=True):
+            if nav_l.button("Previous Page", disabled=(cur_p == 0), use_container_width=True):
                 st.session_state[p_key] = cur_p - 1
                 st.rerun()
-
             nav_m.markdown(
-                f"<div style='text-align:center;padding-top:8px;font-weight:700;color:#0F294A;'>Page {cur_p + 1} of {total_p}</div>",
+                f"<div style='text-align:center;padding-top:8px;font-weight:700;color:#000000;'>Page {cur_p + 1} of {total_p}</div>",
                 unsafe_allow_html=True,
             )
-
-            if nav_r.button("Next Page ▶", disabled=(cur_p == total_p - 1), type="primary", use_container_width=True):
+            if nav_r.button("Next Page", disabled=(cur_p == total_p - 1), type="primary", use_container_width=True):
                 st.session_state[p_key] = cur_p + 1
                 st.rerun()
 
-# ==============================================================================
-# PAGE K: PARENTS PORTAL – REGISTRATION HISTORY & STATUS TRACKING
-# ==============================================================================
 elif active_page == "Registration History":
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">🕒 Parent Registration History & Status Tracking</div>
-                <div style="font-size:13px;color:#475569;">Track whether your child's registration is Pending, Approved, or Rejected and review your selected autism centre.</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">Parent Registration History &amp; Status Tracking</div>
+                <div style="font-size:13px;color:#000000;">Track whether your child's registration is Pending, Approved, or Rejected and review your selected autism centre.</div>
             </div>
         </div>
         """,
@@ -2660,17 +2524,17 @@ elif active_page == "Registration History":
                 c_l, c_r = st.columns([3.2, 1], vertical_alignment="center")
                 with c_l:
                     st.markdown(
-                        f"**{r['reg_code']} — {r['child_name']}** (Age {r['age']} • {r['diagnosis']}) &nbsp; "
+                        f"**{r['reg_code']} - {r['child_name']}** (Age {r['age']} - {r['diagnosis']}) &nbsp; "
                         f"<span class='status-badge {b_cls}'>{st_val}</span>",
                         unsafe_allow_html=True,
                     )
                     st.write(
-                        f"**District:** {r['district']}  |  **Required Services:** {r['required_services']}  |  "
+                        f"**District:** {r['district']} | **Required Services:** {r['required_services']} | "
                         f"**Selected Centre:** {r['selected_centre'] or 'None selected'}"
                     )
                     st.caption(f"Submitted by {r['parent_name']} ({r['parent_contact']}) on {r['submitted_at']}")
                 with c_r:
-                    if st.button("📍 View on GIS Map", key=f"hist_map_{r['id']}", use_container_width=True):
+                    if st.button("View on GIS Map", key=f"hist_map_{r['id']}", use_container_width=True):
                         req_s = [x.strip() for x in str(r["required_services"]).split(",") if x.strip()]
                         top3 = compute_top_3_centres(float(r["home_lat"]), float(r["home_lon"]), req_s, centres_df)
                         st.session_state["latest_recommendation_context"] = {
@@ -2693,16 +2557,13 @@ elif active_page == "Registration History":
                         navigate_to("Find Suitable Centres", "Parent / Guardian")
                         st.rerun()
 
-# ==============================================================================
-# PAGE L: SETTINGS
-# ==============================================================================
 elif active_page == "Settings":
     st.markdown(
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F294A;">⚙️ System Settings & Database Maintenance</div>
-                <div style="font-size:13px;color:#475569;">Manage user portal permissions, export backups, or reset demo database records.</div>
+                <div style="font-size:21px;font-weight:800;color:#000000;">System Settings &amp; Database Maintenance</div>
+                <div style="font-size:13px;color:#000000;">Manage user portal permissions and export backups.</div>
             </div>
         </div>
         """,
@@ -2726,21 +2587,21 @@ elif active_page == "Settings":
         st.subheader("Database Export")
         d1, d2, d3 = st.columns(3)
         d1.download_button(
-            "⬇ Export Student Registry (CSV)",
+            "Export Student Registry (CSV)",
             data=students_df.to_csv(index=False).encode("utf-8"),
             file_name="kelantan_students_registry.csv",
             mime="text/csv",
             use_container_width=True,
         )
         d2.download_button(
-            "⬇ Export Autism Centres (CSV)",
+            "Export Autism Centres (CSV)",
             data=centres_df.to_csv(index=False).encode("utf-8"),
             file_name="kelantan_autism_centres.csv",
             mime="text/csv",
             use_container_width=True,
         )
         d3.download_button(
-            "⬇ Export Parent Registrations (CSV)",
+            "Export Parent Registrations (CSV)",
             data=regs_df.to_csv(index=False).encode("utf-8"),
             file_name="kelantan_parent_registrations.csv",
             mime="text/csv",
