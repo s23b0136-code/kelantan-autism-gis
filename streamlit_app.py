@@ -903,7 +903,7 @@ def build_student_registration_trend(students_df: pd.DataFrame, years: list[int]
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('[https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap)');
     :root, .stApp {
         --text-color: #0F172A !important;
         font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
@@ -1218,8 +1218,8 @@ def render_kelantan_choropleth_map(
 <html>
 <head>
 <meta charset="UTF-8" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.css](https://unpkg.com/leaflet@1.9.4/dist/leaflet.css)" />
+<script src="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.js](https://unpkg.com/leaflet@1.9.4/dist/leaflet.js)"></script>
 <style>
   html, body {{
     margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
@@ -1269,7 +1269,7 @@ def render_kelantan_choropleth_map(
     maxZoom: 16
   }});
 
-  L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+  L.tileLayer('[https://tile.openstreetmap.org/](https://tile.openstreetmap.org/){{z}}/{{x}}/{{y}}.png', {{
     attribution: '&copy; OpenStreetMap contributors'
   }}).addTo(map);
 
@@ -1362,8 +1362,8 @@ def render_recommendation_gis_map(
 <html>
 <head>
 <meta charset="UTF-8" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.css](https://unpkg.com/leaflet@1.9.4/dist/leaflet.css)" />
+<script src="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.js](https://unpkg.com/leaflet@1.9.4/dist/leaflet.js)"></script>
 <style>
   html, body {{
     margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
@@ -1426,7 +1426,7 @@ def render_recommendation_gis_map(
     maxZoom: 16
   }});
 
-  L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+  L.tileLayer('[https://tile.openstreetmap.org/](https://tile.openstreetmap.org/){{z}}/{{x}}/{{y}}.png', {{
     attribution: '&copy; OpenStreetMap contributors'
   }}).addTo(map);
 
@@ -2702,6 +2702,3 @@ elif active_page == "Settings":
             mime="text/csv",
             use_container_width=True,
         )
-```[cite: 298, 311, 334, 336]
-
-Would you also like these two charts added to the **Accessibility Analytics** page, or keep them on the **Admin Dashboard**?
