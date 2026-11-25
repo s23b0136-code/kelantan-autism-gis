@@ -900,6 +900,195 @@ def build_student_registration_trend(students_df: pd.DataFrame, years: list[int]
     return trend_df
 
 
+def render_clean_bar_chart(
+    df: pd.DataFrame,
+    x_field: str,
+    y_field: str,
+    x_title: str,
+    y_title: str,
+    color: str = "#0284C7",
+    height: int = 230,
+):
+    plot_df = df.reset_index() if df.index.name else df.copy()
+    spec = {
+        "background": "#FFFFFF",
+        "height": height,
+        "padding": {"top": 10, "right": 14, "bottom": 8, "left": 8},
+        "mark": {
+            "type": "bar",
+            "color": color,
+            "cornerRadiusTopLeft": 4,
+            "cornerRadiusTopRight": 4,
+        },
+        "encoding": {
+            "x": {
+                "field": x_field,
+                "type": "nominal",
+                "sort": None,
+                "title": x_title,
+                "axis": {
+                    "labelColor": "#0F172A",
+                    "titleColor": "#0F172A",
+                    "titleFontWeight": "bold",
+                    "labelAngle": 0 if len(plot_df) <= 5 else -25,
+                    "labelLimit": 220,
+                    "domainColor": "#94A3B8",
+                    "tickColor": "#94A3B8",
+                },
+            },
+            "y": {
+                "field": y_field,
+                "type": "quantitative",
+                "title": y_title,
+                "axis": {
+                    "labelColor": "#0F172A",
+                    "titleColor": "#0F172A",
+                    "titleFontWeight": "bold",
+                    "gridColor": "#E2E8F0",
+                    "domainColor": "#94A3B8",
+                    "tickColor": "#94A3B8",
+                },
+            },
+            "tooltip": [
+                {"field": x_field, "type": "nominal", "title": x_title},
+                {"field": y_field, "type": "quantitative", "title": y_title},
+            ],
+        },
+        "config": {
+            "view": {"stroke": "transparent", "fill": "#FFFFFF"},
+        },
+    }
+    st.vega_lite_chart(plot_df, spec, use_container_width=True)
+
+
+def render_clean_stacked_bar_chart(
+    wide_df: pd.DataFrame,
+    x_title: str,
+    y_title: str,
+    legend_title: str,
+    colors: list[str],
+    height: int = 220,
+):
+    long_df = wide_df.reset_index().melt(
+        id_vars=[wide_df.index.name or "index"],
+        var_name=legend_title,
+        value_name="Count",
+    )
+    x_col = wide_df.index.name or "index"
+    spec = {
+        "background": "#FFFFFF",
+        "height": height,
+        "padding": {"top": 10, "right": 14, "bottom": 8, "left": 8},
+        "mark": {"type": "bar", "cornerRadiusTopLeft": 2, "cornerRadiusTopRight": 2},
+        "encoding": {
+            "x": {
+                "field": x_col,
+                "type": "nominal",
+                "sort": None,
+                "title": x_title,
+                "axis": {
+                    "labelColor": "#0F172A",
+                    "titleColor": "#0F172A",
+                    "titleFontWeight": "bold",
+                    "labelAngle": -25,
+                    "labelLimit": 200,
+                    "domainColor": "#94A3B8",
+                    "tickColor": "#94A3B8",
+                },
+            },
+            "y": {
+                "field": "Count",
+                "type": "quantitative",
+                "title": y_title,
+                "axis": {
+                    "labelColor": "#0F172A",
+                    "titleColor": "#0F172A",
+                    "titleFontWeight": "bold",
+                    "gridColor": "#E2E8F0",
+                    "domainColor": "#94A3B8",
+                    "tickColor": "#94A3B8",
+                },
+            },
+            "color": {
+                "field": legend_title,
+                "type": "nominal",
+                "title": legend_title,
+                "scale": {"range": colors},
+                "legend": {"labelColor": "#0F172A", "titleColor": "#0F172A"},
+            },
+            "tooltip": [
+                {"field": x_col, "type": "nominal", "title": x_title},
+                {"field": legend_title, "type": "nominal", "title": legend_title},
+                {"field": "Count", "type": "quantitative", "title": y_title},
+            ],
+        },
+        "config": {
+            "view": {"stroke": "transparent", "fill": "#FFFFFF"},
+        },
+    }
+    st.vega_lite_chart(long_df, spec, use_container_width=True)
+
+
+def render_clean_line_chart(
+    df: pd.DataFrame,
+    x_field: str,
+    y_field: str,
+    x_title: str,
+    y_title: str,
+    color: str = "#0F294A",
+    height: int = 220,
+):
+    plot_df = df.reset_index() if df.index.name else df.copy()
+    spec = {
+        "background": "#FFFFFF",
+        "height": height,
+        "padding": {"top": 10, "right": 14, "bottom": 8, "left": 8},
+        "mark": {
+            "type": "line",
+            "color": color,
+            "strokeWidth": 2.5,
+            "point": {"color": color, "size": 55},
+        },
+        "encoding": {
+            "x": {
+                "field": x_field,
+                "type": "nominal",
+                "sort": None,
+                "title": x_title,
+                "axis": {
+                    "labelColor": "#0F172A",
+                    "titleColor": "#0F172A",
+                    "titleFontWeight": "bold",
+                    "labelAngle": 0,
+                    "domainColor": "#94A3B8",
+                    "tickColor": "#94A3B8",
+                },
+            },
+            "y": {
+                "field": y_field,
+                "type": "quantitative",
+                "title": y_title,
+                "axis": {
+                    "labelColor": "#0F172A",
+                    "titleColor": "#0F172A",
+                    "titleFontWeight": "bold",
+                    "gridColor": "#E2E8F0",
+                    "domainColor": "#94A3B8",
+                    "tickColor": "#94A3B8",
+                },
+            },
+            "tooltip": [
+                {"field": x_field, "type": "nominal", "title": x_title},
+                {"field": y_field, "type": "quantitative", "title": y_title},
+            ],
+        },
+        "config": {
+            "view": {"stroke": "transparent", "fill": "#FFFFFF"},
+        },
+    }
+    st.vega_lite_chart(plot_df, spec, use_container_width=True)
+
+
 st.markdown(
     """
     <style>
@@ -1589,26 +1778,41 @@ if active_page == "Admin Dashboard":
             unsafe_allow_html=True,
         )
 
-    st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
 
-    c_left, c_right = st.columns([1.35, 1], gap="medium")
+    c_left, c_right = st.columns([1.25, 1], gap="medium")
     with c_left:
         with st.container(border=True):
-            st.subheader("Students by District (10 Kelantan Districts)")
-            st.caption("Accurate student distribution retrieved directly from registered student records.")
-            dist_chart_df = access_df[["district", "students"]].set_index("district")
-            st.bar_chart(dist_chart_df, color="#1E3A8A", height=290)
+            st.subheader("Students by District")
+            st.caption("Registered students across all 10 Kelantan districts.")
+            render_clean_bar_chart(
+                access_df[["district", "students"]],
+                x_field="district",
+                y_field="students",
+                x_title="District",
+                y_title="Students",
+                color="#1E3A8A",
+                height=225,
+            )
 
     with c_right:
         with st.container(border=True):
-            st.subheader("Autism Diagnosis Distribution")
-            st.caption("Exact breakdown across registered diagnosis categories.")
+            st.subheader("Diagnosis Distribution")
+            st.caption("Breakdown by registered diagnosis category.")
             if not students_df.empty:
                 diag_counts = students_df["diagnosis"].value_counts().reset_index()
                 diag_counts.columns = ["Diagnosis Category", "Students"]
-                st.bar_chart(diag_counts.set_index("Diagnosis Category"), color="#0D9488", height=290)
+                render_clean_bar_chart(
+                    diag_counts,
+                    x_field="Diagnosis Category",
+                    y_field="Students",
+                    x_title="Diagnosis Category",
+                    y_title="Students",
+                    color="#0D9488",
+                    height=225,
+                )
 
-    c_bot_l, c_bot_r = st.columns([1, 1.35], gap="medium")
+    c_bot_l, c_bot_r = st.columns([1, 1.25], gap="medium")
     with c_bot_l:
         with st.container(border=True):
             st.subheader("Required Therapy Services")
@@ -1616,24 +1820,44 @@ if active_page == "Admin Dashboard":
             if not students_df.empty:
                 serv_counts = students_df["required_service"].value_counts().reset_index()
                 serv_counts.columns = ["Therapy Service", "Students"]
-                st.bar_chart(serv_counts.set_index("Therapy Service"), color="#0284C7", height=280)
+                render_clean_bar_chart(
+                    serv_counts,
+                    x_field="Therapy Service",
+                    y_field="Students",
+                    x_title="Therapy Service",
+                    y_title="Students",
+                    color="#0284C7",
+                    height=225,
+                )
 
     with c_bot_r:
         with st.container(border=True):
-            st.subheader("Centre Distribution by District")
-            st.caption("Number of registered autism service centres per Kelantan district.")
-            centre_dist_df = access_df[["district", "centres"]].set_index("district")
-            st.bar_chart(centre_dist_df, color="#4338CA", height=280)
+            st.subheader("Centres by District")
+            st.caption("Registered autism service centres per district.")
+            render_clean_bar_chart(
+                access_df[["district", "centres"]],
+                x_field="district",
+                y_field="centres",
+                x_title="District",
+                y_title="Autism Centres",
+                color="#4338CA",
+                height=225,
+            )
 
-    st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
-
-    c_ext_l, c_ext_r = st.columns([1.35, 1], gap="medium")
+    c_ext_l, c_ext_r = st.columns([1.25, 1], gap="medium")
     with c_ext_l:
         with st.container(border=True):
             st.subheader("Therapy Demand by District")
-            st.caption("Breakdown of required therapy services across all 10 Kelantan districts. Select a row below to inspect that place.")
+            st.caption("Click a district row below to filter matching student records.")
             therapy_dist_df = build_therapy_demand_by_district(students_df)
-            st.bar_chart(therapy_dist_df, color=["#1E3A8A", "#0D9488", "#0284C7", "#14B8A6"], height=260)
+            render_clean_stacked_bar_chart(
+                therapy_dist_df,
+                x_title="District",
+                y_title="Students",
+                legend_title="Therapy Service",
+                colors=["#1E3A8A", "#0D9488", "#0284C7", "#14B8A6"],
+                height=220,
+            )
 
             district_picker_df = therapy_dist_df.reset_index()
             dist_sel_event = st.dataframe(
@@ -1643,25 +1867,34 @@ if active_page == "Admin Dashboard":
                 selection_mode="single-row",
                 use_container_width=True,
                 hide_index=True,
+                height=190,
             )
             sel_d_rows = (dist_sel_event or {}).get("selection", {}).get("rows", [])
             if sel_d_rows:
                 selected_district_click = str(district_picker_df.iloc[sel_d_rows[0]]["District"]).strip()
-                st.markdown(f"**Selected Place:** {html.escape(selected_district_click)}")
-                st.dataframe(therapy_dist_df.loc[[selected_district_click]], use_container_width=True)
                 matched_students = students_df[students_df["district"] == selected_district_click]
+                st.markdown(f"**{html.escape(selected_district_click)}** — {len(matched_students)} student record(s)")
                 st.dataframe(
-                    matched_students[["record_id", "student_name", "diagnosis", "required_service", "registered_date", "status"]],
+                    matched_students[["record_id", "student_name", "required_service", "status"]],
                     use_container_width=True,
                     hide_index=True,
+                    height=150,
                 )
 
     with c_ext_r:
         with st.container(border=True):
             st.subheader("Registered Students Trend (2021–2026)")
-            st.caption("Annual student registrations from registered_date. Select a year row below to inspect that year.")
+            st.caption("Click a year row below to inspect registrations for that year.")
             trend_df = build_student_registration_trend(students_df, [2021, 2022, 2023, 2024, 2025, 2026])
-            st.line_chart(trend_df, color="#0F294A", height=260)
+            render_clean_line_chart(
+                trend_df,
+                x_field="Year",
+                y_field="Registered Students",
+                x_title="Year",
+                y_title="Registered Students",
+                color="#0F294A",
+                height=220,
+            )
 
             year_picker_df = trend_df.reset_index()
             yr_sel_event = st.dataframe(
@@ -1671,21 +1904,23 @@ if active_page == "Admin Dashboard":
                 selection_mode="single-row",
                 use_container_width=True,
                 hide_index=True,
+                height=190,
             )
             sel_y_rows = (yr_sel_event or {}).get("selection", {}).get("rows", [])
             if sel_y_rows:
                 picked_row = year_picker_df.iloc[sel_y_rows[0]]
                 selected_year_click = str(picked_row["Year"]).strip()
                 yr_count = int(picked_row["Registered Students"])
-                st.markdown(f"**Selected Year:** {html.escape(selected_year_click)} — **Registered Students:** {yr_count}")
+                st.markdown(f"**Year {html.escape(selected_year_click)}** — {yr_count} registered student(s)")
                 if selected_year_click.isdigit() and not students_df.empty and "registered_date" in students_df.columns:
                     parsed_yr = pd.to_datetime(students_df["registered_date"], errors="coerce").dt.year.astype("Int64")
                     yr_rows = students_df[parsed_yr == int(selected_year_click)]
                     if not yr_rows.empty:
                         st.dataframe(
-                            yr_rows[["record_id", "student_name", "district", "required_service", "registered_date"]],
+                            yr_rows[["record_id", "student_name", "district", "required_service"]],
                             use_container_width=True,
                             hide_index=True,
+                            height=150,
                         )
                     else:
                         st.caption(f"No student records in the database for {selected_year_click}.")
@@ -2236,7 +2471,14 @@ elif active_page == "Accessibility Analytics":
         gap_chart_df = access_df[["district", "students", "total_capacity"]].rename(
             columns={"students": "Registered Students", "total_capacity": "Centre Slot Capacity"}
         ).set_index("district")
-        st.bar_chart(gap_chart_df, color=["#0F294A", "#0D9488"], height=320)
+        render_clean_stacked_bar_chart(
+            gap_chart_df,
+            x_title="District",
+            y_title="Count",
+            legend_title="Metric",
+            colors=["#0F294A", "#0D9488"],
+            height=280,
+        )
 
     with st.container(border=True):
         st.subheader("Priority Gap Action Table (Sorted by Highest Student-to-Centre Ratio)")
