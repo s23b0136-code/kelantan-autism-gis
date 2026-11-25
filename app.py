@@ -283,16 +283,15 @@ def apply_custom_theme():
             }
 
             h1, h2, h3, h4, h5, h6,
-            p, span, label, div, li,
-            [data-testid="stMarkdownContainer"] *,
+            [data-testid="stWidgetLabel"],
             [data-testid="stWidgetLabel"] *,
-            [data-testid="stCaptionContainer"] *,
+            [data-testid="stMetricLabel"],
             [data-testid="stMetricLabel"] *,
+            [data-testid="stMetricValue"],
             [data-testid="stMetricValue"] *,
             [data-testid="stMetricDelta"] *,
             button[data-baseweb="tab"],
-            button[data-baseweb="tab"] *,
-            .caption-muted, small {
+            button[data-baseweb="tab"] * {
                 color: #000000 !important;
                 opacity: 1 !important;
             }
@@ -327,22 +326,36 @@ def apply_custom_theme():
                 margin-bottom: 1.25rem;
             }
 
-            .stButton > button,
-            .stFormSubmitButton > button,
-            button[kind="primary"],
-            button[kind="secondary"] {
-                background-color: #17365D !important;
-                color: #FFFFFF !important;
-                border: 1px solid #0F2440 !important;
-                border-radius: 6px;
-                font-weight: 600;
+            /* Force black text inside custom HTML cards/templates that set white/light inline colors */
+            .stMarkdown [style*="color: #fff"],
+            .stMarkdown [style*="color: #ffffff"],
+            .stMarkdown [style*="color: white"],
+            .stMarkdown [style*="color:#fff"],
+            .stMarkdown [style*="color:#ffffff"],
+            .stMarkdown [style*="color:white"],
+            .stMarkdown [style*="color: rgba(255"],
+            .stMarkdown [style*="color:rgba(255"] {
+                color: #000000 !important;
             }
 
-            .stButton > button *,
-            .stFormSubmitButton > button *,
-            button[kind="primary"] *,
-            button[kind="secondary"] * {
+            /* Keep dark navy banners/bars readable with crisp white text */
+            .stMarkdown div[style*="background"] [style*="color"],
+            .stMarkdown div[style*="linear-gradient"] * {
                 color: #FFFFFF !important;
+            }
+
+            /* Keep button text white on dark buttons */
+            .stButton > button,
+            .stButton > button *,
+            .stFormSubmitButton > button,
+            .stFormSubmitButton > button *,
+            button[kind="primary"],
+            button[kind="primary"] *,
+            button[kind="secondary"],
+            button[kind="secondary"] * {
+                background-color: #17365D !important;
+                color: #FFFFFF !important;
+                border-color: #0F2440 !important;
                 opacity: 1 !important;
             }
 
@@ -351,13 +364,14 @@ def apply_custom_theme():
                 background-color: #1E3A5F !important;
             }
 
-            input, textarea, select, [data-baseweb="select"] > div {
-                background-color: #FFFFFF !important;
-                color: #000000 !important;
-                border-color: #94A3B8 !important;
+            /* Keep text inside selectboxes and inputs crisp white/readable */
+            [data-baseweb="select"] div,
+            [data-baseweb="select"] span {
+                color: #FFFFFF !important;
             }
 
-            [data-baseweb="select"] span, [data-baseweb="popover"] li {
+            [data-baseweb="popover"] li,
+            [data-baseweb="popover"] li * {
                 color: #000000 !important;
                 background-color: #FFFFFF !important;
             }
