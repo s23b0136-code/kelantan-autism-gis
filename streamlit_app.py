@@ -910,10 +910,11 @@ def render_clean_bar_chart(
     height: int = 230,
 ):
     plot_df = df.reset_index() if df.index.name else df.copy()
+    is_many = len(plot_df) > 5
     spec = {
         "background": "#FFFFFF",
         "height": height,
-        "padding": {"top": 10, "right": 14, "bottom": 8, "left": 8},
+        "padding": {"top": 10, "right": 14, "bottom": 12, "left": 8},
         "mark": {
             "type": "bar",
             "color": color,
@@ -930,7 +931,9 @@ def render_clean_bar_chart(
                     "labelColor": "#0F172A",
                     "titleColor": "#0F172A",
                     "titleFontWeight": "bold",
-                    "labelAngle": 0 if len(plot_df) <= 5 else -25,
+                    "labelAngle": -40 if is_many else 0,
+                    "labelFontSize": 10.5 if is_many else 11.5,
+                    "labelOverlap": False,
                     "labelLimit": 220,
                     "domainColor": "#94A3B8",
                     "tickColor": "#94A3B8",
@@ -975,10 +978,11 @@ def render_clean_stacked_bar_chart(
         value_name="Count",
     )
     x_col = wide_df.index.name or "index"
+    is_many = wide_df.shape[0] > 5
     spec = {
         "background": "#FFFFFF",
         "height": height,
-        "padding": {"top": 10, "right": 14, "bottom": 8, "left": 8},
+        "padding": {"top": 10, "right": 14, "bottom": 12, "left": 8},
         "mark": {"type": "bar", "cornerRadiusTopLeft": 2, "cornerRadiusTopRight": 2},
         "encoding": {
             "x": {
@@ -990,8 +994,10 @@ def render_clean_stacked_bar_chart(
                     "labelColor": "#0F172A",
                     "titleColor": "#0F172A",
                     "titleFontWeight": "bold",
-                    "labelAngle": -25,
-                    "labelLimit": 200,
+                    "labelAngle": -40 if is_many else 0,
+                    "labelFontSize": 10.5 if is_many else 11.5,
+                    "labelOverlap": False,
+                    "labelLimit": 220,
                     "domainColor": "#94A3B8",
                     "tickColor": "#94A3B8",
                 },
@@ -1042,7 +1048,7 @@ def render_clean_line_chart(
     spec = {
         "background": "#FFFFFF",
         "height": height,
-        "padding": {"top": 10, "right": 14, "bottom": 8, "left": 8},
+        "padding": {"top": 10, "right": 14, "bottom": 12, "left": 8},
         "mark": {
             "type": "line",
             "color": color,
@@ -1060,6 +1066,7 @@ def render_clean_line_chart(
                     "titleColor": "#0F172A",
                     "titleFontWeight": "bold",
                     "labelAngle": 0,
+                    "labelOverlap": False,
                     "domainColor": "#94A3B8",
                     "tickColor": "#94A3B8",
                 },
@@ -2997,3 +3004,5 @@ elif active_page == "Settings":
             mime="text/csv",
             use_container_width=True,
         )
+
+
