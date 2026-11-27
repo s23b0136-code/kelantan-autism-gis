@@ -3,7 +3,6 @@ import json
 import math
 import sqlite3
 from datetime import datetime
-
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
@@ -427,8 +426,8 @@ MODULES_4 = [
         ],
     },
     {
-        "key": "Al",
-        "code": "Module 03 - Al",
+        "key": "AI",
+        "code": "Module 03 - AI",
         "title": "Morning Walk & Sensory Regulation",
         "domain": "Sensory & Motor Wellness",
         "color": "#1E3A8A",
@@ -506,19 +505,9 @@ def map_legacy_district(raw_dist: str, idx: int) -> str:
     if d == "Rantau Panjang":
         return "Pasir Mas"
     extra_map = {
-        15: "Machang",
-        22: "Tanah Merah",
-        29: "Kuala Krai",
-        36: "Jeli",
-        43: "Gua Musang",
-        50: "Machang",
-        57: "Tanah Merah",
-        64: "Kuala Krai",
-        71: "Gua Musang",
-        78: "Machang",
-        85: "Tanah Merah",
-        92: "Kuala Krai",
-        99: "Jeli",
+        15: "Machang", 22: "Tanah Merah", 29: "Kuala Krai", 36: "Jeli", 43: "Gua Musang",
+        50: "Machang", 57: "Tanah Merah", 64: "Kuala Krai", 71: "Gua Musang",
+        78: "Machang", 85: "Tanah Merah", 92: "Kuala Krai", 99: "Jeli",
     }
     if idx in extra_map:
         return extra_map[idx]
@@ -687,7 +676,6 @@ def init_database():
                 ),
             )
         conn.commit()
-
     conn.close()
 
 
@@ -866,10 +854,7 @@ def build_therapy_demand_by_district(students_df: pd.DataFrame) -> pd.DataFrame:
         "Occupational Sensory",
         "Early Intervention",
     ]
-    matrix = {
-        dist: {srv: 0 for srv in services}
-        for dist in KELANTAN_DISTRICTS
-    }
+    matrix = {dist: {srv: 0 for srv in services} for dist in KELANTAN_DISTRICTS}
     if not students_df.empty and "district" in students_df.columns and "required_service" in students_df.columns:
         for _, row in students_df.iterrows():
             dist = str(row["district"]).strip()
@@ -891,13 +876,9 @@ def build_student_registration_trend(students_df: pd.DataFrame, years: list[int]
             key = str(yr)
             if key in counts:
                 counts[key] = int(cnt)
-    trend_df = pd.DataFrame(
-        {
-            "Year": list(counts.keys()),
-            "Registered Students": list(counts.values()),
-        }
+    return pd.DataFrame(
+        {"Year": list(counts.keys()), "Registered Students": list(counts.values())}
     ).set_index("Year")
-    return trend_df
 
 
 def render_clean_bar_chart(
@@ -957,9 +938,7 @@ def render_clean_bar_chart(
                 {"field": y_field, "type": "quantitative", "title": y_title},
             ],
         },
-        "config": {
-            "view": {"stroke": "transparent", "fill": "#FFFFFF"},
-        },
+        "config": {"view": {"stroke": "transparent", "fill": "#FFFFFF"}},
     }
     st.vega_lite_chart(plot_df, spec, use_container_width=True)
 
@@ -1028,9 +1007,7 @@ def render_clean_stacked_bar_chart(
                 {"field": "Count", "type": "quantitative", "title": y_title},
             ],
         },
-        "config": {
-            "view": {"stroke": "transparent", "fill": "#FFFFFF"},
-        },
+        "config": {"view": {"stroke": "transparent", "fill": "#FFFFFF"}},
     }
     st.vega_lite_chart(long_df, spec, use_container_width=True)
 
@@ -1089,9 +1066,7 @@ def render_clean_line_chart(
                 {"field": y_field, "type": "quantitative", "title": y_title},
             ],
         },
-        "config": {
-            "view": {"stroke": "transparent", "fill": "#FFFFFF"},
-        },
+        "config": {"view": {"stroke": "transparent", "fill": "#FFFFFF"}},
     }
     st.vega_lite_chart(plot_df, spec, use_container_width=True)
 
@@ -1114,9 +1089,7 @@ def render_accessibility_donut_chart(
         status_name = "Good Coverage"
 
     if total_capacity <= 0 and students <= 0:
-        donut_rows = [
-            {"Segment": "No Active Demand / Capacity", "Slots": 1, "Color": "#CBD5E1"},
-        ]
+        donut_rows = [{"Segment": "No Active Demand / Capacity", "Slots": 1, "Color": "#CBD5E1"}]
     elif students <= total_capacity:
         remaining_slots = max(0, total_capacity - students)
         donut_rows = [
@@ -1133,7 +1106,6 @@ def render_accessibility_donut_chart(
     donut_df = pd.DataFrame(donut_rows)
     domain_labels = donut_df["Segment"].tolist()
     range_colors = donut_df["Color"].tolist()
-
     spec = {
         "background": "#FFFFFF",
         "height": height,
@@ -1151,23 +1123,15 @@ def render_accessibility_donut_chart(
                 "field": "Segment",
                 "type": "nominal",
                 "scale": {"domain": domain_labels, "range": range_colors},
-                "legend": {
-                    "orient": "bottom",
-                    "direction": "vertical",
-                    "labelColor": "#0F172A",
-                    "titleColor": "#0F172A",
-                    "title": f"{district_name} ({status_name})",
-                    "labelFontSize": 11.5,
-                },
+                "legend": {"orient": "bottom", "labelColor": "#0F172A", "titleColor": "#0F172A"},
             },
             "tooltip": [
                 {"field": "Segment", "type": "nominal", "title": "Category"},
                 {"field": "Slots", "type": "quantitative", "title": "Count / Slots"},
             ],
         },
-        "config": {
-            "view": {"stroke": "transparent", "fill": "#FFFFFF"},
-        },
+        "title": {"text": f"{district_name} ({status_name})", "color": "#0F172A", "fontSize": 13},
+        "config": {"view": {"stroke": "transparent", "fill": "#FFFFFF"}},
     }
     st.vega_lite_chart(donut_df, spec, use_container_width=True)
 
@@ -1176,24 +1140,51 @@ st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
     :root, .stApp {
         --text-color: #0F172A !important;
         font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
         background-color: #F1F5F9 !important;
         color: #0F172A !important;
     }
+
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    /* Plain top header bar tiled with colorful puzzle-piece handprints */
     header[data-testid="stHeader"] {
         background-color: #FFFFFF !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='56' viewBox='0 0 96 56'%3E%3Cg transform='translate(28, 8) scale(0.42)'%3E%3Cpath fill='%23EAB308' d='M36 6c4 0 6 3 6 8v18H30V14c0-5 2-8 6-8z'/%3E%3Cpath fill='%232563EB' d='M20 11c3.5 0 6 3 6 8v15H14V19c0-5 2.5-8 6-8z'/%3E%3Cpath fill='%2316A34A' d='M51 12c3.5 0 6 3 6 8v15H45V20c0-5 2.5-8 6-8z'/%3E%3Cpath fill='%239333EA' d='M8 22c3-1.5 6.5 0 8.5 4l6 12-10 5-6-12c-2-4-1.5-7.5 1.5-9z'/%3E%3Cpath fill='%23DC2626' d='M74 25c3-2 6.5-1 8.5 2s1.5 6.5-1.5 8.5L67 45l-6-8 13-12z'/%3E%3Cpath fill='%230D9488' d='M16 34h44v18c0 11-8 20-20 20h-4c-12 0-20-9-20-20V34z'/%3E%3Ccircle cx='28' cy='46' r='5' fill='%23FACC15'/%3E%3Ccircle cx='44' cy='45' r='5' fill='%23EF4444'/%3E%3Ccircle cx='36' cy='58' r='5' fill='%233B82F6'/%3E%3C/g%3E%3C/svg%3E") !important;
+        background-repeat: repeat !important;
+        background-size: 96px 56px !important;
         border-bottom: 1px solid #CBD5E1 !important;
     }
+
+    header[data-testid="stHeader"] [data-testid="stToolbar"],
+    header[data-testid="stHeader"] .stAppDeployButton,
+    header[data-testid="stHeader"] [data-testid="stMainMenu"] {
+        background: rgba(255, 255, 255, 0.92) !important;
+        border-radius: 999px !important;
+        padding: 2px 8px !important;
+        backdrop-filter: blur(2px);
+    }
+
     [data-testid="stSidebar"] {
         background-color: #0F294A !important;
         border-right: 1px solid #1E3A5F !important;
     }
+
     [data-testid="stSidebar"] * {
         color: #F8FAFC !important;
         opacity: 1 !important;
     }
+
     .sidebar-brand {
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(255, 255, 255, 0.14);
@@ -1201,6 +1192,7 @@ st.markdown(
         padding: 14px 12px;
         margin-bottom: 14px;
     }
+
     .sidebar-section-label {
         font-size: 11px;
         font-weight: 800;
@@ -1209,6 +1201,7 @@ st.markdown(
         color: #5EEAD4 !important;
         margin: 14px 0 6px 4px;
     }
+
     [data-testid="stSidebar"] .stButton > button,
     [data-testid="stSidebar"] .stButton > button * {
         width: 100% !important;
@@ -1221,6 +1214,7 @@ st.markdown(
         font-size: 13.5px !important;
         font-weight: 600 !important;
     }
+
     [data-testid="stSidebar"] .stButton > button[kind="primary"],
     [data-testid="stSidebar"] .stButton > button[kind="primary"] * {
         background-color: #0D9488 !important;
@@ -1228,6 +1222,7 @@ st.markdown(
         font-weight: 700 !important;
         border: 1px solid #14B8A6 !important;
     }
+
     [data-testid="stMain"] h1,
     [data-testid="stMain"] h2,
     [data-testid="stMain"] h3,
@@ -1245,16 +1240,14 @@ st.markdown(
         color: #0F172A !important;
         opacity: 1 !important;
     }
+
     [data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
     [data-testid="stMain"] [data-testid="stMarkdownContainer"] span,
     [data-testid="stMain"] [data-testid="stMarkdownContainer"] strong,
     [data-testid="stMain"] [data-testid="stMarkdownContainer"] div {
         color: #0F172A;
     }
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] div[style*="linear-gradient"],
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] div[style*="linear-gradient"] * {
-        color: #FFFFFF !important;
-    }
+
     [data-testid="stMain"] .stButton > button[kind="secondary"],
     [data-testid="stMain"] .stButton > button[kind="secondary"] * {
         background-color: #FFFFFF !important;
@@ -1263,6 +1256,7 @@ st.markdown(
         font-weight: 600 !important;
         opacity: 1 !important;
     }
+
     [data-testid="stMain"] .stButton > button[kind="primary"],
     [data-testid="stMain"] .stButton > button[kind="primary"] *,
     [data-testid="stMain"] .stFormSubmitButton > button,
@@ -1275,11 +1269,13 @@ st.markdown(
         font-weight: 600 !important;
         opacity: 1 !important;
     }
+
     [data-testid="stMain"] [data-testid="stVegaLiteChart"],
     [data-testid="stMain"] [data-testid="stVegaLiteChart"] > div {
         background-color: #FFFFFF !important;
         border-radius: 8px;
     }
+
     .gov-header-banner {
         background: #FFFFFF;
         border-left: 6px solid #0F294A;
@@ -1295,6 +1291,7 @@ st.markdown(
         flex-wrap: wrap;
         gap: 12px;
     }
+
     .dark-summary-banner {
         background: #162438;
         color: #FFFFFF !important;
@@ -1305,9 +1302,11 @@ st.markdown(
         font-weight: 600;
         line-height: 1.45;
     }
+
     .dark-summary-banner * {
         color: #FFFFFF !important;
     }
+
     .saved-centre-pill {
         background-color: #E6F4F1;
         color: #0F766E;
@@ -1318,18 +1317,23 @@ st.markdown(
         font-weight: 700;
         text-align: center;
     }
+
     .kpi-card {
         background: #FFFFFF;
         border: 1px solid #CBD5E1;
         border-top: 4px solid #0F294A;
         border-radius: 12px;
         padding: 16px 18px;
+        max-width: 100%;
+        overflow-wrap: anywhere;
     }
+
     .kpi-card.teal { border-top-color: #0D9488; }
     .kpi-card.lblue { border-top-color: #0284C7; }
     .kpi-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #0F172A; margin-bottom: 6px; }
     .kpi-num { font-size: 30px; font-weight: 800; color: #0F172A; line-height: 1.1; }
     .kpi-sub { font-size: 12px; color: #334155; font-weight: 600; margin-top: 5px; }
+
     .status-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
     .badge-approved { background: #CCFBF1; color: #0F172A; border: 1px solid #0D9488; }
     .badge-pending { background: #FEF3C7; color: #0F172A; border: 1px solid #D97706; }
@@ -1500,127 +1504,122 @@ def render_kelantan_choropleth_map(
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-  html, body {{
+html, body {{
     margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     background: #FFFFFF; color: #0F172A;
-  }}
-  #map {{
+}}
+#map {{
     width: 100%; height: {map_height - 56}px; border-radius: 10px;
     border: 1px solid #CBD5E1; background: #E2E8F0;
-  }}
-  .legend-bar {{
+}}
+.legend-bar {{
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 10px; padding: 10px 4px 2px 4px;
     font-size: 12px; font-weight: 600; color: #0F172A;
-  }}
-  .legend-items {{ display: flex; gap: 14px; flex-wrap: wrap; }}
-  .lg-item {{ display: flex; align-items: center; gap: 6px; color: #0F172A; }}
-  .lg-swatch {{ width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.3); }}
-  .dist-label {{
+}}
+.legend-items {{ display: flex; gap: 14px; flex-wrap: wrap; }}
+.lg-item {{ display: flex; align-items: center; gap: 6px; color: #0F172A; }}
+.lg-swatch {{ width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.3); }}
+.dist-label {{
     background: rgba(255,255,255,0.94); border: 1px solid #64748B;
     border-radius: 5px; padding: 1px 5px; font-size: 10px; font-weight: 700;
     color: #0F172A; white-space: nowrap; text-align: center;
-  }}
+}}
 </style>
 </head>
 <body>
 <div id="map"></div>
 <div class="legend-bar">
-  <div class="legend-items">
-    <div class="lg-item"><span class="lg-swatch" style="background:#0D9488;"></span>Green: Good Accessibility</div>
-    <div class="lg-item"><span class="lg-swatch" style="background:#EAB308;"></span>Yellow: Moderate Accessibility</div>
-    <div class="lg-item"><span class="lg-swatch" style="background:#DC2626;"></span>Red: Poor Accessibility</div>
-    <div class="lg-item"><span class="lg-swatch" style="background:#0F294A; border-radius:999px;"></span>Autism Centre</div>
-  </div>
-  <div style="color:#0F172A;">Scope: Kelantan State (10 Districts)</div>
+    <div class="legend-items">
+        <div class="lg-item"><span class="lg-swatch" style="background:#0D9488;"></span>Green: Good Accessibility</div>
+        <div class="lg-item"><span class="lg-swatch" style="background:#EAB308;"></span>Yellow: Moderate Accessibility</div>
+        <div class="lg-item"><span class="lg-swatch" style="background:#DC2626;"></span>Red: Poor Accessibility</div>
+        <div class="lg-item"><span class="lg-swatch" style="background:#0F294A; border-radius:999px;"></span>Autism Centre</div>
+    </div>
+    <div style="color:#0F172A;">Scope: Kelantan State (10 Districts)</div>
 </div>
 <script>
-  const kelantanGeo = {geojson_str};
-  const accessData = {access_json};
-  const centres = {centres_json};
-  const selectedDist = {sel_dist_json};
-
-  const kelantanBounds = L.latLngBounds([4.50, 101.40], [6.32, 102.62]);
-  const map = L.map('map', {{
+const kelantanGeo = {geojson_str};
+const accessData = {access_json};
+const centres = {centres_json};
+const selectedDist = {sel_dist_json};
+const kelantanBounds = L.latLngBounds([4.50, 101.40], [6.32, 102.62]);
+const map = L.map('map', {{
     maxBounds: kelantanBounds,
     maxBoundsViscosity: 0.9,
     minZoom: 8,
     maxZoom: 16
-  }});
-
-  L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+}});
+L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
     attribution: '&copy; OpenStreetMap contributors'
-  }}).addTo(map);
-
-  let targetLayer = null;
-  const geoLayer = L.geoJSON(kelantanGeo, {{
+}}).addTo(map);
+let targetLayer = null;
+const geoLayer = L.geoJSON(kelantanGeo, {{
     style: function(feature) {{
-      const dName = feature.properties.district;
-      const info = accessData[dName] || {{ fill_hex: "#94A3B8" }};
-      const isSelected = (selectedDist !== "All Districts" && dName === selectedDist);
-      return {{
-        fillColor: info.fill_hex,
-        weight: isSelected ? 3.5 : 1.8,
-        opacity: 1,
-        color: isSelected ? "#0F294A" : "#FFFFFF",
-        fillOpacity: isSelected ? 0.62 : 0.45
-      }};
+        const dName = feature.properties.district;
+        const info = accessData[dName] || {{ fill_hex: "#94A3B8" }};
+        const isSelected = (selectedDist !== "All Districts" && dName === selectedDist);
+        return {{
+            fillColor: info.fill_hex,
+            weight: isSelected ? 3.5 : 1.8,
+            opacity: 1,
+            color: isSelected ? "#0F294A" : "#FFFFFF",
+            fillOpacity: isSelected ? 0.62 : 0.45
+        }};
     }},
     onEachFeature: function(feature, layer) {{
-      const dName = feature.properties.district;
-      const info = accessData[dName] || {{}};
-      if (selectedDist !== "All Districts" && dName === selectedDist) {{
-        targetLayer = layer;
-      }}
-      layer.bindPopup(
-        `<div style="font-family:Inter,sans-serif;min-width:210px;line-height:1.45;color:#0F172A;">` +
-        `<div style="font-size:14px;font-weight:800;border-bottom:1px solid #CBD5E1;padding-bottom:4px;margin-bottom:6px;">${{dName}} District</div>` +
-        `<div><strong>Accessibility:</strong> ${{info.status_label || "N/A"}}</div>` +
-        `<div><strong>Registered Students:</strong> ${{info.students ?? 0}}</div>` +
-        `<div><strong>Available Centres:</strong> ${{info.centres ?? 0}}</div>` +
-        `<div><strong>Total Slot Capacity:</strong> ${{info.total_capacity ?? 0}}</div>` +
-        `<div><strong>Student-to-Centre Ratio:</strong> ${{info.student_per_centre ?? 0}}:1</div>` +
-        `</div>`
-      );
-      const center = layer.getBounds().getCenter();
-      L.marker(center, {{
-        interactive: false,
-        icon: L.divIcon({{
-          className: "",
-          html: `<div class="dist-label">${{dName}} (${{info.students ?? 0}}s / ${{info.centres ?? 0}}c)</div>`,
-          iconSize: [125, 20],
-          iconAnchor: [62, 10]
-        }})
-      }}).addTo(map);
+        const dName = feature.properties.district;
+        const info = accessData[dName] || {{}};
+        if (selectedDist !== "All Districts" && dName === selectedDist) {{
+            targetLayer = layer;
+        }}
+        layer.bindPopup(
+            `<div style="font-family:Inter,sans-serif;min-width:210px;line-height:1.45;color:#0F172A;">` +
+            `<div style="font-size:14px;font-weight:800;border-bottom:1px solid #CBD5E1;padding-bottom:4px;margin-bottom:6px;">${{dName}} District</div>` +
+            `<div><strong>Accessibility:</strong> ${{info.status_label || "N/A"}}</div>` +
+            `<div><strong>Registered Students:</strong> ${{info.students ?? 0}}</div>` +
+            `<div><strong>Available Centres:</strong> ${{info.centres ?? 0}}</div>` +
+            `<div><strong>Total Slot Capacity:</strong> ${{info.total_capacity ?? 0}}</div>` +
+            `<div><strong>Student-to-Centre Ratio:</strong> ${{info.student_per_centre ?? 0}}:1</div>` +
+            `</div>`
+        );
+        const center = layer.getBounds().getCenter();
+        L.marker(center, {{
+            interactive: false,
+            icon: L.divIcon({{
+                className: "",
+                html: `<div class="dist-label">${{dName}} (${{info.students ?? 0}}s / ${{info.centres ?? 0}}c)</div>`,
+                iconSize: [125, 20],
+                iconAnchor: [62, 10]
+            }})
+        }}).addTo(map);
     }}
-  }}).addTo(map);
-
-  if (targetLayer) {{
+}}).addTo(map);
+if (targetLayer) {{
     map.fitBounds(targetLayer.getBounds(), {{ padding: [35, 35] }});
-  }} else {{
+}} else {{
     map.fitBounds(geoLayer.getBounds(), {{ padding: [15, 15] }});
-  }}
-
-  centres.forEach(c => {{
+}}
+centres.forEach(c => {{
     if (selectedDist !== "All Districts" && c.district !== selectedDist) return;
     const markerIcon = L.divIcon({{
-      className: "",
-      html: `<div style="width:24px;height:24px;border-radius:999px;background:#0F294A;border:2.5px solid #FFFFFF;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">C</div>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
+        className: "",
+        html: `<div style="width:24px;height:24px;border-radius:999px;background:#0F294A;border:2.5px solid #FFFFFF;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">C</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
     }});
     const m = L.marker([c.lat, c.lon], {{ icon: markerIcon }}).addTo(map);
     m.bindPopup(
-      `<div style="font-family:Inter,sans-serif;min-width:230px;line-height:1.45;color:#0F172A;">` +
-      `<div style="font-size:13.5px;font-weight:800;margin-bottom:4px;">${{c.centre_name}}</div>` +
-      `<div style="font-size:11.5px;font-weight:700;margin-bottom:6px;">${{c.category}} - ${{c.district}}</div>` +
-      `<div style="font-size:12px;"><strong>Address:</strong> ${{c.address}}</div>` +
-      `<div style="font-size:12px;"><strong>Services:</strong> ${{c.services}}</div>` +
-      `<div style="font-size:12px;"><strong>Hours:</strong> ${{c.hours}}</div>` +
-      `<div style="font-size:12px;"><strong>Contact:</strong> ${{c.contact}} | <strong>Capacity:</strong> ${{c.capacity}}</div>` +
-      `</div>`
+        `<div style="font-family:Inter,sans-serif;min-width:230px;line-height:1.45;color:#0F172A;">` +
+        `<div style="font-size:13.5px;font-weight:800;margin-bottom:4px;">${{c.centre_name}}</div>` +
+        `<div style="font-size:11.5px;font-weight:700;margin-bottom:6px;">${{c.category}} - ${{c.district}}</div>` +
+        `<div style="font-size:12px;"><strong>Address:</strong> ${{c.address}}</div>` +
+        `<div style="font-size:12px;"><strong>Services:</strong> ${{c.services}}</div>` +
+        `<div style="font-size:12px;"><strong>Hours:</strong> ${{c.hours}}</div>` +
+        `<div style="font-size:12px;"><strong>Contact:</strong> ${{c.contact}} | <strong>Capacity:</strong> ${{c.capacity}}</div>` +
+        `</div>`
     );
-  }});
+}});
 </script>
 </body>
 </html>"""
@@ -1644,95 +1643,91 @@ def render_recommendation_gis_map(
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-  html, body {{
+html, body {{
     margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     background: #FFFFFF; color: #0F172A;
-  }}
-  #recMap {{
+}}
+#recMap {{
     width: 100%; height: {map_height - 54}px; border-radius: 10px;
     border: 1px solid #CBD5E1; background: #E2E8F0;
-  }}
-  @keyframes dashFlow {{
+}}
+@keyframes dashFlow {{
     to {{ stroke-dashoffset: -36; }}
-  }}
-  .house-pin {{
+}}
+.house-pin {{
     width: 34px; height: 34px; border-radius: 999px;
     background: #0F294A; border: 3px solid #FFFFFF;
     color: #FFFFFF; font-size: 13px; font-weight: 800;
     display: flex; align-items: center; justify-content: center;
-  }}
-  .num-pin {{
+}}
+.num-pin {{
     width: 34px; height: 34px; border-radius: 999px;
     border: 3px solid #FFFFFF; color: #FFFFFF;
     font-size: 15px; font-weight: 800;
     display: flex; align-items: center; justify-content: center;
-  }}
-  .num-pin.active-focus {{
+}}
+.num-pin.active-focus {{
     transform: scale(1.22);
     border: 3.5px solid #FACC15;
-  }}
-  .animated-route {{
+}}
+.animated-route {{
     animation: dashFlow 1.2s linear infinite;
-  }}
-  .legend-strip {{
+}}
+.legend-strip {{
     display: flex; justify-content: space-between; align-items: center;
     flex-wrap: wrap; gap: 10px; padding: 9px 4px 2px 4px;
     font-size: 12px; font-weight: 600; color: #0F172A;
-  }}
+}}
 </style>
 </head>
 <body>
 <div id="recMap"></div>
 <div class="legend-strip">
-  <div style="display:flex;gap:14px;flex-wrap:wrap;color:#0F172A;">
-    <span><strong>H = Child's Home</strong></span>
-    <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0D9488;vertical-align:middle;"></span> <strong>#1 Best Match</strong></span>
-    <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0284C7;vertical-align:middle;"></span> <strong>#2 Second Match</strong></span>
-    <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0F294A;vertical-align:middle;"></span> <strong>#3 Third Match</strong></span>
-  </div>
-  <div style="color:#0F172A;">Kelantan GIS Spatial Matcher</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;color:#0F172A;">
+        <span><strong>H = Child's Home</strong></span>
+        <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0D9488;vertical-align:middle;"></span> <strong>#1 Best Match</strong></span>
+        <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0284C7;vertical-align:middle;"></span> <strong>#2 Second Match</strong></span>
+        <span><span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:#0F294A;vertical-align:middle;"></span> <strong>#3 Third Match</strong></span>
+    </div>
+    <div style="color:#0F172A;">Kelantan GIS Spatial Matcher</div>
 </div>
 <script>
-  const kelantanGeo = {geojson_str};
-  const accessData = {access_json};
-  const ctx = {ctx_json};
-
-  const kelantanBounds = L.latLngBounds([4.50, 101.40], [6.32, 102.62]);
-  const map = L.map('recMap', {{
+const kelantanGeo = {geojson_str};
+const accessData = {access_json};
+const ctx = {ctx_json};
+const kelantanBounds = L.latLngBounds([4.50, 101.40], [6.32, 102.62]);
+const map = L.map('recMap', {{
     maxBounds: kelantanBounds,
     maxBoundsViscosity: 0.9,
     minZoom: 8,
     maxZoom: 16
-  }});
-
-  L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+}});
+L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
     attribution: '&copy; OpenStreetMap contributors'
-  }}).addTo(map);
-
-  L.geoJSON(kelantanGeo, {{
+}}).addTo(map);
+L.geoJSON(kelantanGeo, {{
     style: function(feature) {{
-      const dName = feature.properties.district;
-      const info = accessData[dName] || {{ fill_hex: "#94A3B8" }};
-      const isHomeDist = (dName === ctx.district);
-      return {{
-        fillColor: info.fill_hex,
-        weight: isHomeDist ? 2.5 : 1.2,
-        opacity: 1,
-        color: isHomeDist ? "#0F294A" : "#FFFFFF",
-        fillOpacity: isHomeDist ? 0.28 : 0.14
-      }};
+        const dName = feature.properties.district;
+        const info = accessData[dName] || {{ fill_hex: "#94A3B8" }};
+        const isHomeDist = (dName === ctx.district);
+        return {{
+            fillColor: info.fill_hex,
+            weight: isHomeDist ? 2.5 : 1.2,
+            opacity: 1,
+            color: isHomeDist ? "#0F294A" : "#FFFFFF",
+            fillOpacity: isHomeDist ? 0.28 : 0.14
+        }};
     }}
-  }}).addTo(map);
-
-  const homeLatLng = [ctx.home_lat, ctx.home_lon];
-  const houseIcon = L.divIcon({{
+}}).addTo(map);
+const homeLatLng = [ctx.home_lat, ctx.home_lon];
+const houseIcon = L.divIcon({{
     className: "",
     html: `<div class="house-pin" title="Child Residential Location">H</div>`,
     iconSize: [34, 34],
     iconAnchor: [17, 17]
-  }});
-  const homeMarker = L.marker(homeLatLng, {{ icon: houseIcon, zIndexOffset: 1000 }}).addTo(map);
-  homeMarker.bindPopup(
+}});
+const homeMarker = L.marker(homeLatLng, {{ icon: houseIcon, zIndexOffset: 1000 }}).addTo(map);
+homeMarker.bindPopup(
     `<div style="font-family:Inter,sans-serif;min-width:210px;line-height:1.45;color:#0F172A;">` +
     `<div style="font-size:13.5px;font-weight:800;">Child's Residential Location</div>` +
     `<div style="font-size:12.5px;font-weight:700;margin:3px 0;">${{ctx.child_name}} (Age ${{ctx.age}})</div>` +
@@ -1740,72 +1735,66 @@ def render_recommendation_gis_map(
     `<div style="font-size:12px;"><strong>Address:</strong> ${{ctx.residential_address}}</div>` +
     `<div style="font-size:12px;"><strong>Required:</strong> ${{(ctx.required_services || []).join(", ")}}</div>` +
     `</div>`
-  );
-
-  const rankColors = {{ 1: "#0D9488", 2: "#0284C7", 3: "#0F294A" }};
-  const allPoints = [homeLatLng];
-  const centreMarkers = {{}};
-
-  (ctx.top3 || []).forEach(c => {{
+);
+const rankColors = {{ 1: "#0D9488", 2: "#0284C7", 3: "#0F294A" }};
+const allPoints = [homeLatLng];
+const centreMarkers = {{}};
+(ctx.top3 || []).forEach(c => {{
     const cLatLng = [c.lat, c.lon];
     allPoints.push(cLatLng);
     const col = rankColors[c.rank] || "#0D9488";
     const isFocused = (ctx.focused_rank === c.rank);
-
     L.polyline([homeLatLng, cLatLng], {{
-      color: col,
-      weight: isFocused ? 4.5 : 3,
-      opacity: isFocused ? 0.95 : 0.78,
-      dashArray: "10, 8",
-      className: "animated-route"
+        color: col,
+        weight: isFocused ? 4.5 : 3,
+        opacity: isFocused ? 0.95 : 0.78,
+        dashArray: "10, 8",
+        className: "animated-route"
     }}).addTo(map);
-
     const midLat = (homeLatLng[0] + cLatLng[0]) / 2;
     const midLon = (homeLatLng[1] + cLatLng[1]) / 2;
     L.marker([midLat, midLon], {{
-      interactive: false,
-      icon: L.divIcon({{
-        className: "",
-        html: `<div style="background:#FFFFFF;border:1.5px solid ${{col}};color:#0F172A;border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:800;white-space:nowrap;">#${{c.rank}}: ${{c.distance_km}} km</div>`,
-        iconSize: [78, 20],
-        iconAnchor: [39, 10]
-      }})
+        interactive: false,
+        icon: L.divIcon({{
+            className: "",
+            html: `<div style="background:#FFFFFF;border:1.5px solid ${{col}};color:#0F172A;border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:800;white-space:nowrap;">#${{c.rank}}: ${{c.distance_km}} km</div>`,
+            iconSize: [78, 20],
+            iconAnchor: [39, 10]
+        }})
     }}).addTo(map);
-
     const focusClass = isFocused ? "active-focus" : "";
     const numIcon = L.divIcon({{
-      className: "",
-      html: `<div class="num-pin ${{focusClass}}" style="background:${{col}};">${{c.rank}}</div>`,
-      iconSize: [34, 34],
-      iconAnchor: [17, 17]
+        className: "",
+        html: `<div class="num-pin ${{focusClass}}" style="background:${{col}};">${{c.rank}}</div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 17]
     }});
     const m = L.marker(cLatLng, {{ icon: numIcon, zIndexOffset: 900 - c.rank }}).addTo(map);
     m.bindPopup(
-      `<div style="font-family:Inter,sans-serif;min-width:240px;line-height:1.45;color:#0F172A;">` +
-      `<div style="display:inline-block;background:${{col}};color:#FFFFFF;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-bottom:5px;">#${{c.rank}} - ${{c.suitability_pct}}% Suitability</div>` +
-      `<div style="font-size:14px;font-weight:800;">${{c.centre_name}}</div>` +
-      `<div style="font-size:12px;font-weight:700;margin:3px 0;">Distance from Home: ${{c.distance_km}} km</div>` +
-      `<div style="font-size:12px;"><strong>Address:</strong> ${{c.address}}</div>` +
-      `<div style="font-size:12px;"><strong>Services:</strong> ${{c.services}}</div>` +
-      `<div style="font-size:12px;"><strong>Operating Hours:</strong> ${{c.hours}}</div>` +
-      `<div style="font-size:12px;"><strong>Contact:</strong> ${{c.contact}}</div>` +
-      `</div>`
+        `<div style="font-family:Inter,sans-serif;min-width:240px;line-height:1.45;color:#0F172A;">` +
+        `<div style="display:inline-block;background:${{col}};color:#FFFFFF;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-bottom:5px;">#${{c.rank}} - ${{c.suitability_pct}}% Suitability</div>` +
+        `<div style="font-size:14px;font-weight:800;">${{c.centre_name}}</div>` +
+        `<div style="font-size:12px;font-weight:700;margin:3px 0;">Distance from Home: ${{c.distance_km}} km</div>` +
+        `<div style="font-size:12px;"><strong>Address:</strong> ${{c.address}}</div>` +
+        `<div style="font-size:12px;"><strong>Services:</strong> ${{c.services}}</div>` +
+        `<div style="font-size:12px;"><strong>Operating Hours:</strong> ${{c.hours}}</div>` +
+        `<div style="font-size:12px;"><strong>Contact:</strong> ${{c.contact}}</div>` +
+        `</div>`
     );
     centreMarkers[c.rank] = m;
-  }});
-
-  if (ctx.focused_rank && centreMarkers[ctx.focused_rank]) {{
+}});
+if (ctx.focused_rank && centreMarkers[ctx.focused_rank]) {{
     const targetC = ctx.top3.find(x => x.rank === ctx.focused_rank);
     map.setView(homeLatLng, 11);
     setTimeout(() => {{
-      map.flyTo([targetC.lat, targetC.lon], 14, {{ animate: true, duration: 1.2 }});
-      setTimeout(() => {{ centreMarkers[ctx.focused_rank].openPopup(); }}, 1250);
+        map.flyTo([targetC.lat, targetC.lon], 14, {{ animate: true, duration: 1.2 }});
+        setTimeout(() => {{ centreMarkers[ctx.focused_rank].openPopup(); }}, 1250);
     }}, 350);
-  }} else {{
+}} else {{
     const groupBounds = L.latLngBounds(allPoints);
     map.fitBounds(groupBounds, {{ padding: [48, 48], maxZoom: 13 }});
     setTimeout(() => {{ homeMarker.openPopup(); }}, 450);
-  }}
+}}
 </script>
 </body>
 </html>"""
@@ -1816,7 +1805,6 @@ students_df = load_students_df()
 centres_df = load_centres_df()
 regs_df = load_registrations_df()
 access_df = compute_district_accessibility(students_df, centres_df)
-
 active_page = st.session_state["active_page"]
 
 if active_page == "Admin Dashboard":
@@ -1864,7 +1852,6 @@ if active_page == "Admin Dashboard":
         )
 
     st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-
     c_left, c_right = st.columns([1.25, 1], gap="medium")
     with c_left:
         with st.container(border=True):
@@ -1879,7 +1866,6 @@ if active_page == "Admin Dashboard":
                 color="#1E3A8A",
                 height=225,
             )
-
     with c_right:
         with st.container(border=True):
             st.subheader("Diagnosis Distribution")
@@ -1914,7 +1900,6 @@ if active_page == "Admin Dashboard":
                     color="#0284C7",
                     height=225,
                 )
-
     with c_bot_r:
         with st.container(border=True):
             st.subheader("Centres by District")
@@ -1943,7 +1928,6 @@ if active_page == "Admin Dashboard":
                 colors=["#1E3A8A", "#0D9488", "#0284C7", "#14B8A6"],
                 height=220,
             )
-
             district_picker_df = therapy_dist_df.reset_index()
             dist_sel_event = st.dataframe(
                 district_picker_df,
@@ -1958,17 +1942,16 @@ if active_page == "Admin Dashboard":
             if sel_d_rows:
                 selected_district_click = str(district_picker_df.iloc[sel_d_rows[0]]["District"]).strip()
                 matched_students = students_df[students_df["district"] == selected_district_click]
-                st.markdown(f"**{html.escape(selected_district_click)}** — {len(matched_students)} student record(s)")
+                st.markdown(f"**{html.escape(selected_district_click)}** - {len(matched_students)} student record(s)")
                 st.dataframe(
                     matched_students[["record_id", "student_name", "required_service", "status"]],
                     use_container_width=True,
                     hide_index=True,
                     height=150,
                 )
-
     with c_ext_r:
         with st.container(border=True):
-            st.subheader("Registered Students Trend (2021–2026)")
+            st.subheader("Registered Students Trend (2021-2026)")
             st.caption("Click a year row below to inspect registrations for that year.")
             trend_df = build_student_registration_trend(students_df, [2021, 2022, 2023, 2024, 2025, 2026])
             render_clean_line_chart(
@@ -1980,7 +1963,6 @@ if active_page == "Admin Dashboard":
                 color="#0F294A",
                 height=220,
             )
-
             year_picker_df = trend_df.reset_index()
             yr_sel_event = st.dataframe(
                 year_picker_df,
@@ -1996,7 +1978,7 @@ if active_page == "Admin Dashboard":
                 picked_row = year_picker_df.iloc[sel_y_rows[0]]
                 selected_year_click = str(picked_row["Year"]).strip()
                 yr_count = int(picked_row["Registered Students"])
-                st.markdown(f"**Year {html.escape(selected_year_click)}** — {yr_count} registered student(s)")
+                st.markdown(f"**Year {html.escape(selected_year_click)}** - {yr_count} registered student(s)")
                 if selected_year_click.isdigit() and not students_df.empty and "registered_date" in students_df.columns:
                     parsed_yr = pd.to_datetime(students_df["registered_date"], errors="coerce").dt.year.astype("Int64")
                     yr_rows = students_df[parsed_yr == int(selected_year_click)]
@@ -2064,7 +2046,6 @@ elif active_page == "Student Registry":
         "Edit Existing Record",
         "Delete Record (With Confirmation)",
     ])
-
     with tab_view:
         with st.container(border=True):
             if not filtered_df.empty:
@@ -2387,7 +2368,6 @@ elif active_page == "Autism Centre Management":
         )
 
     c_tab1, c_tab2, c_tab3 = st.tabs(["Add New Autism Centre", "Edit Centre Details", "Delete Centre"])
-
     with c_tab1:
         with st.container(border=True):
             with st.form("add_centre_form", clear_on_submit=True):
@@ -2555,7 +2535,6 @@ elif active_page == "Accessibility Analytics":
 
     st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
 
-    # Interactive District Selector + Clickable District Cards
     with st.container(border=True):
         sel_top_l, sel_top_r = st.columns([1.4, 2.6], vertical_alignment="center")
         with sel_top_l:
@@ -2598,7 +2577,6 @@ elif active_page == "Accessibility Analytics":
 
     selected_district = st.session_state["analytics_selected_district"]
     dist_row = access_df[access_df["district"] == selected_district].iloc[0]
-
     d_students = int(dist_row["students"])
     d_centres = int(dist_row["centres"])
     d_capacity = int(dist_row["total_capacity"])
@@ -2652,11 +2630,10 @@ elif active_page == "Accessibility Analytics":
             f"Available autism service capacity is relatively sufficient compared to current registered student demand."
         )
 
-    # Interactive Donut Chart + District Accessibility Analysis Panel
     chart_col, analysis_col = st.columns([1.05, 1.35], gap="medium")
     with chart_col:
         with st.container(border=True):
-            st.subheader(f"{selected_district} — Service Accessibility Donut")
+            st.subheader(f"{selected_district} - Service Accessibility Donut")
             st.caption("Comparison of registered autism students vs. available autism centre slot capacity.")
             render_accessibility_donut_chart(
                 district_name=selected_district,
@@ -2676,7 +2653,7 @@ elif active_page == "Accessibility Analytics":
                     f"""
                     <div style="text-align:right;">
                         <span style="display:inline-block;background:{badge_bg};color:#0F172A;border:1.5px solid {badge_border};
-                        padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;">
+                                     padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;">
                             {class_title} ({d_level})
                         </span>
                     </div>
@@ -2687,23 +2664,23 @@ elif active_page == "Accessibility Analytics":
             m1, m2, m3 = st.columns(3, gap="small")
             with m1:
                 st.markdown(
-                    f'<div class="kpi-card" style="padding:12px 14px;"><div class="kpi-title">Registered Students</div>'
-                    f'<div class="kpi-num" style="font-size:24px;">{d_students}</div>'
+                    f'<div class="kpi-card" style="padding:12px 12px;"><div class="kpi-title">Registered Students</div>'
+                    f'<div class="kpi-num" style="font-size:clamp(18px, 1.6vw, 24px);">{d_students}</div>'
                     f'<div class="kpi-sub">Across {d_centres} Centre(s)</div></div>',
                     unsafe_allow_html=True,
                 )
             with m2:
                 st.markdown(
-                    f'<div class="kpi-card lblue" style="padding:12px 14px;"><div class="kpi-title">Centre Slot Capacity</div>'
-                    f'<div class="kpi-num" style="font-size:24px;">{d_capacity}</div>'
+                    f'<div class="kpi-card lblue" style="padding:12px 12px;"><div class="kpi-title">Centre Slot Capacity</div>'
+                    f'<div class="kpi-num" style="font-size:clamp(18px, 1.6vw, 24px);">{d_capacity}</div>'
                     f'<div class="kpi-sub">Student-to-Centre: {d_ratio}:1</div></div>',
                     unsafe_allow_html=True,
                 )
             with m3:
                 st.markdown(
-                    f'<div class="kpi-card" style="border-top-color:{accent_hex};padding:12px 14px;">'
+                    f'<div class="kpi-card" style="border-top-color:{accent_hex};padding:12px 12px;">'
                     f'<div class="kpi-title">Service Coverage</div>'
-                    f'<div class="kpi-num" style="font-size:24px;">{coverage_pct}%</div>'
+                    f'<div class="kpi-num" style="font-size:clamp(18px, 1.6vw, 24px);">{coverage_pct}%</div>'
                     f'<div class="kpi-sub">Capacity vs. Demand</div></div>',
                     unsafe_allow_html=True,
                 )
@@ -2716,12 +2693,15 @@ elif active_page == "Accessibility Analytics":
             )
             st.markdown(
                 f"""
-                <div style="background:#F8FAFC;border:1px solid #CBD5E1;border-left:5px solid {accent_hex};
-                border-radius:10px;padding:14px 16px;color:#0F172A;">
-                    <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:#0F172A;margin-bottom:6px;">
+                <div style="box-sizing:border-box;width:100%;max-width:100%;background:#F8FAFC;
+                            border:1px solid #CBD5E1;border-left:5px solid {accent_hex};
+                            border-radius:10px;padding:12px 14px;color:#0F172A;
+                            overflow-wrap:anywhere;word-break:break-word;">
+                    <div style="font-size:12px;font-weight:800;text-transform:uppercase;
+                                color:#0F172A;margin-bottom:6px;line-height:1.35;">
                         Why {html.escape(selected_district)} Is Classified as {class_title} ({balance_label})
                     </div>
-                    <div style="font-size:13.5px;line-height:1.55;color:#0F172A;">
+                    <div style="font-size:13px;line-height:1.5;color:#0F172A;">
                         {explanation_text}
                     </div>
                 </div>
@@ -2729,14 +2709,12 @@ elif active_page == "Accessibility Analytics":
                 unsafe_allow_html=True,
             )
 
-    # Excel Dataset Table Underneath (Connected to Same Dataset, Searchable, Sortable, Highlights Selected District)
     with st.container(border=True):
         st.subheader("Kelantan District Autism Accessibility Dataset (Connected Registry Table)")
         st.caption(
             f"All 10 Kelantan districts derived directly from the active student and centre records. "
             f"Currently highlighted district: {selected_district}."
         )
-
         tbl_df = access_df.copy()
         tbl_df["Service Coverage (%)"] = tbl_df.apply(
             lambda r: round((r["total_capacity"] / r["students"]) * 100.0, 1)
@@ -2751,7 +2729,6 @@ elif active_page == "Accessibility Analytics":
                 "Green": "Good Coverage (Green)",
             }
         )
-
         f_col1, f_col2 = st.columns([2, 1.3])
         tbl_search = f_col1.text_input(
             "Search District or Classification in Table",
@@ -2769,7 +2746,6 @@ elif active_page == "Accessibility Analytics":
             ],
             key="analytics_table_sort",
         )
-
         if tbl_search.strip():
             q_txt = tbl_search.strip().lower()
             tbl_df = tbl_df[
@@ -2777,7 +2753,6 @@ elif active_page == "Accessibility Analytics":
                 | tbl_df["Coverage Classification"].str.lower().str.contains(q_txt, na=False)
                 | tbl_df["gap_status"].str.lower().str.contains(q_txt, na=False)
             ]
-
         if tbl_sort == "Highest Registered Students":
             tbl_df = tbl_df.sort_values(by="students", ascending=False)
         elif tbl_sort == "Highest Centre Slot Capacity":
@@ -2820,12 +2795,7 @@ elif active_page == "Accessibility Analytics":
                 "Students / Centre Ratio": "{:.1f}",
             }
         )
-
-        st.dataframe(
-            styled_tbl,
-            use_container_width=True,
-            hide_index=True,
-        )
+        st.dataframe(styled_tbl, use_container_width=True, hide_index=True)
 
 elif active_page == "Parents Dashboard":
     st.markdown(
@@ -2917,7 +2887,6 @@ elif active_page == "Child Registration":
             parent_contact = p2.text_input("Parent Contact Number *", placeholder="e.g., 012-987 6543")
 
             submitted = st.form_submit_button("Submit and Find Suitable Centres", type="primary", use_container_width=True)
-
             if submitted:
                 errors = []
                 if not child_name.strip():
@@ -2939,14 +2908,12 @@ elif active_page == "Child Registration":
                 else:
                     home_lat, home_lon = estimate_home_coordinates(district_in, res_address)
                     top3 = compute_top_3_centres(home_lat, home_lon, req_services, centres_df)
-
                     conn = get_conn()
                     cur = conn.cursor()
                     cur.execute("SELECT COUNT(*) FROM parent_registrations")
                     next_reg_num = cur.fetchone()[0] + 1
                     reg_code = f"REG-2026-{next_reg_num:03d}"
                     now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
-
                     cur.execute(
                         """
                         INSERT INTO parent_registrations
@@ -2964,7 +2931,6 @@ elif active_page == "Child Registration":
                     )
                     conn.commit()
                     conn.close()
-
                     st.session_state["latest_recommendation_context"] = {
                         "reg_code": reg_code,
                         "child_name": child_name.strip(),
@@ -3041,7 +3007,6 @@ elif active_page == "Find Suitable Centres":
                     "matching score based on therapy availability, distance from home, and centre slot "
                     "capacity - not a clinical or medical assessment."
                 )
-
         with cards_col:
             st.subheader("Top 3 Recommended Centres")
             rank_badge_colors = {1: "#0D9488", 2: "#0284C7", 3: "#0F294A"}
@@ -3145,11 +3110,9 @@ elif active_page == "Learning Modules":
         p_key = f"fb_page_{mod['key']}"
         cur_p = st.session_state[p_key]
         total_p = len(mod["pages"]) + 1
-
         if st.button("Back to All 4 Module Covers", type="secondary"):
             st.session_state["open_flipbook_key"] = None
             st.rerun()
-
         with st.container(border=True):
             if cur_p == 0:
                 page_title = f"Cover Page - {mod['title']}"
@@ -3162,50 +3125,48 @@ elif active_page == "Learning Modules":
                 page_sub = f"{mod['code']} - {mod['title']}"
                 page_body = summary
                 page_bullets = steps
-
             bullets_html = "<br>".join(html.escape(line) for line in page_bullets.split("\n"))
             flipbook_visual = f"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8" />
 <style>
-  body {{ margin:0; padding:4px; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background:transparent; }}
-  @keyframes pageTurnIn {{
+body {{ margin:0; padding:4px; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background:transparent; }}
+@keyframes pageTurnIn {{
     0% {{ opacity: 0; transform: perspective(1000px) rotateY(-14deg) translateX(16px); }}
     100% {{ opacity: 1; transform: perspective(1000px) rotateY(0deg) translateX(0); }}
-  }}
-  .book-page {{
+}}
+.book-page {{
     animation: pageTurnIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     background: #FFFFFF;
     border: 1px solid #CBD5E1;
     border-left: 8px solid {mod['color']};
     border-radius: 12px;
     padding: 24px 26px;
-  }}
-  .badge {{
+}}
+.badge {{
     display: inline-block; background: {mod['soft_bg']}; color: #0F172A;
     font-size: 11.5px; font-weight: 800; padding: 4px 12px; border-radius: 999px;
     margin-bottom: 10px;
-  }}
-  .p-title {{ font-size: 21px; font-weight: 800; color: #0F172A; margin: 0 0 8px 0; }}
-  .p-summary {{ font-size: 14.5px; color: #0F172A; line-height: 1.55; margin-bottom: 14px; }}
-  .p-box {{
+}}
+.p-title {{ font-size: 21px; font-weight: 800; color: #0F172A; margin: 0 0 8px 0; }}
+.p-summary {{ font-size: 14.5px; color: #0F172A; line-height: 1.55; margin-bottom: 14px; }}
+.p-box {{
     background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px;
     padding: 14px 16px; font-size: 13.5px; color: #0F172A; line-height: 1.7;
-  }}
+}}
 </style>
 </head>
 <body>
-  <div class="book-page">
+<div class="book-page">
     <div class="badge">{html.escape(page_sub)} - Page {cur_p + 1} of {total_p}</div>
     <div class="p-title">{html.escape(page_title)}</div>
     <div class="p-summary">{html.escape(page_body)}</div>
     <div class="p-box">{bullets_html}</div>
-  </div>
+</div>
 </body>
 </html>"""
             components.html(flipbook_visual, height=295, scrolling=False)
-
             nav_l, nav_m, nav_r = st.columns([1, 1.5, 1])
             if nav_l.button("Previous Page", disabled=(cur_p == 0), type="secondary", use_container_width=True):
                 st.session_state[p_key] = cur_p - 1
