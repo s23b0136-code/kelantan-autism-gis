@@ -515,6 +515,7 @@ def map_legacy_district(raw_dist: str, idx: int) -> str:
         15: "Machang", 22: "Tanah Merah", 29: "Kuala Krai", 36: "Jeli", 43: "Gua Musang",
         50: "Machang", 57: "Tanah Merah", 64: "Kuala Krai", 71: "Gua Musang",
         78: "Machang", 85: "Tanah Merah", 92: "Kuala Krai", 99: "Jeli",
+        104: "Kota Bharu", 105: "Tumpat",
     }
     if idx in extra_map:
         return extra_map[idx]
@@ -611,7 +612,7 @@ def init_database():
             "Wan Amirul", "Nik Sofea", "Che Muhammad Hakim", "Tengku Zara", "Muhammad Rayyan",
             "Nur Qistina", "Ahmad Harith", "Putri Damia", "Muhammad Iman", "Nur Aleesya",
         ]
-        for i in range(104):
+        for i in range(106):
             rec_id = f"KOD-{1000 + i}"
             s_name = f"{sample_names[i % len(sample_names)]} ({rec_id})"
             age = 4 + (i % 12)
@@ -883,8 +884,8 @@ def _base_vl_config() -> dict:
             "labelColor": "#0F172A",
             "titleColor": "#0F172A",
             "titleFontWeight": "bold",
-            "labelFontSize": 11,
-            "titleFontSize": 11.5,
+            "labelFontSize": 11.5,
+            "titleFontSize": 12,
             "domainColor": "#94A3B8",
             "domainWidth": 1,
             "tickColor": "#94A3B8",
@@ -893,8 +894,8 @@ def _base_vl_config() -> dict:
         "legend": {
             "labelColor": "#0F172A",
             "titleColor": "#0F172A",
-            "labelFontSize": 11,
-            "titleFontSize": 11.5,
+            "labelFontSize": 11.5,
+            "titleFontSize": 12,
         },
     }
 
@@ -906,7 +907,7 @@ def render_horizontal_bar_with_labels(
     y_title: str,
     color: str = "#1E3A8A",
     sort_desc: bool = True,
-    height: int = 270,
+    height: int = 330,
 ):
     plot_df = df[[category_col, value_col]].copy()
     plot_df[category_col] = plot_df[category_col].astype(str)
@@ -924,7 +925,7 @@ def render_horizontal_bar_with_labels(
         "width": "container",
         "height": height,
         "background": "#FFFFFF",
-        "padding": {"top": 8, "right": 18, "bottom": 8, "left": 6},
+        "padding": {"top": 12, "right": 22, "bottom": 12, "left": 10},
         "data": {"values": plot_df.to_dict(orient="records")},
         "layer": [
             {
@@ -933,7 +934,7 @@ def render_horizontal_bar_with_labels(
                     "color": color,
                     "cornerRadiusTopRight": 4,
                     "cornerRadiusBottomRight": 4,
-                    "size": 16 if len(plot_df) > 6 else 24,
+                    "size": 19 if len(plot_df) > 6 else 30,
                 },
                 "encoding": {
                     "y": {
@@ -942,8 +943,9 @@ def render_horizontal_bar_with_labels(
                         "sort": sort_order,
                         "title": y_title,
                         "axis": {
-                            "labelLimit": 170,
+                            "labelLimit": 180,
                             "labelOverlap": False,
+                            "labelPadding": 8,
                             "grid": False,
                         },
                     },
@@ -971,8 +973,8 @@ def render_horizontal_bar_with_labels(
                     "type": "text",
                     "align": "left",
                     "baseline": "middle",
-                    "dx": 6,
-                    "fontSize": 11,
+                    "dx": 7,
+                    "fontSize": 11.5,
                     "fontWeight": "bold",
                     "color": "#0F172A",
                 },
@@ -1001,7 +1003,7 @@ def render_horizontal_lollipop_chart(
     value_col: str,
     y_title: str,
     color: str = "#4338CA",
-    height: int = 270,
+    height: int = 330,
 ):
     plot_df = df[[category_col, value_col]].copy()
     plot_df[category_col] = plot_df[category_col].astype(str)
@@ -1016,14 +1018,14 @@ def render_horizontal_lollipop_chart(
         "width": "container",
         "height": height,
         "background": "#FFFFFF",
-        "padding": {"top": 8, "right": 18, "bottom": 8, "left": 6},
+        "padding": {"top": 12, "right": 22, "bottom": 12, "left": 10},
         "data": {"values": plot_df.to_dict(orient="records")},
         "layer": [
             {
                 "mark": {
                     "type": "rule",
                     "color": color,
-                    "strokeWidth": 2.5,
+                    "strokeWidth": 2.8,
                 },
                 "encoding": {
                     "y": {
@@ -1032,8 +1034,9 @@ def render_horizontal_lollipop_chart(
                         "sort": sort_order,
                         "title": y_title,
                         "axis": {
-                            "labelLimit": 170,
+                            "labelLimit": 180,
                             "labelOverlap": False,
+                            "labelPadding": 8,
                             "grid": False,
                         },
                     },
@@ -1046,7 +1049,7 @@ def render_horizontal_lollipop_chart(
                     "type": "point",
                     "filled": True,
                     "color": color,
-                    "size": 95,
+                    "size": 105,
                 },
                 "encoding": {
                     "y": {"field": category_col, "type": "nominal", "sort": sort_order},
@@ -1074,8 +1077,8 @@ def render_horizontal_lollipop_chart(
                     "type": "text",
                     "align": "left",
                     "baseline": "middle",
-                    "dx": 9,
-                    "fontSize": 11,
+                    "dx": 10,
+                    "fontSize": 11.5,
                     "fontWeight": "bold",
                     "color": "#0F172A",
                 },
@@ -1091,7 +1094,7 @@ def render_horizontal_lollipop_chart(
     st.vega_lite_chart(plot_df, spec, use_container_width=True)
 
 
-def render_diagnosis_donut_with_legend(diag_counts_df: pd.DataFrame, height: int = 270):
+def render_diagnosis_donut_with_legend(diag_counts_df: pd.DataFrame, height: int = 330):
     ordered_cats = ["Mild Autism", "High-Function Autism", "Severe Autism"]
     palette = {
         "Mild Autism": "#0D9488",
@@ -1128,16 +1131,16 @@ def render_diagnosis_donut_with_legend(diag_counts_df: pd.DataFrame, height: int
         "width": "container",
         "height": height,
         "background": "#FFFFFF",
-        "padding": {"top": 6, "right": 10, "bottom": 6, "left": 10},
+        "padding": {"top": 10, "right": 12, "bottom": 12, "left": 12},
         "data": {"values": df_d.to_dict(orient="records")},
         "layer": [
             {
                 "mark": {
                     "type": "arc",
-                    "innerRadius": 54,
-                    "outerRadius": 84,
+                    "innerRadius": 62,
+                    "outerRadius": 96,
                     "stroke": "#FFFFFF",
-                    "strokeWidth": 2,
+                    "strokeWidth": 2.5,
                 },
                 "encoding": {
                     "theta": {"field": "count", "type": "quantitative", "stack": True},
@@ -1150,10 +1153,11 @@ def render_diagnosis_donut_with_legend(diag_counts_df: pd.DataFrame, height: int
                         "legend": {
                             "orient": "bottom",
                             "direction": "vertical",
-                            "labelLimit": 320,
-                            "labelFontSize": 11,
-                            "symbolSize": 95,
-                            "rowPadding": 3,
+                            "labelLimit": 340,
+                            "labelFontSize": 11.5,
+                            "symbolSize": 105,
+                            "rowPadding": 5,
+                            "padding": 10,
                         },
                     },
                     "tooltip": [
@@ -1167,10 +1171,10 @@ def render_diagnosis_donut_with_legend(diag_counts_df: pd.DataFrame, height: int
                     "type": "text",
                     "align": "center",
                     "baseline": "middle",
-                    "fontSize": 13,
+                    "fontSize": 14,
                     "fontWeight": "bold",
                     "color": "#0F172A",
-                    "yOffset": -26,
+                    "yOffset": -38,
                 },
                 "encoding": {
                     "text": {"datum": f"{total_students} Students"},
@@ -1182,7 +1186,7 @@ def render_diagnosis_donut_with_legend(diag_counts_df: pd.DataFrame, height: int
     st.vega_lite_chart(df_d, spec, use_container_width=True)
 
 
-def render_therapy_heatmap(wide_df: pd.DataFrame, height: int = 270):
+def render_therapy_heatmap(wide_df: pd.DataFrame, height: int = 330):
     long_df = wide_df.reset_index().melt(
         id_vars=[wide_df.index.name or "District"],
         value_vars=THERAPY_SERVICES,
@@ -1190,20 +1194,20 @@ def render_therapy_heatmap(wide_df: pd.DataFrame, height: int = 270):
         value_name="Demand",
     )
     x_col = wide_df.index.name or "District"
-    short_labels = {
-        "Speech Therapy": "Speech",
+    code_map = {
+        "Speech Therapy": "ST",
         "ABA Therapy": "ABA",
-        "Occupational Sensory": "Sensory",
-        "Early Intervention": "Early Int.",
+        "Occupational Sensory": "OT",
+        "Early Intervention": "EI",
     }
-    long_df["ServiceShort"] = long_df["Service"].map(lambda s: short_labels.get(s, s))
-    service_short_order = [short_labels[s] for s in THERAPY_SERVICES]
+    long_df["ServiceCode"] = long_df["Service"].map(lambda s: code_map.get(s, s))
+    service_code_order = [code_map[s] for s in THERAPY_SERVICES]
 
     spec = {
         "width": "container",
         "height": height,
         "background": "#FFFFFF",
-        "padding": {"top": 6, "right": 12, "bottom": 6, "left": 6},
+        "padding": {"top": 10, "right": 14, "bottom": 10, "left": 10},
         "data": {"values": long_df.to_dict(orient="records")},
         "layer": [
             {
@@ -1215,14 +1219,15 @@ def render_therapy_heatmap(wide_df: pd.DataFrame, height: int = 270):
                 },
                 "encoding": {
                     "x": {
-                        "field": "ServiceShort",
+                        "field": "ServiceCode",
                         "type": "nominal",
-                        "sort": service_short_order,
-                        "title": "Therapy Service",
+                        "sort": service_code_order,
+                        "title": "Therapy Service (ST / ABA / OT / EI)",
                         "axis": {
                             "labelAngle": 0,
                             "labelOverlap": False,
-                            "labelFontSize": 10.5,
+                            "labelPadding": 6,
+                            "labelFontSize": 11.5,
                         },
                     },
                     "y": {
@@ -1231,9 +1236,10 @@ def render_therapy_heatmap(wide_df: pd.DataFrame, height: int = 270):
                         "sort": KELANTAN_DISTRICTS,
                         "title": "District",
                         "axis": {
-                            "labelLimit": 130,
+                            "labelLimit": 140,
                             "labelOverlap": False,
-                            "labelFontSize": 10.5,
+                            "labelPadding": 8,
+                            "labelFontSize": 11,
                         },
                     },
                     "color": {
@@ -1255,11 +1261,11 @@ def render_therapy_heatmap(wide_df: pd.DataFrame, height: int = 270):
                     "type": "text",
                     "align": "center",
                     "baseline": "middle",
-                    "fontSize": 11,
+                    "fontSize": 11.5,
                     "fontWeight": "bold",
                 },
                 "encoding": {
-                    "x": {"field": "ServiceShort", "type": "nominal", "sort": service_short_order},
+                    "x": {"field": "ServiceCode", "type": "nominal", "sort": service_code_order},
                     "y": {"field": x_col, "type": "nominal", "sort": KELANTAN_DISTRICTS},
                     "text": {"field": "Demand", "type": "quantitative"},
                     "color": {
@@ -1360,6 +1366,7 @@ st.markdown(
         max-width: 100% !important;
         overflow: hidden !important;
         background-color: #FFFFFF !important;
+        padding: 10px 14px !important;
     }
 
     /* Single horizontal row of puzzle-piece handprints across the top header bar */
@@ -1480,6 +1487,7 @@ st.markdown(
         background-color: #FFFFFF !important;
         border-radius: 8px;
         width: 100% !important;
+        padding: 4px 2px !important;
     }
 
     .gov-header-banner {
@@ -1543,8 +1551,8 @@ st.markdown(
     .box6-kpi-card {
         background: #FFFFFF;
         border-radius: 10px;
-        padding: 28px 18px;
-        min-height: 270px;
+        padding: 36px 22px;
+        min-height: 330px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -1553,18 +1561,18 @@ st.markdown(
     }
 
     .box6-kpi-number {
-        font-size: clamp(42px, 4.2vw, 58px);
+        font-size: clamp(46px, 4.5vw, 64px);
         font-weight: 800;
         color: #0F294A;
         line-height: 1.05;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
 
     .box6-kpi-label {
-        font-size: 14.5px;
+        font-size: 15px;
         font-weight: 600;
         color: #334155;
-        line-height: 1.4;
+        line-height: 1.45;
     }
 
     .status-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
@@ -2084,10 +2092,10 @@ if active_page == "Admin Dashboard":
             unsafe_allow_html=True,
         )
 
-    st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
 
     # Row 1: Boxes 1, 2, 3
-    row1_c1, row1_c2, row1_c3 = st.columns(3, gap="medium")
+    row1_c1, row1_c2, row1_c3 = st.columns(3, gap="large")
     with row1_c1:
         with st.container(border=True):
             st.markdown("**1. Students by District**")
@@ -2099,7 +2107,7 @@ if active_page == "Admin Dashboard":
                 y_title="District",
                 color="#1E3A8A",
                 sort_desc=True,
-                height=275,
+                height=330,
             )
 
     with row1_c2:
@@ -2109,7 +2117,7 @@ if active_page == "Admin Dashboard":
             if not students_df.empty:
                 diag_counts = students_df["diagnosis"].value_counts().reset_index()
                 diag_counts.columns = ["Diagnosis Category", "Students"]
-                render_diagnosis_donut_with_legend(diag_counts, height=275)
+                render_diagnosis_donut_with_legend(diag_counts, height=330)
 
     with row1_c3:
         with st.container(border=True):
@@ -2132,13 +2140,13 @@ if active_page == "Admin Dashboard":
                     y_title="Therapy Service",
                     color="#0284C7",
                     sort_desc=True,
-                    height=275,
+                    height=330,
                 )
 
-    st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
 
     # Row 2: Boxes 4, 5, 6
-    row2_c1, row2_c2, row2_c3 = st.columns(3, gap="medium")
+    row2_c1, row2_c2, row2_c3 = st.columns(3, gap="large")
     with row2_c1:
         with st.container(border=True):
             st.markdown("**4. Autism Centres by District**")
@@ -2149,15 +2157,15 @@ if active_page == "Admin Dashboard":
                 value_col="centres",
                 y_title="District",
                 color="#4338CA",
-                height=275,
+                height=330,
             )
 
     with row2_c2:
         with st.container(border=True):
             st.markdown("**5. Therapy Demand by District**")
-            st.caption("Student demand heatmap across districts and therapy services.")
+            st.caption("ST: Speech Therapy | ABA: ABA Therapy | OT: Occupational Sensory | EI: Early Intervention")
             therapy_dist_df = build_therapy_demand_by_district(students_df)
-            render_therapy_heatmap(therapy_dist_df, height=275)
+            render_therapy_heatmap(therapy_dist_df, height=330)
 
     with row2_c3:
         with st.container(border=True):
@@ -2173,6 +2181,8 @@ if active_page == "Admin Dashboard":
                 """,
                 unsafe_allow_html=True,
             )
+
+    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
 
     with st.expander("Inspect District Therapy Breakdown & Student Records", expanded=False):
         t_col1, t_col2 = st.columns([1.25, 1], gap="medium")
