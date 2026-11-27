@@ -949,7 +949,7 @@ def render_clean_stacked_bar_chart(
     y_title: str,
     legend_title: str,
     colors: list[str],
-    height: int = 220,
+    height: int = 230,
 ):
     long_df = wide_df.reset_index().melt(
         id_vars=[wide_df.index.name or "index"],
@@ -1019,7 +1019,7 @@ def render_clean_line_chart(
     x_title: str,
     y_title: str,
     color: str = "#0F294A",
-    height: int = 220,
+    height: int = 230,
 ):
     plot_df = df.reset_index() if df.index.name else df.copy()
     spec = {
@@ -1157,22 +1157,22 @@ st.markdown(
         overflow: hidden !important;
     }
 
-    /* Plain top header bar tiled with colorful puzzle-piece handprints */
+    /* Single horizontal row of puzzle-piece handprints across the top header bar */
     header[data-testid="stHeader"] {
         background-color: #FFFFFF !important;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='56' viewBox='0 0 96 56'%3E%3Cg transform='translate(28, 8) scale(0.42)'%3E%3Cpath fill='%23EAB308' d='M36 6c4 0 6 3 6 8v18H30V14c0-5 2-8 6-8z'/%3E%3Cpath fill='%232563EB' d='M20 11c3.5 0 6 3 6 8v15H14V19c0-5 2.5-8 6-8z'/%3E%3Cpath fill='%2316A34A' d='M51 12c3.5 0 6 3 6 8v15H45V20c0-5 2.5-8 6-8z'/%3E%3Cpath fill='%239333EA' d='M8 22c3-1.5 6.5 0 8.5 4l6 12-10 5-6-12c-2-4-1.5-7.5 1.5-9z'/%3E%3Cpath fill='%23DC2626' d='M74 25c3-2 6.5-1 8.5 2s1.5 6.5-1.5 8.5L67 45l-6-8 13-12z'/%3E%3Cpath fill='%230D9488' d='M16 34h44v18c0 11-8 20-20 20h-4c-12 0-20-9-20-20V34z'/%3E%3Ccircle cx='28' cy='46' r='5' fill='%23FACC15'/%3E%3Ccircle cx='44' cy='45' r='5' fill='%23EF4444'/%3E%3Ccircle cx='36' cy='58' r='5' fill='%233B82F6'/%3E%3C/g%3E%3C/svg%3E") !important;
-        background-repeat: repeat !important;
-        background-size: 96px 56px !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='52' viewBox='0 0 76 52'%3E%3Cg transform='translate(14, 5) scale(0.54)'%3E%3Cpath fill='%23EAB308' d='M36 5c4 0 6 3 6 8v19H30V13c0-5 2-8 6-8z'/%3E%3Cpath fill='%232563EB' d='M20 10c3.5 0 6 3 6 8v16H14V18c0-5 2.5-8 6-8z'/%3E%3Cpath fill='%2316A34A' d='M51 11c3.5 0 6 3 6 8v16H45V19c0-5 2.5-8 6-8z'/%3E%3Cpath fill='%239333EA' d='M7 22c3-1.5 6.5 0 8.5 4l6 13-10 5-6-13c-2-4-1.5-7.5 1.5-9z'/%3E%3Cpath fill='%23DC2626' d='M74 25c3-2 6.5-1 8.5 2s1.5 6.5-1.5 8.5L67 46l-6-8 13-13z'/%3E%3Cpath fill='%230D9488' d='M16 34h44v19c0 11-8 20-20 20h-4c-12 0-20-9-20-20V34z'/%3E%3Ccircle cx='28' cy='46' r='5.5' fill='%23FACC15'/%3E%3Ccircle cx='44' cy='45' r='5.5' fill='%23EF4444'/%3E%3Ccircle cx='36' cy='59' r='5.5' fill='%233B82F6'/%3E%3C/g%3E%3C/svg%3E") !important;
+        background-repeat: repeat-x !important;
+        background-position: left center !important;
+        background-size: 76px 52px !important;
         border-bottom: 1px solid #CBD5E1 !important;
     }
 
     header[data-testid="stHeader"] [data-testid="stToolbar"],
     header[data-testid="stHeader"] .stAppDeployButton,
     header[data-testid="stHeader"] [data-testid="stMainMenu"] {
-        background: rgba(255, 255, 255, 0.92) !important;
+        background: rgba(255, 255, 255, 0.94) !important;
         border-radius: 999px !important;
         padding: 2px 8px !important;
-        backdrop-filter: blur(2px);
     }
 
     [data-testid="stSidebar"] {
@@ -1851,11 +1851,13 @@ if active_page == "Admin Dashboard":
             unsafe_allow_html=True,
         )
 
-    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-    c_left, c_right = st.columns([1.25, 1], gap="medium")
-    with c_left:
+    st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+
+    # Row 1: Boxes 1, 2, 3
+    row1_c1, row1_c2, row1_c3 = st.columns(3, gap="medium")
+    with row1_c1:
         with st.container(border=True):
-            st.subheader("Students by District")
+            st.markdown("**1. Students by District**")
             st.caption("Registered students across all 10 Kelantan districts.")
             render_clean_bar_chart(
                 access_df[["district", "students"]],
@@ -1864,12 +1866,12 @@ if active_page == "Admin Dashboard":
                 x_title="District",
                 y_title="Students",
                 color="#1E3A8A",
-                height=225,
+                height=230,
             )
-    with c_right:
+    with row1_c2:
         with st.container(border=True):
-            st.subheader("Diagnosis Distribution")
-            st.caption("Breakdown by registered diagnosis category.")
+            st.markdown("**2. Diagnosis Distribution**")
+            st.caption("Breakdown by registered autism diagnosis category.")
             if not students_df.empty:
                 diag_counts = students_df["diagnosis"].value_counts().reset_index()
                 diag_counts.columns = ["Diagnosis Category", "Students"]
@@ -1877,17 +1879,15 @@ if active_page == "Admin Dashboard":
                     diag_counts,
                     x_field="Diagnosis Category",
                     y_field="Students",
-                    x_title="Diagnosis Category",
+                    x_title="Diagnosis",
                     y_title="Students",
                     color="#0D9488",
-                    height=225,
+                    height=230,
                 )
-
-    c_bot_l, c_bot_r = st.columns([1, 1.25], gap="medium")
-    with c_bot_l:
+    with row1_c3:
         with st.container(border=True):
-            st.subheader("Required Therapy Services")
-            st.caption("Demand across registered student therapy requirements.")
+            st.markdown("**3. Required Therapy Services**")
+            st.caption("Demand across registered therapy service types.")
             if not students_df.empty:
                 serv_counts = students_df["required_service"].value_counts().reset_index()
                 serv_counts.columns = ["Therapy Service", "Students"]
@@ -1898,36 +1898,58 @@ if active_page == "Admin Dashboard":
                     x_title="Therapy Service",
                     y_title="Students",
                     color="#0284C7",
-                    height=225,
+                    height=230,
                 )
-    with c_bot_r:
+
+    st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+
+    # Row 2: Boxes 4, 5, 6
+    row2_c1, row2_c2, row2_c3 = st.columns(3, gap="medium")
+    with row2_c1:
         with st.container(border=True):
-            st.subheader("Centres by District")
-            st.caption("Registered autism service centres per district.")
+            st.markdown("**4. Autism Centres by District**")
+            st.caption("Active autism service centres per district.")
             render_clean_bar_chart(
                 access_df[["district", "centres"]],
                 x_field="district",
                 y_field="centres",
                 x_title="District",
-                y_title="Autism Centres",
+                y_title="Centres",
                 color="#4338CA",
-                height=225,
+                height=230,
             )
-
-    c_ext_l, c_ext_r = st.columns([1.25, 1], gap="medium")
-    with c_ext_l:
+    with row2_c2:
         with st.container(border=True):
-            st.subheader("Therapy Demand by District")
-            st.caption("Click a district row below to filter matching student records.")
+            st.markdown("**5. Therapy Demand by District**")
+            st.caption("Service breakdown across Kelantan districts.")
             therapy_dist_df = build_therapy_demand_by_district(students_df)
             render_clean_stacked_bar_chart(
                 therapy_dist_df,
                 x_title="District",
                 y_title="Students",
-                legend_title="Therapy Service",
-                colors=["#1E3A8A", "#0D9488", "#0284C7", "#14B8A6"],
-                height=220,
+                legend_title="Service",
+                colors=["#1E3A8A", "#0D9488", "#0284C7", "#F59E0B"],
+                height=230,
             )
+    with row2_c3:
+        with st.container(border=True):
+            st.markdown("**6. Registered Students Trend (2021–2026)**")
+            st.caption("Annual student registration growth over time.")
+            trend_df = build_student_registration_trend(students_df, [2021, 2022, 2023, 2024, 2025, 2026])
+            render_clean_line_chart(
+                trend_df,
+                x_field="Year",
+                y_field="Registered Students",
+                x_title="Year",
+                y_title="Students",
+                color="#0F294A",
+                height=230,
+            )
+
+    with st.expander("Inspect District Therapy Breakdown & Yearly Student Records", expanded=False):
+        t_col1, t_col2 = st.columns([1.25, 1], gap="medium")
+        with t_col1:
+            st.markdown("**Select a District Row to Filter Student Records**")
             district_picker_df = therapy_dist_df.reset_index()
             dist_sel_event = st.dataframe(
                 district_picker_df,
@@ -1936,7 +1958,7 @@ if active_page == "Admin Dashboard":
                 selection_mode="single-row",
                 use_container_width=True,
                 hide_index=True,
-                height=190,
+                height=210,
             )
             sel_d_rows = (dist_sel_event or {}).get("selection", {}).get("rows", [])
             if sel_d_rows:
@@ -1947,22 +1969,10 @@ if active_page == "Admin Dashboard":
                     matched_students[["record_id", "student_name", "required_service", "status"]],
                     use_container_width=True,
                     hide_index=True,
-                    height=150,
+                    height=160,
                 )
-    with c_ext_r:
-        with st.container(border=True):
-            st.subheader("Registered Students Trend (2021-2026)")
-            st.caption("Click a year row below to inspect registrations for that year.")
-            trend_df = build_student_registration_trend(students_df, [2021, 2022, 2023, 2024, 2025, 2026])
-            render_clean_line_chart(
-                trend_df,
-                x_field="Year",
-                y_field="Registered Students",
-                x_title="Year",
-                y_title="Registered Students",
-                color="#0F294A",
-                height=220,
-            )
+        with t_col2:
+            st.markdown("**Select a Year Row to Inspect Yearly Registrations**")
             year_picker_df = trend_df.reset_index()
             yr_sel_event = st.dataframe(
                 year_picker_df,
@@ -1971,7 +1981,7 @@ if active_page == "Admin Dashboard":
                 selection_mode="single-row",
                 use_container_width=True,
                 hide_index=True,
-                height=190,
+                height=210,
             )
             sel_y_rows = (yr_sel_event or {}).get("selection", {}).get("rows", [])
             if sel_y_rows:
@@ -1987,10 +1997,8 @@ if active_page == "Admin Dashboard":
                             yr_rows[["record_id", "student_name", "district", "required_service"]],
                             use_container_width=True,
                             hide_index=True,
-                            height=150,
+                            height=160,
                         )
-                    else:
-                        st.caption(f"No student records in the database for {selected_year_click}.")
 
 elif active_page == "Student Registry":
     st.markdown(
