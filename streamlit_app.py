@@ -569,14 +569,12 @@ def build_balanced_106_students_df() -> pd.DataFrame:
     for d_name, cnt in district_targets:
         districts_pool.extend([d_name] * cnt)
 
-    # Exact counts: Mild Autism = 36, High-Function Autism = 35, Severe Autism = 35 (total 106)
     diagnosis_pool = (
         ["Mild Autism"] * 36
         + ["High-Function Autism"] * 35
         + ["Severe Autism"] * 35
     )
 
-    # Exact counts: Speech Therapy = 28, ABA = 26, Occupational Sensory = 26, Early Intervention = 26 (total 106)
     services_pool = (
         ["Speech Therapy"] * 28
         + ["ABA Therapy"] * 26
@@ -709,8 +707,7 @@ def init_database():
         conn.commit()
 
     cur.execute("SELECT COUNT(*) FROM students")
-    cur_count = cur.fetchone()[0]
-    if cur_count == 0:
+    if cur.fetchone()[0] == 0:
         seed_df = build_balanced_106_students_df()
         for _, r in seed_df.iterrows():
             cur.execute(
@@ -791,7 +788,6 @@ def load_students_df() -> pd.DataFrame:
     df = pd.read_sql_query("SELECT * FROM students ORDER BY record_id ASC", conn)
     conn.close()
     cleaned = normalize_students_df(df)
-    # If database had legacy 104 seed rows without manual edits, sync to exact 106 balanced seed
     if len(cleaned) == 104 and set(cleaned["record_id"]).issubset({f"KOD-{1000 + i}" for i in range(106)}):
         conn = get_conn()
         conn.execute("DELETE FROM students")
@@ -1624,8 +1620,15 @@ st.markdown(
         padding: 0 !important;
     }
 
+    /* Upper banner with puzzle strip filling the right side instead of white */
     .gov-header-banner {
-        background: #FFFFFF;
+        position: relative;
+        overflow: hidden;
+        background-color: #FFFFFF;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='92' viewBox='0 0 360 92'%3E%3Cpath d='M8 22 H44 V10 A9 9 0 0 1 62 10 V22 H72 V35 A8 8 0 0 0 72 51 V64 H62 V76 A9 9 0 0 1 44 76 V64 H8 V51 A8 8 0 0 1 8 35 Z' fill='%23E12D39'/%3E%3Cpath d='M72 22 H116 V10 A9 9 0 0 1 134 10 V22 H144 V35 A8 8 0 0 0 144 51 V64 H134 V76 A9 9 0 0 1 116 76 V64 H72 V51 A8 8 0 0 1 72 35 Z' fill='%23F59E0B'/%3E%3Cpath d='M144 22 H188 V10 A9 9 0 0 1 206 10 V22 H216 V35 A8 8 0 0 0 216 51 V64 H206 V76 A9 9 0 0 1 188 76 V64 H144 V51 A8 8 0 0 1 144 35 Z' fill='%2365A30D'/%3E%3Cpath d='M216 22 H260 V10 A9 9 0 0 1 278 10 V22 H288 V35 A8 8 0 0 0 288 51 V64 H278 V76 A9 9 0 0 1 260 76 V64 H216 V51 A8 8 0 0 1 216 35 Z' fill='%230EA5E9'/%3E%3Cpath d='M288 22 H332 V35 A8 8 0 0 0 348 35 A9 9 0 0 1 348 51 A8 8 0 0 0 332 51 V64 H288 V51 A8 8 0 0 1 288 35 Z' fill='%239333EA'/%3E%3C/svg%3E");
+        background-repeat: repeat-y;
+        background-position: right center;
+        background-size: auto 84%;
         border-left: 6px solid #0F294A;
         border-top: 1px solid #CBD5E1;
         border-right: 1px solid #CBD5E1;
@@ -1638,6 +1641,11 @@ st.markdown(
         align-items: center;
         flex-wrap: wrap;
         gap: 12px;
+    }
+
+    .gov-header-banner > div {
+        position: relative;
+        z-index: 2;
     }
 
     .dark-summary-banner {
@@ -2214,7 +2222,6 @@ if active_page == "Admin Dashboard":
 
     st.markdown("<div style='height:18px;'></div>", unsafe_allow_html=True)
 
-    # Row 1: Charts 1 & 2
     r1_c1, r1_c2 = st.columns(2, gap="large")
     with r1_c1:
         st.markdown(
@@ -2253,7 +2260,6 @@ if active_page == "Admin Dashboard":
         render_diagnosis_donut_with_legend(diag_counts, height=400)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Row 2: Charts 3 & 4
     r2_c1, r2_c2 = st.columns(2, gap="large")
     with r2_c1:
         st.markdown(
@@ -2298,7 +2304,6 @@ if active_page == "Admin Dashboard":
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Row 3: Charts 5 & 6
     r3_c1, r3_c2 = st.columns(2, gap="large")
     with r3_c1:
         st.markdown(
@@ -3064,569 +3069,4 @@ elif active_page == "Accessibility Analytics":
                 unsafe_allow_html=True,
             )
 
-    with st.container(border=True):
-        st.subheader("Kelantan District Autism Accessibility Dataset (Connected Registry Table)")
-        st.caption(
-            f"All 10 Kelantan districts derived directly from the active student and centre records. "
-            f"Currently highlighted district: {selected_district}."
-        )
-        tbl_df = access_df.copy()
-        tbl_df["Service Coverage (%)"] = tbl_df.apply(
-            lambda r: round((r["total_capacity"] / r["students"]) * 100.0, 1)
-            if r["students"] > 0
-            else (100.0 if r["total_capacity"] > 0 else 0.0),
-            axis=1,
-        )
-        tbl_df["Coverage Classification"] = tbl_df["level"].map({
-            "Red": "Critical Coverage (Red)",
-            "Yellow": "Moderate Coverage (Yellow)",
-            "Green": "Good Coverage (Green)",
-        })
-        f_col1, f_col2 = st.columns([2, 1.3])
-        tbl_search = f_col1.text_input(
-            "Search District or Classification in Table",
-            placeholder="Filter by district name or Critical / Moderate / Good...",
-            key="analytics_table_search",
-        )
-        tbl_sort = f_col2.selectbox(
-            "Sort Dataset By",
-            [
-                "Default District Order",
-                "Highest Registered Students",
-                "Highest Centre Slot Capacity",
-                "Highest Student-to-Centre Ratio",
-                "Lowest Service Coverage (%)",
-            ],
-            key="analytics_table_sort",
-        )
-        if tbl_search.strip():
-            q_txt = tbl_search.strip().lower()
-            tbl_df = tbl_df[
-                tbl_df["district"].str.lower().str.contains(q_txt, na=False)
-                | tbl_df["Coverage Classification"].str.lower().str.contains(q_txt, na=False)
-                | tbl_df["gap_status"].str.lower().str.contains(q_txt, na=False)
-            ]
-        if tbl_sort == "Highest Registered Students":
-            tbl_df = tbl_df.sort_values(by="students", ascending=False)
-        elif tbl_sort == "Highest Centre Slot Capacity":
-            tbl_df = tbl_df.sort_values(by="total_capacity", ascending=False)
-        elif tbl_sort == "Highest Student-to-Centre Ratio":
-            tbl_df = tbl_df.sort_values(by=["student_per_centre", "students"], ascending=False)
-        elif tbl_sort == "Lowest Service Coverage (%)":
-            tbl_df = tbl_df.sort_values(by="Service Coverage (%)", ascending=True)
-
-        display_tbl = tbl_df[[
-            "district",
-            "students",
-            "centres",
-            "total_capacity",
-            "Service Coverage (%)",
-            "student_per_centre",
-            "Coverage Classification",
-            "gap_status",
-        ]].rename(
-            columns={
-                "district": "District",
-                "students": "Registered Students",
-                "centres": "Autism Centres",
-                "total_capacity": "Centre Slot Capacity",
-                "student_per_centre": "Students / Centre Ratio",
-                "gap_status": "Accessibility Gap Assessment",
-            }
-        )
-
-        def highlight_selected_district_row(row):
-            if str(row["District"]) == selected_district:
-                return ["background-color: #DBEAFE; font-weight: 700; color: #0F172A;"] * len(row)
-            return ["background-color: #FFFFFF; color: #0F172A;"] * len(row)
-
-        styled_tbl = display_tbl.style.apply(highlight_selected_district_row, axis=1).format({
-            "Service Coverage (%)": "{:.1f}%",
-            "Students / Centre Ratio": "{:.1f}",
-        })
-        st.dataframe(styled_tbl, use_container_width=True, hide_index=True)
-
-elif active_page == "Parents Dashboard":
-    st.markdown(
-        """
-        <div class="gov-header-banner">
-            <div>
-                <div style="font-size:21px;font-weight:800;color:#0F172A;">Parents &amp; Guardian Support Portal</div>
-                <div style="font-size:13px;color:#334155;">Register your child, locate the 3 most suitable autism centres in Kelantan, track application status, and explore home learning modules.</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    p1, p2, p3 = st.columns(3, gap="medium")
-    with p1:
-        with st.container(border=True):
-            st.subheader("1. Child Registration")
-            st.write("Submit your child's age, diagnosis, residential address, and therapy needs to find the closest suitable centres.")
-            if st.button("Open Child Registration Form", type="primary", use_container_width=True):
-                navigate_to("Child Registration", "Parent / Guardian")
-                st.rerun()
-    with p2:
-        with st.container(border=True):
-            st.subheader("2. Find Suitable Centres")
-            st.write("View your home marker, animated routes, km distances, and the top 3 matched centres on the Kelantan GIS map.")
-            if st.button("Open GIS Centre Matcher", type="primary", use_container_width=True):
-                navigate_to("Find Suitable Centres", "Parent / Guardian")
-                st.rerun()
-    with p3:
-        with st.container(border=True):
-            st.subheader("3. Learning Modules")
-            st.write("Read 4 interactive page-turning flipbooks covering hygiene, classroom arrival, sensory walk, and PECS communication.")
-            if st.button("Explore 4 Flipbook Modules", type="primary", use_container_width=True):
-                navigate_to("Learning Modules", "Parent / Guardian")
-                st.rerun()
-
-    with st.container(border=True):
-        st.subheader("Recent Parent Registration Tracking")
-        if regs_df.empty:
-            st.info("No registrations submitted yet. Click 'Open Child Registration Form' above to begin.")
-        else:
-            st.dataframe(
-                regs_df[["reg_code", "child_name", "district", "required_services", "selected_centre", "status", "submitted_at"]].rename(
-                    columns={
-                        "reg_code": "Registration ID",
-                        "child_name": "Child Name",
-                        "district": "District",
-                        "required_services": "Therapy Required",
-                        "selected_centre": "Selected Centre",
-                        "status": "Approval Status",
-                        "submitted_at": "Submitted At",
-                    }
-                ),
-                use_container_width=True,
-                hide_index=True,
-            )
-
-elif active_page == "Child Registration":
-    st.markdown(
-        """
-        <div class="gov-header-banner">
-            <div>
-                <div style="font-size:21px;font-weight:800;color:#0F172A;">Child Registration &amp; Automatic GIS Centre Matching</div>
-                <div style="font-size:13px;color:#334155;">Complete your child's registration below. Upon submission, the system will save your record and zoom to your home on the Kelantan GIS map with your top 3 recommended centres.</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    with st.container(border=True):
-        with st.form("parent_child_registration_form"):
-            c1, c2, c3 = st.columns([1.6, 0.8, 1.2])
-            child_name = c1.text_input("Child's Full Name *", placeholder="e.g., Aisyah Humaira binti Ahmad")
-            child_age = c2.number_input("Child's Age *", min_value=1, max_value=21, value=6)
-            diagnosis_cat = c3.selectbox("Diagnosis Category *", DIAGNOSIS_CATEGORIES)
-
-            c4, c5 = st.columns([2, 1])
-            res_address = c4.text_input("Residential Address in Kelantan *", placeholder="e.g., Lot 45, Jalan Kubang Kerian, 16150 Kota Bharu, Kelantan")
-            district_in = c5.selectbox("District in Kelantan *", KELANTAN_DISTRICTS)
-
-            req_services = st.multiselect("Required Therapy Services *", THERAPY_SERVICES, default=["Speech Therapy", "Occupational Sensory"])
-
-            p1, p2 = st.columns(2)
-            parent_name = p1.text_input("Parent / Guardian Full Name *", placeholder="e.g., Ahmad bin Ismail")
-            parent_contact = p2.text_input("Parent Contact Number *", placeholder="e.g., 012-987 6543")
-
-            submitted = st.form_submit_button("Submit and Find Suitable Centres", type="primary", use_container_width=True)
-
-            if submitted:
-                errors = []
-                if not child_name.strip():
-                    errors.append("Child's full name is required.")
-                if not res_address.strip():
-                    errors.append("Residential address is required.")
-                if not req_services:
-                    errors.append("Please select at least one required therapy service.")
-                if not parent_name.strip():
-                    errors.append("Parent's name is required.")
-                if not parent_contact.strip() or len(parent_contact.strip()) < 8:
-                    errors.append("Please enter a valid parent contact number.")
-
-                if errors:
-                    for err in errors:
-                        st.error(err)
-                elif centres_df.empty:
-                    st.error("Insufficient autism centre data in the database. Please ask an administrator to add centre records first.")
-                else:
-                    home_lat, home_lon = estimate_home_coordinates(district_in, res_address)
-                    top3 = compute_top_3_centres(home_lat, home_lon, req_services, centres_df)
-                    conn = get_conn()
-                    cur = conn.cursor()
-                    cur.execute("SELECT COUNT(*) FROM parent_registrations")
-                    next_reg_num = cur.fetchone()[0] + 1
-                    reg_code = f"REG-2026-{next_reg_num:03d}"
-                    now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
-                    cur.execute(
-                        """
-                        INSERT INTO parent_registrations
-                        (reg_code, child_name, age, diagnosis, residential_address, district, home_lat, home_lon,
-                         required_services, parent_name, parent_contact, recommended_centres_json,
-                         selected_centre, status, submitted_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', ?)
-                        """,
-                        (
-                            reg_code, child_name.strip(), int(child_age), diagnosis_cat,
-                            res_address.strip(), district_in, home_lat, home_lon,
-                            ", ".join(req_services), parent_name.strip(), parent_contact.strip(),
-                            json.dumps(top3), top3[0]["centre_name"] if top3 else "", now_str,
-                        ),
-                    )
-                    conn.commit()
-                    conn.close()
-
-                    st.session_state["latest_recommendation_context"] = {
-                        "reg_code": reg_code,
-                        "child_name": child_name.strip(),
-                        "age": int(child_age),
-                        "diagnosis": diagnosis_cat,
-                        "residential_address": res_address.strip(),
-                        "district": district_in,
-                        "home_lat": home_lat,
-                        "home_lon": home_lon,
-                        "required_services": req_services,
-                        "parent_name": parent_name.strip(),
-                        "parent_contact": parent_contact.strip(),
-                        "top3": top3,
-                        "focused_rank": 0,
-                        "selected_centre": top3[0]["centre_name"] if top3 else "",
-                        "just_submitted": True,
-                    }
-                    navigate_to("Find Suitable Centres", "Parent / Guardian")
-                    st.rerun()
-
-elif active_page == "Find Suitable Centres":
-    rec_ctx = st.session_state["latest_recommendation_context"]
-    live_top3 = compute_top_3_centres(
-        rec_ctx["home_lat"],
-        rec_ctx["home_lon"],
-        rec_ctx["required_services"],
-        centres_df,
-    )
-    rec_ctx["top3"] = live_top3
-
-    st.markdown(
-        f"""
-        <div class="gov-header-banner">
-            <div>
-                <div style="font-size:21px;font-weight:800;color:#0F172A;">Kelantan GIS Spatial Centre Recommendation</div>
-                <div style="font-size:13px;color:#334155;">
-                    Showing residential location and Top 3 matched autism centres for
-                    <strong>{html.escape(rec_ctx['child_name'])}</strong>
-                    ({html.escape(rec_ctx['district'])})
-                </div>
-            </div>
-            <div style="background:#CCFBF1; color:#0F172A; padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid #0D9488;">
-                Registration ID: {html.escape(rec_ctx['reg_code'])}
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    if rec_ctx.get("just_submitted"):
-        st.success(
-            f"Registration **{rec_ctx['reg_code']}** saved! The Kelantan GIS map has zoomed to "
-            f"**{rec_ctx['child_name']}'s** residential location and calculated distances and suitability "
-            f"scores for the 3 best-matched autism centres."
-        )
-        rec_ctx["just_submitted"] = False
-
-    if not live_top3:
-        st.warning("Insufficient autism centre data exists in the database to generate recommendations. Please contact an administrator.")
-    else:
-        map_col, cards_col = st.columns([1.35, 1], gap="medium")
-        with map_col:
-            with st.container(border=True):
-                top_bar_l, top_bar_r = st.columns([3, 1.3], vertical_alignment="center")
-                with top_bar_l:
-                    st.subheader("Interactive Kelantan GIS Route & Centre Map")
-                with top_bar_r:
-                    if st.button("Reset Overview", type="secondary", use_container_width=True):
-                        rec_ctx["focused_rank"] = 0
-                        st.rerun()
-                render_recommendation_gis_map(access_df, rec_ctx, map_height=540)
-                st.caption(
-                    "Note: The suitability percentage is a system-generated spatial and service "
-                    "matching score based on therapy availability, distance from home, and centre slot "
-                    "capacity - not a clinical or medical assessment."
-                )
-
-        with cards_col:
-            st.subheader("Top 3 Recommended Centres")
-            rank_badge_colors = {1: "#0D9488", 2: "#0284C7", 3: "#0F294A"}
-            for c in live_top3:
-                b_col = rank_badge_colors.get(c["rank"], "#0D9488")
-                is_selected = (rec_ctx.get("selected_centre") == c["centre_name"])
-                with st.container(border=True):
-                    st.markdown(
-                        f"""
-                        <div style="display: flex; justify-content:space-between; align-items:center;gap:8px;margin-bottom:4px;">
-                            <span style="background:{b_col};color:#FFFFFF;font-size:11px;font-weight:800;padding:3px 10px; border-radius:999px;">
-                                Recommendation #{c['rank']} - {c['suitability_pct']}% Suitability
-                            </span>
-                            <span style="font-size:12.5px;font-weight:800; color:#0F172A;">
-                                {c['distance_km']} km
-                            </span>
-                        </div>
-                        <div style="font-size: 15.5px;font-weight:800;color:#0F172A;margin-bottom:4px;overflow-wrap:anywhere;">
-                            {html.escape(c['centre_name'])}
-                        </div>
-                        <div style="font-size:12px; color:#0F172A;line-height:1.45;">
-                            <strong>Address:</strong> {html.escape(c['address'])}<br>
-                            <strong>Available Services:</strong> {html.escape(c['services'])}<br>
-                            <strong>Contact:</strong> {html.escape(c['contact'])} &nbsp;|&nbsp;
-                            <strong>Hours:</strong> {html.escape(c['hours'])}
-                        </div>
-                        <div style="margin-top:6px;background:#E6F4F1; border-left:3px solid {b_col};padding:6px 9px;border-radius:6px;font-size: 11.8px;color:#0F172A;">
-                            {html.escape(c['reason'])}
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
-                    st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
-                    btn1, btn2 = st.columns(2)
-                    if btn1.button("View on GIS Map", key=f"view_map_{c['rank']}", type="secondary", use_container_width=True):
-                        rec_ctx["focused_rank"] = c["rank"]
-                        st.rerun()
-                    if is_selected:
-                        btn2.markdown('<div class="saved-centre-pill">Preferred Centre Saved</div>', unsafe_allow_html=True)
-                    else:
-                        if btn2.button(f"Select Centre #{c['rank']}", key=f"select_centre_{c['rank']}", type="primary", use_container_width=True):
-                            rec_ctx["selected_centre"] = c["centre_name"]
-                            conn = get_conn()
-                            conn.execute(
-                                "UPDATE parent_registrations SET selected_centre=? WHERE reg_code=?",
-                                (c["centre_name"], rec_ctx["reg_code"]),
-                            )
-                            conn.commit()
-                            conn.close()
-                            st.success(f"Saved **{c['centre_name']}** as your preferred centre for {rec_ctx['reg_code']}!")
-                            st.rerun()
-
-elif active_page == "Learning Modules":
-    st.markdown(
-        """
-        <div class="gov-header-banner">
-            <div>
-                <div style="font-size:21px;font-weight:800; color:#0F172A;">Parents Learning Interactive Flipbooks</div>
-                <div style="font-size:13px;color:#334155;">Click any module cover to open its interactive page-turning flipbook guide for home routine support.</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    open_key = st.session_state["open_flipbook_key"]
-    if open_key is None:
-        cols = st.columns(2, gap="large")
-        for idx, mod in enumerate(MODULES_4):
-            with cols[idx % 2]:
-                with st.container(border=True):
-                    st.markdown(
-                        f"""
-                        <div style="background:linear-gradient(135deg, {mod['color']} 0%, {mod['accent']} 100%); color:#FFFFFF;border-radius: 10px;padding:22px 20px;margin-bottom:12px;">
-                            <div style="font-size: 11px;font-weight:800;letter-spacing:1px;text-transform:uppercase; color:#FFFFFF;">
-                                {html.escape(mod['code'])} - {html.escape(mod['domain'])}
-                            </div>
-                            <div style="font-size:20px;font-weight:800;margin:8px 0 6px 0;line-height:1.25;color:#FFFFFF;">
-                                {html.escape(mod['title'])}
-                            </div>
-                            <div style="font-size: 12.5px; color:#FFFFFF;line-height:1.45;">
-                                {html.escape(mod['cover_desc'])}
-                            </div>
-                            <div style="margin-top:14px;font-size: 11.5px;font-weight:700;background:rgba(255,255,255,0.2); color:#FFFFFF;display:inline-block;padding:4px 10px;border-radius:999px;">
-                                4 Interactive Pages: Cover + Step-by-Step Guide
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
-                    if st.button(f"Open {mod['title']}", key=f"open_mod_{mod['key']}", type="primary", use_container_width=True):
-                        st.session_state["open_flipbook_key"] = mod["key"]
-                        st.session_state[f"fb_page_{mod['key']}"] = 0
-                        st.rerun()
-    else:
-        mod = next(m for m in MODULES_4 if m["key"] == open_key)
-        p_key = f"fb_page_{mod['key']}"
-        cur_p = st.session_state[p_key]
-        total_p = len(mod["pages"]) + 1
-        if st.button("Back to All 4 Module Covers", type="secondary"):
-            st.session_state["open_flipbook_key"] = None
-            st.rerun()
-        with st.container(border=True):
-            if cur_p == 0:
-                page_title = f"Cover Page - {mod['title']}"
-                page_sub = mod["domain"]
-                page_body = mod["cover_desc"]
-                page_bullets = "- Click 'Next Page' below to turn to Step 1.\n- Designed for daily home practice alongside therapist guidance."
-            else:
-                heading, summary, steps = mod["pages"][cur_p - 1]
-                page_title = heading
-                page_sub = f"{mod['code']} - {mod['title']}"
-                page_body = summary
-                page_bullets = steps
-            bullets_html = "<br>".join(html.escape(line) for line in page_bullets.split("\n"))
-            flipbook_visual = f"""<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8" />
-<style>
-body {{ margin:0; padding:4px; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background:transparent; }}
-@keyframes pageTurnIn {{
-    0% {{ opacity: 0; transform: perspective(1000px) rotateY(-14deg) translateX(16px); }}
-    100% {{ opacity: 1; transform: perspective(1000px) rotateY(0deg) translateX(0); }}
-}}
-.book-page {{
-    animation: pageTurnIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    background: #FFFFFF;
-    border: 1px solid #CBD5E1;
-    border-left: 8px solid {mod['color']};
-    border-radius: 12px;
-    padding: 24px 26px;
-}}
-.badge {{
-    display: inline-block; background: {mod['soft_bg']}; color: #0F172A;
-    font-size: 11.5px; font-weight: 800; padding: 4px 12px; border-radius: 999px;
-    margin-bottom: 10px;
-}}
-.p-title {{ font-size: 21px; font-weight: 800; color: #0F172A; margin: 0 0 8px 0; }}
-.p-summary {{ font-size: 14.5px; color: #0F172A; line-height: 1.55; margin-bottom: 14px; }}
-.p-box {{
-    background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px;
-    padding: 14px 16px; font-size: 13.5px; color: #0F172A; line-height: 1.7;
-}}
-</style>
-</head>
-<body>
-<div class="book-page">
-    <div class="badge">{html.escape(page_sub)} - Page {cur_p + 1} of {total_p}</div>
-    <div class="p-title">{html.escape(page_title)}</div>
-    <div class="p-summary">{html.escape(page_body)}</div>
-    <div class="p-box">{bullets_html}</div>
-</div>
-</body>
-</html>"""
-            components.html(flipbook_visual, height=295, scrolling=False)
-            nav_l, nav_m, nav_r = st.columns([1, 1.5, 1])
-            if nav_l.button("Previous Page", disabled=(cur_p == 0), type="secondary", use_container_width=True):
-                st.session_state[p_key] = cur_p - 1
-                st.rerun()
-            nav_m.markdown(
-                f"<div style='text-align:center;padding-top:8px;font-weight:700; color:#0F172A;'>Page {cur_p + 1} of {total_p}</div>",
-                unsafe_allow_html=True,
-            )
-            if nav_r.button("Next Page", disabled=(cur_p == total_p - 1), type="primary", use_container_width=True):
-                st.session_state[p_key] = cur_p + 1
-                st.rerun()
-
-elif active_page == "Registration History":
-    st.markdown(
-        """
-        <div class="gov-header-banner">
-            <div>
-                <div style="font-size:21px;font-weight:800; color:#0F172A;">Parent Registration History &amp; Status Tracking</div>
-                <div style="font-size:13px;color:#334155;">Track whether your child's registration is Pending, Approved, or Rejected and review your selected autism centre.</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    if regs_df.empty:
-        st.info("No registration records found yet.")
-    else:
-        for _, r in regs_df.iterrows():
-            st_val = r["status"]
-            b_cls = (
-                "badge-approved"
-                if st_val == "Approved"
-                else ("badge-rejected" if st_val == "Rejected" else "badge-pending")
-            )
-            with st.container(border=True):
-                c_l, c_r = st.columns([3.2, 1], vertical_alignment="center")
-                with c_l:
-                    st.markdown(
-                        f"**{r['reg_code']} - {r['child_name']}** (Age {r['age']} - {r['diagnosis']}) &nbsp;"
-                        f"<span class='status-badge {b_cls}'>{st_val}</span>",
-                        unsafe_allow_html=True,
-                    )
-                    st.write(
-                        f"**District:** {r['district']} | **Required Services:** {r['required_services']} | "
-                        f"**Selected Centre:** {r['selected_centre'] or 'None selected'}"
-                    )
-                    st.caption(f"Submitted by {r['parent_name']} ({r['parent_contact']}) on {r['submitted_at']}")
-                with c_r:
-                    if st.button("View on GIS Map", key=f"hist_map_{r['id']}", type="secondary", use_container_width=True):
-                        req_s = [x.strip() for x in str(r["required_services"]).split(",") if x.strip()]
-                        top3 = compute_top_3_centres(float(r["home_lat"]), float(r["home_lon"]), req_s, centres_df)
-                        st.session_state["latest_recommendation_context"] = {
-                            "reg_code": r["reg_code"],
-                            "child_name": r["child_name"],
-                            "age": int(r["age"]),
-                            "diagnosis": r["diagnosis"],
-                            "residential_address": r["residential_address"],
-                            "district": r["district"],
-                            "home_lat": float(r["home_lat"]),
-                            "home_lon": float(r["home_lon"]),
-                            "required_services": req_s,
-                            "parent_name": r["parent_name"],
-                            "parent_contact": r["parent_contact"],
-                            "top3": top3,
-                            "focused_rank": 0,
-                            "selected_centre": r["selected_centre"],
-                            "just_submitted": False,
-                        }
-                        navigate_to("Find Suitable Centres", "Parent / Guardian")
-                        st.rerun()
-
-elif active_page == "Settings":
-    st.markdown(
-        """
-        <div class="gov-header-banner">
-            <div>
-                <div style="font-size:21px;font-weight:800; color:#0F172A;">System Settings &amp; Database Maintenance</div>
-                <div style="font-size:13px;color:#334155;">Manage user portal permissions and export backups.</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    with st.container(border=True):
-        st.subheader("Active Portal Role & Access Control")
-        role_choice = st.radio(
-            "Select Active Role",
-            ["Administrator", "Parent / Guardian"],
-            index=0 if st.session_state["user_role"] == "Administrator" else 1,
-            horizontal=True,
-        )
-        if st.button("Apply Role Setting", type="primary"):
-            st.session_state["user_role"] = role_choice
-            st.success(f"Active portal role set to {role_choice}.")
-            st.rerun()
-
-    with st.container(border=True):
-        st.subheader("Database Export")
-        d1, d2, d3 = st.columns(3)
-        d1.download_button(
-            "Export Student Registry (CSV)",
-            data=students_df.to_csv(index=False).encode("utf-8"),
-            file_name="kelantan_students_registry.csv",
-            mime="text/csv",
-            use_container_width=True,
-        )
-        d2.download_button(
-            "Export Autism Centres (CSV)",
-            data=centres_df.to_csv(index=False).encode("utf-8"),
-            file_name="kelantan_autism_centres.csv",
-            mime="text/csv",
-            use_container_width=True,
-        )
-        d3.download_button(
-            "Export Parent Registrations (CSV)",
-            data=regs_df.to_csv(index=False).encode("utf-8"),
-            file_name="kelantan_parent_registrations.csv",
-            mime="text/csv",
-            use_container_width=True,
-        )
+    with st.container(border
