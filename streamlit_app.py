@@ -1096,6 +1096,82 @@ def render_clean_line_chart(
     st.vega_lite_chart(plot_df, spec, use_container_width=True)
 
 
+def render_accessibility_donut_chart(
+    district_name: str,
+    students: int,
+    total_capacity: int,
+    level: str,
+    height: int = 270,
+):
+    if level == "Red":
+        status_hex = "#DC2626"
+        status_name = "Critical Coverage"
+    elif level == "Yellow":
+        status_hex = "#EAB308"
+        status_name = "Moderate Coverage"
+    else:
+        status_hex = "#0D9488"
+        status_name = "Good Coverage"
+
+    if total_capacity <= 0 and students <= 0:
+        donut_rows = [
+            {"Segment": "No Active Demand / Capacity", "Slots": 1, "Color": "#CBD5E1"},
+        ]
+    elif students <= total_capacity:
+        remaining_slots = max(0, total_capacity - students)
+        donut_rows = [
+            {"Segment": "Registered Autism Students", "Slots": students, "Color": status_hex},
+            {"Segment": "Remaining Centre Slot Capacity", "Slots": remaining_slots, "Color": "#E2E8F0"},
+        ]
+    else:
+        unmet_demand = students - total_capacity
+        donut_rows = [
+            {"Segment": "Covered by Centre Capacity", "Slots": total_capacity, "Color": "#0F294A"},
+            {"Segment": "Unmet Student Demand (Shortage)", "Slots": unmet_demand, "Color": "#DC2626"},
+        ]
+
+    donut_df = pd.DataFrame(donut_rows)
+    domain_labels = donut_df["Segment"].tolist()
+    range_colors = donut_df["Color"].tolist()
+
+    spec = {
+        "background": "#FFFFFF",
+        "height": height,
+        "padding": {"top": 8, "right": 12, "bottom": 8, "left": 12},
+        "mark": {
+            "type": "arc",
+            "innerRadius": 62,
+            "outerRadius": 102,
+            "stroke": "#FFFFFF",
+            "strokeWidth": 2.5,
+        },
+        "encoding": {
+            "theta": {"field": "Slots", "type": "quantitative", "stack": True},
+            "color": {
+                "field": "Segment",
+                "type": "nominal",
+                "scale": {"domain": domain_labels, "range": range_colors},
+                "legend": {
+                    "orient": "bottom",
+                    "direction": "vertical",
+                    "labelColor": "#0F172A",
+                    "titleColor": "#0F172A",
+                    "title": f"{district_name} ({status_name})",
+                    "labelFontSize": 11.5,
+                },
+            },
+            "tooltip": [
+                {"field": "Segment", "type": "nominal", "title": "Category"},
+                {"field": "Slots", "type": "quantitative", "title": "Count / Slots"},
+            ],
+        },
+        "config": {
+            "view": {"stroke": "transparent", "fill": "#FFFFFF"},
+        },
+    }
+    st.vega_lite_chart(donut_df, spec, use_container_width=True)
+
+
 st.markdown(
     """
     <style>
@@ -1284,6 +1360,8 @@ if "user_role" not in st.session_state:
     st.session_state["user_role"] = "Administrator"
 if "logged_out" not in st.session_state:
     st.session_state["logged_out"] = False
+if "analytics_selected_district" not in st.session_state:
+    st.session_state["analytics_selected_district"] = "Kota Bharu"
 if "latest_recommendation_context" not in st.session_state:
     init_centres = load_centres_df()
     def_lat, def_lon = 6.1180, 102.2480
@@ -2443,13 +2521,17 @@ elif active_page == "Accessibility Analytics":
         """
         <div class="gov-header-banner">
             <div>
-                <div style="font-size:21px;font-weight:800;color:#0F172A;">District Accessibility Gap &amp; Service Deficit Analysis</div>
-                <div style="font-size:13px;color:#334155;">Identifies Kelantan districts with high registered student demand but insufficient autism service centres.</div>
+                <div style="font-size:21px;font-weight:800;color:#0F172A;">Autism Service Accessibility Analysis</div>
+                <div style="font-size:13px;color:#334155;">Interactive district-level spatial capacity evaluation comparing registered autism students against autism service centre slot capacity across Kelantan.</div>
+            </div>
+            <div style="background:#E0F2FE;color:#0F172A;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid #0284C7;">
+                Interactive District Drill-Down
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
     critical_df = access_df[access_df["level"] == "Red"]
     moderate_df = access_df[access_df["level"] == "Yellow"]
     good_df = access_df[access_df["level"] == "Green"]
@@ -2457,7 +2539,7 @@ elif active_page == "Accessibility Analytics":
     g1, g2, g3 = st.columns(3, gap="medium")
     with g1:
         st.markdown(
-            f'<div class="kpi-card" style="border-top-color:#DC2626;"><div class="kpi-title">Critical Shortage Districts (Red)</div><div class="kpi-num">{len(critical_df)}</div><div class="kpi-sub">High Student-to-Centre Deficit</div></div>',
+            f'<div class="kpi-card" style="border-top-color:#DC2626;"><div class="kpi-title">Critical Coverage Districts (Red)</div><div class="kpi-num">{len(critical_df)}</div><div class="kpi-sub">Insufficient Service Capacity</div></div>',
             unsafe_allow_html=True,
         )
     with g2:
@@ -2467,40 +2549,280 @@ elif active_page == "Accessibility Analytics":
         )
     with g3:
         st.markdown(
-            f'<div class="kpi-card teal"><div class="kpi-title">Good Accessibility Districts (Green)</div><div class="kpi-num">{len(good_df)}</div><div class="kpi-sub">Sufficient Multi-Centre Support</div></div>',
+            f'<div class="kpi-card teal"><div class="kpi-title">Good Coverage Districts (Green)</div><div class="kpi-num">{len(good_df)}</div><div class="kpi-sub">Sufficient Multi-Centre Support</div></div>',
             unsafe_allow_html=True,
         )
 
     st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+
+    # Interactive District Selector + Clickable District Cards
     with st.container(border=True):
-        st.subheader("Student Demand vs. Total Centre Slot Capacity by District")
-        st.caption("Districts where registered students approach or exceed local capacity require priority outreach or new centre allocation.")
-        gap_chart_df = access_df[["district", "students", "total_capacity"]].rename(
-            columns={"students": "Registered Students", "total_capacity": "Centre Slot Capacity"}
-        ).set_index("district")
-        render_clean_stacked_bar_chart(
-            gap_chart_df,
-            x_title="District",
-            y_title="Count",
-            legend_title="Metric",
-            colors=["#0F294A", "#0D9488"],
-            height=280,
+        sel_top_l, sel_top_r = st.columns([1.4, 2.6], vertical_alignment="center")
+        with sel_top_l:
+            current_dist = st.session_state["analytics_selected_district"]
+            if current_dist not in KELANTAN_DISTRICTS:
+                current_dist = KELANTAN_DISTRICTS[0]
+            chosen_dist = st.selectbox(
+                "Select Kelantan District to Analyze",
+                options=KELANTAN_DISTRICTS,
+                index=KELANTAN_DISTRICTS.index(current_dist),
+                key="analytics_district_selectbox",
+            )
+            if chosen_dist != st.session_state["analytics_selected_district"]:
+                st.session_state["analytics_selected_district"] = chosen_dist
+                st.rerun()
+        with sel_top_r:
+            st.caption("Or click any district button below to dynamically update the donut chart, KPIs, classification badge, analytical explanation, and highlighted table row:")
+            row1_cols = st.columns(5)
+            for idx, d_name in enumerate(KELANTAN_DISTRICTS[:5]):
+                is_sel = (d_name == st.session_state["analytics_selected_district"])
+                if row1_cols[idx].button(
+                    d_name,
+                    key=f"dist_chip_{d_name}",
+                    type="primary" if is_sel else "secondary",
+                    use_container_width=True,
+                ):
+                    st.session_state["analytics_selected_district"] = d_name
+                    st.rerun()
+            row2_cols = st.columns(5)
+            for idx, d_name in enumerate(KELANTAN_DISTRICTS[5:]):
+                is_sel = (d_name == st.session_state["analytics_selected_district"])
+                if row2_cols[idx].button(
+                    d_name,
+                    key=f"dist_chip_{d_name}",
+                    type="primary" if is_sel else "secondary",
+                    use_container_width=True,
+                ):
+                    st.session_state["analytics_selected_district"] = d_name
+                    st.rerun()
+
+    selected_district = st.session_state["analytics_selected_district"]
+    dist_row = access_df[access_df["district"] == selected_district].iloc[0]
+
+    d_students = int(dist_row["students"])
+    d_centres = int(dist_row["centres"])
+    d_capacity = int(dist_row["total_capacity"])
+    d_ratio = float(dist_row["student_per_centre"])
+    d_level = str(dist_row["level"])
+
+    if d_students > 0:
+        coverage_pct = round((d_capacity / d_students) * 100.0, 1)
+    elif d_capacity > 0:
+        coverage_pct = 100.0
+    else:
+        coverage_pct = 0.0
+
+    utilization_pct = round((d_students / d_capacity) * 100.0, 1) if d_capacity > 0 else 0.0
+    surplus_or_deficit = d_capacity - d_students
+
+    if d_level == "Red":
+        class_title = "Critical Coverage"
+        badge_bg = "#FEE2E2"
+        badge_border = "#DC2626"
+        accent_hex = "#DC2626"
+        explanation_text = (
+            f"<strong>{html.escape(selected_district)}</strong> is classified under <strong>Critical Coverage (Red)</strong> because "
+            f"<strong>{d_students} registered autism students</strong> rely on only <strong>{d_centres} autism service centre(s)</strong> "
+            f"(<strong>{d_capacity} total slots</strong>, resulting in a <strong>{d_ratio}:1 student-to-centre ratio</strong> and "
+            f"<strong>{coverage_pct}% capacity-to-demand coverage</strong>). The high concentration of student demand relative to available "
+            f"specialist infrastructure indicates a critical service shortage and priority need for additional autism therapy resources."
+        )
+    elif d_level == "Yellow":
+        class_title = "Moderate Coverage"
+        badge_bg = "#FEF3C7"
+        badge_border = "#EAB308"
+        accent_hex = "#EAB308"
+        explanation_text = (
+            f"<strong>{html.escape(selected_district)}</strong> is classified under <strong>Moderate Coverage (Yellow)</strong> because "
+            f"the district currently operates <strong>{d_centres} autism service centre(s)</strong> providing <strong>{d_capacity} total slots</strong> "
+            f"for <strong>{d_students} registered autism students</strong> (<strong>{d_ratio}:1 student-to-centre ratio</strong>, "
+            f"<strong>{utilization_pct}% slot utilization</strong>, and <strong>{coverage_pct}% capacity-to-demand ratio</strong>). "
+            f"While baseline autism service capacity is available, limited specialist bandwidth may become strained as student registrations grow."
+        )
+    else:
+        class_title = "Good Coverage"
+        badge_bg = "#CCFBF1"
+        badge_border = "#0D9488"
+        accent_hex = "#0D9488"
+        explanation_text = (
+            f"<strong>{html.escape(selected_district)}</strong> is classified under <strong>Good Coverage (Green)</strong> because "
+            f"<strong>{d_centres} active autism service centres</strong> offer <strong>{d_capacity} total slots</strong> against "
+            f"<strong>{d_students} registered autism students</strong> (a balanced <strong>{d_ratio}:1 student-to-centre ratio</strong>, "
+            f"<strong>{coverage_pct}% capacity-to-demand ratio</strong>, and <strong>{surplus_or_deficit} spare slot(s)</strong>). "
+            f"Available autism service capacity is relatively sufficient compared to current registered student demand."
         )
 
+    # Interactive Donut Chart + District Accessibility Analysis Panel
+    chart_col, analysis_col = st.columns([1.05, 1.35], gap="medium")
+    with chart_col:
+        with st.container(border=True):
+            st.subheader(f"{selected_district} — Service Accessibility Donut")
+            st.caption("Comparison of registered autism students vs. available autism centre slot capacity.")
+            render_accessibility_donut_chart(
+                district_name=selected_district,
+                students=d_students,
+                total_capacity=d_capacity,
+                level=d_level,
+                height=285,
+            )
+
+    with analysis_col:
+        with st.container(border=True):
+            hdr_l, hdr_r = st.columns([2.2, 1.2], vertical_alignment="center")
+            with hdr_l:
+                st.subheader(f"{selected_district} District Analysis")
+            with hdr_r:
+                st.markdown(
+                    f"""
+                    <div style="text-align:right;">
+                        <span style="display:inline-block;background:{badge_bg};color:#0F172A;border:1.5px solid {badge_border};
+                        padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;">
+                            {class_title} ({d_level})
+                        </span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+            m1, m2, m3 = st.columns(3, gap="small")
+            with m1:
+                st.markdown(
+                    f'<div class="kpi-card" style="padding:12px 14px;"><div class="kpi-title">Registered Students</div>'
+                    f'<div class="kpi-num" style="font-size:24px;">{d_students}</div>'
+                    f'<div class="kpi-sub">Across {d_centres} Centre(s)</div></div>',
+                    unsafe_allow_html=True,
+                )
+            with m2:
+                st.markdown(
+                    f'<div class="kpi-card lblue" style="padding:12px 14px;"><div class="kpi-title">Centre Slot Capacity</div>'
+                    f'<div class="kpi-num" style="font-size:24px;">{d_capacity}</div>'
+                    f'<div class="kpi-sub">Student-to-Centre: {d_ratio}:1</div></div>',
+                    unsafe_allow_html=True,
+                )
+            with m3:
+                st.markdown(
+                    f'<div class="kpi-card" style="border-top-color:{accent_hex};padding:12px 14px;">'
+                    f'<div class="kpi-title">Service Coverage</div>'
+                    f'<div class="kpi-num" style="font-size:24px;">{coverage_pct}%</div>'
+                    f'<div class="kpi-sub">Capacity vs. Demand</div></div>',
+                    unsafe_allow_html=True,
+                )
+
+            st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+            balance_label = (
+                f"+{surplus_or_deficit} Available Buffer Slots"
+                if surplus_or_deficit >= 0
+                else f"{abs(surplus_or_deficit)} Student Slot Deficit"
+            )
+            st.markdown(
+                f"""
+                <div style="background:#F8FAFC;border:1px solid #CBD5E1;border-left:5px solid {accent_hex};
+                border-radius:10px;padding:14px 16px;color:#0F172A;">
+                    <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:#0F172A;margin-bottom:6px;">
+                        Why {html.escape(selected_district)} Is Classified as {class_title} ({balance_label})
+                    </div>
+                    <div style="font-size:13.5px;line-height:1.55;color:#0F172A;">
+                        {explanation_text}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    # Excel Dataset Table Underneath (Connected to Same Dataset, Searchable, Sortable, Highlights Selected District)
     with st.container(border=True):
-        st.subheader("Priority Gap Action Table (Sorted by Highest Student-to-Centre Ratio)")
-        sorted_gap = access_df.sort_values(by=["student_per_centre", "students"], ascending=False)
+        st.subheader("Kelantan District Autism Accessibility Dataset (Connected Registry Table)")
+        st.caption(
+            f"All 10 Kelantan districts derived directly from the active student and centre records. "
+            f"Currently highlighted district: {selected_district}."
+        )
+
+        tbl_df = access_df.copy()
+        tbl_df["Service Coverage (%)"] = tbl_df.apply(
+            lambda r: round((r["total_capacity"] / r["students"]) * 100.0, 1)
+            if r["students"] > 0
+            else (100.0 if r["total_capacity"] > 0 else 0.0),
+            axis=1,
+        )
+        tbl_df["Coverage Classification"] = tbl_df["level"].map(
+            {
+                "Red": "Critical Coverage (Red)",
+                "Yellow": "Moderate Coverage (Yellow)",
+                "Green": "Good Coverage (Green)",
+            }
+        )
+
+        f_col1, f_col2 = st.columns([2, 1.3])
+        tbl_search = f_col1.text_input(
+            "Search District or Classification in Table",
+            placeholder="Filter by district name or Critical / Moderate / Good...",
+            key="analytics_table_search",
+        )
+        tbl_sort = f_col2.selectbox(
+            "Sort Dataset By",
+            [
+                "Default District Order",
+                "Highest Registered Students",
+                "Highest Centre Slot Capacity",
+                "Highest Student-to-Centre Ratio",
+                "Lowest Service Coverage (%)",
+            ],
+            key="analytics_table_sort",
+        )
+
+        if tbl_search.strip():
+            q_txt = tbl_search.strip().lower()
+            tbl_df = tbl_df[
+                tbl_df["district"].str.lower().str.contains(q_txt, na=False)
+                | tbl_df["Coverage Classification"].str.lower().str.contains(q_txt, na=False)
+                | tbl_df["gap_status"].str.lower().str.contains(q_txt, na=False)
+            ]
+
+        if tbl_sort == "Highest Registered Students":
+            tbl_df = tbl_df.sort_values(by="students", ascending=False)
+        elif tbl_sort == "Highest Centre Slot Capacity":
+            tbl_df = tbl_df.sort_values(by="total_capacity", ascending=False)
+        elif tbl_sort == "Highest Student-to-Centre Ratio":
+            tbl_df = tbl_df.sort_values(by=["student_per_centre", "students"], ascending=False)
+        elif tbl_sort == "Lowest Service Coverage (%)":
+            tbl_df = tbl_df.sort_values(by="Service Coverage (%)", ascending=True)
+
+        display_tbl = tbl_df[
+            [
+                "district",
+                "students",
+                "centres",
+                "total_capacity",
+                "Service Coverage (%)",
+                "student_per_centre",
+                "Coverage Classification",
+                "gap_status",
+            ]
+        ].rename(
+            columns={
+                "district": "District",
+                "students": "Registered Students",
+                "centres": "Autism Centres",
+                "total_capacity": "Centre Slot Capacity",
+                "student_per_centre": "Students / Centre Ratio",
+                "gap_status": "Accessibility Gap Assessment",
+            }
+        )
+
+        def highlight_selected_district_row(row):
+            if str(row["District"]) == selected_district:
+                return ["background-color: #DBEAFE; font-weight: 700; color: #0F172A;"] * len(row)
+            return ["background-color: #FFFFFF; color: #0F172A;"] * len(row)
+
+        styled_tbl = display_tbl.style.apply(highlight_selected_district_row, axis=1).format(
+            {
+                "Service Coverage (%)": "{:.1f}%",
+                "Students / Centre Ratio": "{:.1f}",
+            }
+        )
+
         st.dataframe(
-            sorted_gap[["district", "students", "centres", "total_capacity", "student_per_centre", "gap_status"]].rename(
-                columns={
-                    "district": "District",
-                    "students": "Registered Students",
-                    "centres": "Autism Centres",
-                    "total_capacity": "Total Slots",
-                    "student_per_centre": "Students / Centre Ratio",
-                    "gap_status": "Accessibility Gap Assessment",
-                }
-            ),
+            styled_tbl,
             use_container_width=True,
             hide_index=True,
         )
@@ -3004,5 +3326,3 @@ elif active_page == "Settings":
             mime="text/csv",
             use_container_width=True,
         )
-
-
