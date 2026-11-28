@@ -1602,14 +1602,7 @@ st.markdown(
         position: relative;
         overflow: hidden;
         background-color: #FFFFFF;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='92' viewBox='0 0 360 92'%3E%3Cpath d='M8 22 H44 V10 A9 9 0 0 1 62 10 V22 H72 V35 A8 8 0 0 0 72 51 V64 H62 V76 A9 9 0 0 1 44 76 V64 H8 V51 A8 8 0 0 1 8 35 Z' fill='%23E12D39'/%3E%3Cpath d='M72 22 H116 V10 A9 9 0 0 1 134 10 V22 H144 V35 A8 8 0 0 0 144 51 V64 H134 V76 A9 9 0 0 1 116 76 V64 H72 V51 A8 8 0 0 1 72 35 Z' fill='%23F59E0B'/%3E%3Cpath d='M144 22 H188 V10 A9 9 0 0 1 206 10 V22 H216 V35 A8 8 0 0 0 216 51 V64 H206 V76 A9 9 0 0 1 188 76 V64 H144 V51 A8 8 0 0 1 144 35 Z' fill='%2365A30D'/%3E%3Cpath d='M216 22 H260 V10 A9 9 0 0 1 278 10 V22 H288 V35 A8 8 0 0 0 288 51 V64 H278 V76 A9 9 0 0 1 260 76 V64 H216 V51 A8 8 0 0 1 216 35 Z' fill='%230EA5E9'/%3E%3Cpath d='M288 22 H332 V35 A8 8 0 0 0 348 35 A9 9 0 0 1 348 51 A8 8 0 0 0 332 51 V64 H288 V51 A8 8 0 0 1 288 35 Z' fill='%239333EA'/%3E%3C/svg%3E");
-        background-repeat: repeat-y;
-        background-position: right center;
-        background-size: auto 84%;
-        border-left: 6px solid #0F294A;
-        border-top: 1px solid #CBD5E1;
-        border-right: 1px solid #CBD5E1;
-        border-bottom: 1px solid #CBD5E1;
+        border: 1px solid #CBD5E1;
         border-radius: 12px;
         padding: 16px 20px;
         margin-bottom: 14px;
