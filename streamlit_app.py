@@ -1501,26 +1501,31 @@ st.markdown(
 
     header[data-testid="stHeader"] {
         background-color: #FFFFFF !important;
-        border-bottom: none !important;
+        border-bottom: 1px solid #CBD5E1 !important;
         position: relative !important;
-        overflow: visible !important;
+        overflow: hidden !important;
     }
 
-    header[data-testid="stHeader"]::after {
+    header[data-testid="stHeader"] > * {
+        position: relative;
+        z-index: 2;
+    }
+
+    header[data-testid="stHeader"]::before {
         content: "";
         position: absolute;
+        top: 0;
         left: 0;
-        right: 0;
-        bottom: -14px;
-        width: 100%;
-        height: 14px;
+        bottom: 0;
+        width: calc(100% - 230px);
+        height: 100%;
         pointer-events: none;
-        z-index: 5;
-        background-color: transparent;
+        z-index: 1;
+        background-color: #FFFFFF;
         background-repeat: repeat-x;
-        background-position: left bottom;
-        background-size: 72px 14px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='14' viewBox='0 0 72 14'%3E%3Cpath d='M0,1.5 H9.5 A2.5,2.5 0 0,1 14.5,1.5 H24 V4.5 A2.5,2.5 0 0,1 24,9.5 V12.5 H14.5 A2.5,2.5 0 0,0 9.5,12.5 H0 Z' fill='%232563EB'/%3E%3Cpath d='M24,1.5 H33.5 A2.5,2.5 0 0,0 38.5,1.5 H48 V4.5 A2.5,2.5 0 0,0 48,9.5 V12.5 H38.5 A2.5,2.5 0 0,1 33.5,12.5 H24 V9.5 A2.5,2.5 0 0,0 24,4.5 Z' fill='%23EF4444'/%3E%3Cpath d='M48,1.5 H57.5 A2.5,2.5 0 0,1 62.5,1.5 H72 V12.5 H62.5 A2.5,2.5 0 0,0 57.5,12.5 H48 V9.5 A2.5,2.5 0 0,1 48,4.5 Z' fill='%23FACC15'/%3E%3C/svg%3E");
+        background-position: left top;
+        background-size: auto 100%;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='48' viewBox='0 0 144 48'%3E%3Cpath d='M0,0 H48 V17 A7,7 0 0,0 48,31 V48 H0 Z' fill='%232563EB'/%3E%3Cpath d='M48,0 H96 V17 A7,7 0 0,1 96,31 V48 H48 V31 A7,7 0 0,1 48,17 Z' fill='%23EF4444'/%3E%3Cpath d='M96,0 H144 V48 H96 V31 A7,7 0 0,0 96,17 Z' fill='%23FACC15'/%3E%3C/svg%3E");
     }
 
     [data-testid="stSidebar"] {
