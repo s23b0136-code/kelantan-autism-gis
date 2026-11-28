@@ -1501,7 +1501,26 @@ st.markdown(
 
     header[data-testid="stHeader"] {
         background-color: #FFFFFF !important;
-        border-bottom: 1px solid #CBD5E1 !important;
+        border-bottom: none !important;
+        position: relative !important;
+        overflow: visible !important;
+    }
+
+    header[data-testid="stHeader"]::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -14px;
+        width: 100%;
+        height: 14px;
+        pointer-events: none;
+        z-index: 5;
+        background-color: transparent;
+        background-repeat: repeat-x;
+        background-position: left bottom;
+        background-size: 72px 14px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='14' viewBox='0 0 72 14'%3E%3Cpath d='M0,1.5 H9.5 A2.5,2.5 0 0,1 14.5,1.5 H24 V4.5 A2.5,2.5 0 0,1 24,9.5 V12.5 H14.5 A2.5,2.5 0 0,0 9.5,12.5 H0 Z' fill='%232563EB'/%3E%3Cpath d='M24,1.5 H33.5 A2.5,2.5 0 0,0 38.5,1.5 H48 V4.5 A2.5,2.5 0 0,0 48,9.5 V12.5 H38.5 A2.5,2.5 0 0,1 33.5,12.5 H24 V9.5 A2.5,2.5 0 0,0 24,4.5 Z' fill='%23EF4444'/%3E%3Cpath d='M48,1.5 H57.5 A2.5,2.5 0 0,1 62.5,1.5 H72 V12.5 H62.5 A2.5,2.5 0 0,0 57.5,12.5 H48 V9.5 A2.5,2.5 0 0,1 48,4.5 Z' fill='%23FACC15'/%3E%3C/svg%3E");
     }
 
     [data-testid="stSidebar"] {
